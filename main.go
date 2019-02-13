@@ -153,7 +153,7 @@ func main() {
 	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 
 	router := httprouter.New()
-	router.GET("/detail", GetDetail)
+	router.GET("/wf", ShowData)
 
 	log.Fatal(http.ListenAndServe(":8000", context.ClearHandler(router)))
 }
@@ -356,8 +356,8 @@ func parseData() {
 	encjson, _ = json.Marshal(mainStruct)
 }
 
-// GetDetail demos
-func GetDetail(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// ShowData
+func ShowData(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write(encjson)
 }
