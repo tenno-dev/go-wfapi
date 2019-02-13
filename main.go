@@ -1,23 +1,49 @@
 package main
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/Anderson-Lu/gofasion/gofasion"
-	"github.com/gorilla/mux"
+	"github.com/gorilla/context"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/julienschmidt/httprouter"
 )
 
 var missiontypelang = []byte(`{}`)
 var factionslang = []byte(`{}`)
-var srcjson = []byte(`{}`)
 var locationlang = []byte(`{}`)
-
+var apidata = []byte(`{}`)
+var encjson = []byte(`{}`)
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
+func loadapidata() {
+	// Missiontypess
+	url := "http://content.warframe.com/pc/dynamic/worldState.php"
+	wfClient := http.Client{
+		Timeout: time.Second * 20, // Maximum of 2 secs
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, getErr := wfClient.Do(req)
+	if getErr != nil {
+		log.Fatal(getErr)
+	}
+	defer res.Body.Close()
+
+	body, readErr := ioutil.ReadAll(res.Body)
+	if readErr != nil {
+		log.Fatal(readErr)
+	}
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+	apidata = body
+}
 func loadlangs() {
 	// Missiontypes
 	url := "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
@@ -39,6 +65,8 @@ func loadlangs() {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
 	missiontypelang = body
 	// Factions
 	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
@@ -60,6 +88,8 @@ func loadlangs() {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
 	factionslang = body
 	// Locations
 	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
@@ -81,65 +111,54 @@ func loadlangs() {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
 	locationlang = body
 }
 func translatetest(src string, langtype string) (ret string) {
-
-	if langtype == "faction" {
-		srcjson = factionslang
-	}
-	if langtype == "missiontype" {
-		srcjson = missiontypelang
-	}
-	if langtype == "location" {
-		srcjson = locationlang
-	}
 	var m map[string]interface{}
 
-	err := json.Unmarshal(srcjson, &m)
-	if err != nil {
-		panic(err)
+	if langtype == "faction" {
+		err := json.Unmarshal(factionslang, &m)
+		if err != nil {
+			panic(err)
+		}
+		x1 := m[src].(map[string]interface{})["value"].(string)
+		ret = string(x1)
 	}
-	x1 := m[src].(map[string]interface{})["value"].(string)
-	ret = string(x1)
-
+	if langtype == "missiontype" {
+		err := json.Unmarshal(missiontypelang, &m)
+		if err != nil {
+			panic(err)
+		}
+		x1 := m[src].(map[string]interface{})["value"].(string)
+		ret = string(x1)
+	}
+	if langtype == "location" {
+		err := json.Unmarshal(locationlang, &m)
+		if err != nil {
+			panic(err)
+		}
+		x1 := m[src].(map[string]interface{})["value"].(string)
+		ret = string(x1)
+	}
 	return ret
+
 }
 
 func main() {
 	loadlangs()
+	loadapidata()
+	parseData()
 	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 
-	router := mux.NewRouter()
-	router.HandleFunc("/detail", GetDetail).Methods("GET")
+	router := httprouter.New()
+	router.GET("/detail", GetDetail)
 
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":8000", context.ClearHandler(router)))
 }
 
-// GetDetail demo
-func GetDetail(w http.ResponseWriter, r *http.Request) {
-	// Currently hardcoded to PC
-	url := "http://content.warframe.com/pc/dynamic/worldState.php"
-	wfClient := http.Client{
-		Timeout: time.Second * 20, // Maximum of 2 secs
-	}
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	res, getErr := wfClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-	defer res.Body.Close()
-
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
+func parseData() {
 	type Eventmessage struct {
 		LanguageCode string
 		Message      string
@@ -208,7 +227,7 @@ func GetDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	mainStruct := Main{Testresult: "Success"}
 
-	fsion := gofasion.NewFasion(string(body[:]))
+	fsion := gofasion.NewFasion(string(apidata[:]))
 	// Event Section
 	Eventarray := fsion.Get("Events").Array()
 	fsion.ValueDefaultStr("-")
@@ -334,6 +353,11 @@ func GetDetail(w http.ResponseWriter, r *http.Request) {
 			mainStruct.SyndicateMissions = append(mainStruct.SyndicateMissions, w)
 		}
 	}
-	encjson, _ := json.Marshal(mainStruct)
-	w.Write(encjson)
+	encjson, _ = json.Marshal(mainStruct)
+}
+
+// GetDetail demos
+func GetDetail(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(encjson)
 }
