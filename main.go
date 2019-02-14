@@ -274,18 +274,30 @@ func parseData(lang string) (ret []byte) {
 		Syndicate string
 		Jobs      []SyndicateJobs
 	}
+
+	type ActiveMissions struct {
+		ID          string
+		Started     int
+		Ends        int
+		Region      int
+		Node        string
+		MissionType string
+		Modifier    string
+	}
 	type Main struct {
 		WorldSeed         string
 		Alerts            []Alerts
 		Events            []Event
 		Sortie            []Sortie
 		SyndicateMissions []SyndicateMissions
+		ActiveMissions    []ActiveMissions
 		Goals             string // As of  13.02.19 : no Goals reported from WF api
 		Testresult        string // Test String
 	}
 	mainStruct := Main{Testresult: "Success"}
 
 	fsion := gofasion.NewFasion(string(apidata[:]))
+
 	// Event Section
 	Eventarray := fsion.Get("Events").Array()
 	fsion.ValueDefaultStr("-")
@@ -420,6 +432,33 @@ func parseData(lang string) (ret []byte) {
 			mainStruct.SyndicateMissions = append(mainStruct.SyndicateMissions, w)
 		}
 	}
+
+	// ActiveMissions Section
+	ActiveMissionsarray := fsion.Get("ActiveMissions").Array()
+
+	for _, v := range ActiveMissionsarray {
+		id := v.Get("_id").Get("$oid").ValueStr()
+		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000
+		ended := v.Get("Expiry").Get("$date").Get("$numberLong").ValueInt() / 1000
+		region := v.Get("Region").ValueInt()
+		node := translatetest(v.Get("Node").ValueStr(), "location", lang)
+		missiontype := translatetest(v.Get("MissionType").ValueStr(), "missiontype", lang)
+		modifier := v.Get("Modifier").ValueStr()
+
+		if int32(ended) > int32(time.Now().Unix()) {
+			w := ActiveMissions{
+				ID:          id,
+				Started:     started,
+				Ends:        ended,
+				Region:      region,
+				Node:        node,
+				MissionType: missiontype,
+				Modifier:    modifier,
+			}
+			mainStruct.ActiveMissions = append(mainStruct.ActiveMissions, w)
+		}
+	}
+
 	ret, _ = json.Marshal(mainStruct)
 	return ret
 }
