@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/Anderson-Lu/gofasion/gofasion"
-	"github.com/gorilla/context"
+	emitter "github.com/emitter-io/go"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/julienschmidt/httprouter"
 )
@@ -203,20 +203,27 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 }
 
 func main() {
-	loadlangs()
-	loadapidata()
-	encjson[1] = parseData("de")
-	encjson[0] = parseData("en")
 	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 
-	router := httprouter.New()
-	router.GET("/wf", ShowData)
-	router.GET("/wf/:lang", ShowData)
+	// mqtt client start
+	o := emitter.NewClientOptions().AddBroker("tcp://0.0.0.0:8080")
+	c := emitter.NewClient(o)
+	sToken := c.Connect()
+	if sToken.Wait() && sToken.Error() != nil {
+		panic("Error on Client.Connect(): " + sToken.Error().Error())
+	}
+	c.Subscribe("xx", "test/")
+	//mqtt client end
 
-	log.Fatal(http.ListenAndServe(":8000", context.ClearHandler(router)))
+	loadlangs()
+	loadapidata()
+	encjson[0] = parseData("en", c)
+	/*
+		multi lang beside english  scraped till i found a better way for the lang files.
+		encjson[1] = parseData("de")
+	*/
 }
-
-func parseData(lang string) (ret []byte) {
+func parseData(lang string, e emitter.Emitter) (ret []byte) {
 	type Eventmessage struct {
 		LanguageCode string
 		Message      string
@@ -458,7 +465,13 @@ func parseData(lang string) (ret []byte) {
 			mainStruct.ActiveMissions = append(mainStruct.ActiveMissions, w)
 		}
 	}
-
+	// test publish to local mqtt broker
+	var test, _ = json.Marshal(mainStruct.Sortie)
+	var test2 = string(test[:])
+	var test3 = `{ "msg":` + test2 + "}"
+	//fmt.Println(test2)
+	e.Publish("xx", "test/", test3)
+	// test publish end
 	ret, _ = json.Marshal(mainStruct)
 	return ret
 }
