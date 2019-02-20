@@ -35,7 +35,6 @@ func loadapidata(id1 int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(res.Body)
 
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
@@ -163,7 +162,7 @@ func main() {
 	for i := 0; i < len(platforms); i++ {
 
 		loadapidata(i)
-		parseAlerts(apidata[i], c)
+		parseInvasions(i, c)
 		wg.Done()
 	}
 	wg.Wait()
@@ -384,7 +383,6 @@ func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
 	}
 
 }
-
 func parseActiveMissions(apidata []byte, e emitter.Emitter) {
 	type ActiveMissions struct {
 		ID          string
@@ -424,8 +422,56 @@ func parseActiveMissions(apidata []byte, e emitter.Emitter) {
 	fmt.Println(len(mission))
 
 }
-func parseInvasions(apidata []byte, e emitter.Emitter) {
+func parseInvasions(id12 int, e emitter.Emitter) {
+	type Invasion struct {
+		ID                  string
+		Location            string
+		MissionType         string
+		Completed           bool
+		Started             int
+		AttackerRewardItem  string `json:",omitempty"`
+		AttackerRewardCount int    `json:",omitempty"`
+		AttackerMissionInfo string `json:",omitempty"`
+		DefenderRewardItem  string `json:",omitempty"`
+		DefenderRewardCount int    `json:",omitempty"`
+		DefenderMissionInfo string `json:",omitempty"`
+	}
 
+	fsion := gofasion.NewFasion(string(apidata[id12][:]))
+	var invasions []Invasion
+	lang := string("en")
+	fmt.Println(fsion.Get("WorldSeed").ValueStr())
+	Invasionarray := fsion.Get("Invasions").Array()
+	for _, v := range Invasionarray {
+		attackeritem := ""
+		attackeritemcount := 0
+		defenderitem := ""
+		defenderitemcount := 0
+		id := v.Get("_id").Get("$oid").ValueStr()                                        //k
+		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000 //k
+		location := translatetest(v.Get("Node").ValueStr(), "location", lang)
+		missiontype := v.Get("LocTag").ValueStr()
+		completed := v.Get("Completed").ValueBool()
+		attackerrewardarray := v.Get("AttackerReward").Get("countedItems").Array()
+		if len(attackerrewardarray) != 0 {
+			attackeritem = attackerrewardarray[0].Get("ItemType").ValueStr()
+			attackeritemcount = attackerrewardarray[0].Get("ItemCount").ValueInt()
+		}
+		attackerfaction := translatetest(v.Get("AttackerMissionInfo").Get("faction").ValueStr(), "faction", lang)
+		defenderrewardarray := v.Get("DefenderReward").Get("countedItems").Array()
+		if len(defenderrewardarray) != 0 {
+			defenderitem = defenderrewardarray[0].Get("ItemType").ValueStr()
+			defenderitemcount = defenderrewardarray[0].Get("ItemCount").ValueInt()
+		}
+		defenderfaction := translatetest(v.Get("DefenderMissionInfo").Get("faction").ValueStr(), "faction", lang)
+
+		w := Invasion{id, location, missiontype, completed, started,
+			attackeritem, attackeritemcount, attackerfaction,
+			defenderitem, defenderitemcount, defenderfaction}
+		invasions = append(invasions, w)
+
+	}
+	fmt.Println(len(invasions))
 }
 
 /*
