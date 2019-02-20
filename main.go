@@ -7,49 +7,39 @@ import (
 	"log"
 	"net/http"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/Anderson-Lu/gofasion/gofasion"
 	emitter "github.com/emitter-io/go"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/julienschmidt/httprouter"
 )
 
 //current supported lang
 var langid = map[string]int{
 	"en": 0,
-	"de": 1,
 }
-var missiontypelang = make([]byte, 2)
-var factionslang = make([][]byte, 2)
-var locationlang = make([][]byte, 2)
-var apidata = make([]byte, 2)
-var encjson = make([][]byte, 2)
+var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
+var missiontypelang = make([]byte, 1)
+var factionslang = make([]byte, 1)
+var locationlang = make([]byte, 1)
+var apidata = make([][]byte, 4)
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func loadapidata() {
+func loadapidata(id1 int) {
 	// WF API Source
-	url := "http://content.warframe.com/pc/dynamic/worldState.php"
-	wfClient := http.Client{
-		Timeout: time.Second * 20, // Maximum of 2 secs
-	}
+	url := "http://content.warframe.com/" + platforms[id1] + "/dynamic/worldState.php"
+	fmt.Println("url:", url)
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
-	res, getErr := wfClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-	defer res.Body.Close()
+	fmt.Println(res.Body)
 
-	body, readErr := ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	apidata = body
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	apidata[id1] = body
 }
 func loadlangs() {
 	// Missiontypes EN
@@ -97,7 +87,7 @@ func loadlangs() {
 	}
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
-	factionslang[langid["en"]] = body
+	factionslang = body
 
 	// Locations EN
 	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
@@ -121,61 +111,13 @@ func loadlangs() {
 	}
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
-	locationlang[langid["en"]] = body
-	// Factions DE
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/l10n/data/de/factionsData.json"
-	wfClient = http.Client{
-		Timeout: time.Second * 20, // Maximum of 2 secs
-	}
-
-	req, err = http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	res, getErr = wfClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-	defer res.Body.Close()
-
-	body, readErr = ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	factionslang[langid["de"]] = body
-
-	// Locations DE
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
-	wfClient = http.Client{
-		Timeout: time.Second * 20, // Maximum of 2 secs
-	}
-
-	req, err = http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	res, getErr = wfClient.Do(req)
-	if getErr != nil {
-		log.Fatal(getErr)
-	}
-	defer res.Body.Close()
-
-	body, readErr = ioutil.ReadAll(res.Body)
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	locationlang[langid["de"]] = body
+	locationlang = body
 }
 func translatetest(src string, langtype string, lang string) (ret string) {
 	var m map[string]interface{}
-	langid := langid[lang]
 
-	if langtype == "faction" && lang == "en" {
-		err := json.Unmarshal(factionslang[langid], &m)
+	if langtype == "faction" {
+		err := json.Unmarshal(factionslang, &m)
 		if err != nil {
 			panic(err)
 		}
@@ -191,7 +133,7 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 		ret = string(x1)
 	}
 	if langtype == "location" {
-		err := json.Unmarshal(locationlang[langid], &m)
+		err := json.Unmarshal(locationlang, &m)
 		if err != nil {
 			panic(err)
 		}
@@ -203,39 +145,42 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(len(platforms))
 	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 
 	// mqtt client start
-	o := emitter.NewClientOptions().AddBroker("tcp://0.0.0.0:8080")
+	o := emitter.NewClientOptions().AddBroker("tcp://0.0.0.0:8090")
 	c := emitter.NewClient(o)
 	sToken := c.Connect()
 	if sToken.Wait() && sToken.Error() != nil {
 		panic("Error on Client.Connect(): " + sToken.Error().Error())
 	}
-	c.Subscribe("xx", "test/")
+	c.Subscribe("yyy", "test/")
 	//mqtt client end
 
 	loadlangs()
-	loadapidata()
-	encjson[0] = parseData("en", c)
-	/*
-		multi lang beside english  scraped till i found a better way for the lang files.
-		encjson[1] = parseData("de")
-	*/
+	for i := 0; i < len(platforms); i++ {
+
+		loadapidata(i)
+		parseAlerts(apidata[i], c)
+		wg.Done()
+	}
+	wg.Wait()
+	PrintMemUsage()
+	/*		parseAlerts(apidata[x], c)
+			parseNews(apidata[x], c)
+			parseSorties(apidata[x], c)
+			parseSyndicateMissions(apidata[x], c)
+	parseActiveMissions(apidata[0], c)
+	parseActiveMissions(apidata[1], c)
+	parseActiveMissions(apidata[2], c)
+	parseActiveMissions(apidata[3], c)*/
+
+	PrintMemUsage()
+
 }
-func parseData(lang string, e emitter.Emitter) (ret []byte) {
-	type Eventmessage struct {
-		LanguageCode string
-		Message      string
-	}
-	type Event struct {
-		ID         string
-		Message    []Eventmessage
-		URL        string
-		Date       string
-		priority   bool
-		mobileonly bool
-	}
+func parseAlerts(apidata []byte, e emitter.Emitter) {
 	type Alerts struct {
 		ID                  string
 		Started             int
@@ -251,97 +196,11 @@ func parseData(lang string, e emitter.Emitter) (ret []byte) {
 		RewardItemManyCount int    `json:",omitempty"`
 		RewardItem          string `json:",omitempty"`
 	}
-	type Sortievariant struct {
-		MissionType     string
-		MissionMod      string
-		MissionLocation string
-		MissionTileset  string
-	}
-	type Sortie struct {
-		ID       string
-		Started  int
-		Ends     int
-		Boss     string
-		Reward   string
-		Variants []Sortievariant
-		Twitter  bool
-	}
-	type SyndicateJobs struct {
-		Jobtype            string
-		Rewards            string
-		MasterrankRequired int
-		MinEnemyLevel      int
-		MaxEnemyLevel      int
-		XpReward           []int `json:"XPRewards"`
-	}
-	type SyndicateMissions struct {
-		ID        string
-		Started   int
-		Ends      int
-		Syndicate string
-		Jobs      []SyndicateJobs
-	}
+	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	var alerts []Alerts
+	lang := string("en")
+	fmt.Println(fsion.Get("WorldSeed").ValueStr())
 
-	type ActiveMissions struct {
-		ID          string
-		Started     int
-		Ends        int
-		Region      int
-		Node        string
-		MissionType string
-		Modifier    string
-	}
-	type Main struct {
-		WorldSeed         string
-		Alerts            []Alerts
-		Events            []Event
-		Sortie            []Sortie
-		SyndicateMissions []SyndicateMissions
-		ActiveMissions    []ActiveMissions
-		Goals             string // As of  13.02.19 : no Goals reported from WF api
-		Testresult        string // Test String
-	}
-	mainStruct := Main{Testresult: "Success"}
-
-	fsion := gofasion.NewFasion(string(apidata[:]))
-
-	// Event Section
-	Eventarray := fsion.Get("Events").Array()
-	fsion.ValueDefaultStr("-")
-	fsion.ValueDefaultInt(0)
-	for _, v := range Eventarray {
-		id := v.Get("_id").Get("$oid").ValueStr()
-		messagearray := v.Get("Messages").Array()
-		var test []Eventmessage
-		for i := range messagearray {
-			if messagearray[i].Get("LanguageCode").ValueStr() == lang {
-				test = append(test, Eventmessage{
-					LanguageCode: messagearray[i].Get("LanguageCode").ValueStr(),
-					Message:      messagearray[i].Get("Message").ValueStr()})
-			}
-			// remove duplicate Items
-			if len(test) > 1 {
-				fmt.Println(len(test))
-				test = append(test[:1])
-			}
-		}
-		url := v.Get("Prop").ValueStr()
-		date := v.Get("Date").Get("$date").Get("$numberLong").ValueStr()
-		priority := v.Get("Priority").ValueBool()
-		mobileonly := v.Get("MobileOnly").ValueBool()
-		w := Event{ID: id, Message: test, URL: url, Date: date, priority: priority, mobileonly: mobileonly}
-		if len(test) != 0 {
-			mainStruct.Events = append(mainStruct.Events, w)
-		}
-	}
-
-	//Goals Section
-	mainStruct.Goals = "No Goals"
-
-	// WorldSeed Section
-	mainStruct.WorldSeed = fsion.Get("WorldSeed").ValueStr()
-
-	// Alerts Section
 	Alertarray := fsion.Get("Alerts").Array()
 	for _, v := range Alertarray {
 		rewarditemsmany := ""
@@ -367,21 +226,86 @@ func parseData(lang string, e emitter.Emitter) (ret []byte) {
 		if len(rewarditemarray) != 0 {
 			rewarditem = rewarditemarray[0].Get("items").ValueStr()
 		}
-		if int32(ended) > int32(time.Now().Unix()) {
+		if ended > int(time.Now().Unix()) {
 			w := Alerts{id, started,
 				ended, missiontype,
 				missionfaction, missionlocation,
 				minEnemyLevel, maxEnemyLevel, enemywaves,
 				rewardcredits, rewarditemsmany, rewarditemsmanycount, rewarditem}
-			mainStruct.Alerts = append(mainStruct.Alerts, w)
+			alerts = append(alerts, w)
+		}
+
+	}
+	fmt.Println(len(alerts))
+}
+func parseNews(apidata []byte, e emitter.Emitter) {
+	type Newsmessage struct {
+		LanguageCode string
+		Message      string
+	}
+	type News struct {
+		ID         string
+		Message    []Newsmessage
+		URL        string
+		Date       string
+		priority   bool
+		mobileonly bool
+	}
+	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	var news []News
+	lang := string("en")
+	Newsarray := fsion.Get("Events").Array()
+	fsion.ValueDefaultStr("-")
+	fsion.ValueDefaultInt(0)
+	for _, v := range Newsarray {
+		id := v.Get("_id").Get("$oid").ValueStr()
+		messagearray := v.Get("Messages").Array()
+		var test []Newsmessage
+		for i := range messagearray {
+			if messagearray[i].Get("LanguageCode").ValueStr() == lang {
+				test = append(test, Newsmessage{
+					LanguageCode: messagearray[i].Get("LanguageCode").ValueStr(),
+					Message:      messagearray[i].Get("Message").ValueStr()})
+			}
+			// remove duplicate Items
+			if len(test) > 1 {
+				test = append(test[:1])
+			}
+		}
+		url := v.Get("Prop").ValueStr()
+		date := v.Get("Date").Get("$date").Get("$numberLong").ValueStr()
+		priority := v.Get("Priority").ValueBool()
+		mobileonly := v.Get("MobileOnly").ValueBool()
+		w := News{ID: id, Message: test, URL: url, Date: date, priority: priority, mobileonly: mobileonly}
+		if len(test) != 0 {
+			news = append(news, w)
 		}
 	}
-
-	// Sorties Section
+}
+func parseSorties(apidata []byte, e emitter.Emitter) {
+	type Sortievariant struct {
+		MissionType     string
+		MissionMod      string
+		MissionLocation string
+		MissionTileset  string
+	}
+	type Sortie struct {
+		ID       string
+		Started  int
+		Ends     int
+		Boss     string
+		Reward   string
+		Variants []Sortievariant
+		Twitter  bool
+	}
+	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	var sortie []Sortie
+	lang := string("en")
 	Sortiearray := fsion.Get("Sorties").Array()
-
 	for _, v := range Sortiearray {
+
 		id := v.Get("_id").Get("$oid").ValueStr()
+
 		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000
 		ended := v.Get("Expiry").Get("$date").Get("$numberLong").ValueInt() / 1000
 		boss := v.Get("Boss").ValueStr()
@@ -396,18 +320,37 @@ func parseData(lang string, e emitter.Emitter) (ret []byte) {
 				MissionTileset:  variantarray[i].Get("tileset").ValueStr(),
 			})
 		}
+
 		twitter := v.Get("Twitter").ValueBool()
 
-		if int32(ended) > int32(time.Now().Unix()) {
-			w := Sortie{ID: id, Started: started,
-				Ends: ended, Boss: boss,
-				Reward: reward, Variants: variants,
-				Twitter: twitter}
-			mainStruct.Sortie = append(mainStruct.Sortie, w)
-		}
+		w := Sortie{ID: id, Started: started,
+			Ends: ended, Boss: boss,
+			Reward: reward, Variants: variants,
+			Twitter: twitter}
+		sortie = append(sortie, w)
 	}
 
-	//SyndicateMissions Section
+}
+func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
+	type SyndicateJobs struct {
+		Jobtype            string
+		Rewards            string
+		MasterrankRequired int
+		MinEnemyLevel      int
+		MaxEnemyLevel      int
+		XpReward           []int `json:"XPRewards"`
+	}
+	type SyndicateMissions struct {
+		ID        string
+		Started   int
+		Ends      int
+		Syndicate string
+		Jobs      []SyndicateJobs
+	}
+
+	fsion := gofasion.NewFasion(string(apidata[:]))
+	var syndicates []SyndicateMissions
+	//lang := string("en")
 	SyndicateMissionsarray := fsion.Get("SyndicateMissions").Array()
 	for _, v := range SyndicateMissionsarray {
 		faction := v.Get("Tag").ValueStr()
@@ -436,12 +379,27 @@ func parseData(lang string, e emitter.Emitter) (ret []byte) {
 				Ends:      ended,
 				Syndicate: syndicate,
 				Jobs:      jobs}
-			mainStruct.SyndicateMissions = append(mainStruct.SyndicateMissions, w)
+			syndicates = append(syndicates, w)
 		}
 	}
 
-	// ActiveMissions Section
+}
+
+func parseActiveMissions(apidata []byte, e emitter.Emitter) {
+	type ActiveMissions struct {
+		ID          string
+		Started     int
+		Ends        int
+		Region      int
+		Node        string
+		MissionType string
+		Modifier    string
+	}
+	fsion := gofasion.NewFasion(string(apidata[:]))
+	var mission []ActiveMissions
+	lang := string("en")
 	ActiveMissionsarray := fsion.Get("ActiveMissions").Array()
+	fmt.Println(len(ActiveMissionsarray))
 
 	for _, v := range ActiveMissionsarray {
 		id := v.Get("_id").Get("$oid").ValueStr()
@@ -452,29 +410,59 @@ func parseData(lang string, e emitter.Emitter) (ret []byte) {
 		missiontype := translatetest(v.Get("MissionType").ValueStr(), "missiontype", lang)
 		modifier := v.Get("Modifier").ValueStr()
 
-		if int32(ended) > int32(time.Now().Unix()) {
-			w := ActiveMissions{
-				ID:          id,
-				Started:     started,
-				Ends:        ended,
-				Region:      region,
-				Node:        node,
-				MissionType: missiontype,
-				Modifier:    modifier,
-			}
-			mainStruct.ActiveMissions = append(mainStruct.ActiveMissions, w)
+		w := ActiveMissions{
+			ID:          id,
+			Started:     started,
+			Ends:        ended,
+			Region:      region,
+			Node:        node,
+			MissionType: missiontype,
+			Modifier:    modifier,
 		}
+		mission = append(mission, w)
 	}
-	// test publish to local mqtt broker
-	var test, _ = json.Marshal(mainStruct.Sortie)
+	fmt.Println(len(mission))
+
+}
+func parseInvasions(apidata []byte, e emitter.Emitter) {
+
+}
+
+/*
+func parseData(lang string, e emitter.Emitter) (ret []byte) {
+
+	type Main struct {
+		WorldSeed  string
+		Goals      string // As of  13.02.19 : no Goals reported from WF api
+		Testresult string // Test String
+	}
+	mainStruct := Main{Testresult: "Success"}
+
+	fsion := gofasion.NewFasion(string(apidata[:]))
+
+	//Goals Section
+	mainStruct.Goals = "No Goals"
+
+	// WorldSeed Section
+	mainStruct.WorldSeed = fsion.Get("WorldSeed").ValueStr()
+
+	// Alerts Section
+	/* test publish to local mqtt broker
+	var test, _ = json.Marshal(mainStruct.Alerts)
 	var test2 = string(test[:])
 	var test3 = `{ "msg":` + test2 + "}"
 	//fmt.Println(test2)
 	e.Publish("xx", "test/", test3)
 	// test publish end
+	// Sorties Section
+
+	//SyndicateMissions Section
+	// ActiveMissions Section
+
 	ret, _ = json.Marshal(mainStruct)
 	return ret
 }
+*/
 
 // PrintMemUsage - only fo debug
 func PrintMemUsage() {
@@ -489,20 +477,4 @@ func PrintMemUsage() {
 
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
-}
-
-// ShowData APIResponse
-func ShowData(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	fmt.Println(p.ByName("lang"))
-	langsel := p.ByName("lang")
-	_, exists := langid[langsel]
-	fmt.Println(exists)
-	if exists == false {
-		_, _ = w.Write([]byte("unknown Langcode"))
-
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write(encjson[langid[langsel]])
-	}
-	PrintMemUsage()
 }
