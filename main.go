@@ -6,12 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
-	"sync"
+	"strings"
 	"time"
 
 	"github.com/Anderson-Lu/gofasion/gofasion"
-	emitter "github.com/emitter-io/go"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -23,22 +24,35 @@ var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
 var missiontypelang = make([]byte, 1)
 var factionslang = make([]byte, 1)
 var locationlang = make([]byte, 1)
+var languageslang = make([]byte, 5486)
 var apidata = make([][]byte, 4)
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func loadapidata(id1 int) {
+var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+	fmt.Printf("TOPIC: %s\n", msg.Topic())
+	fmt.Printf("MSG: %s\n", msg.Payload())
+}
+
+func loadapidata(id1 string) (ret []byte) {
 	// WF API Source
-	url := "http://content.warframe.com/" + platforms[id1] + "/dynamic/worldState.php"
+	client := &http.Client{}
+	url := "http://content.warframe.com/" + id1 + "/dynamic/worldState.php"
 	fmt.Println("url:", url)
 
-	res, err := http.Get(url)
+	req, _ := http.NewRequest("GET", url, nil)
+
+	res, err := client.Do(req)
+
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Errored when sending request to the server")
+		return
 	}
 
 	defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
-	apidata[id1] = body
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
+	return body
 }
 func loadlangs() {
 	// Missiontypes EN
@@ -61,8 +75,6 @@ func loadlangs() {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
 	missiontypelang = body
 	// Factions EN
 	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
@@ -111,6 +123,30 @@ func loadlangs() {
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	locationlang = body
+
+	// Languages EN
+	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/languages.json"
+	wfClient = http.Client{
+		Timeout: time.Second * 60, // Maximum of 2 secs
+	}
+
+	req, err = http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, getErr = wfClient.Do(req)
+	if getErr != nil {
+		log.Fatal(getErr)
+	}
+	defer res.Body.Close()
+
+	body, readErr = ioutil.ReadAll(res.Body)
+	if readErr != nil {
+		log.Fatal(readErr)
+	}
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+	fmt.Println("langfile loaded")
+	languageslang = body
 }
 func translatetest(src string, langtype string, lang string) (ret string) {
 	var m map[string]interface{}
@@ -139,34 +175,90 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 		x1 := m[src].(map[string]interface{})["value"].(string)
 		ret = string(x1)
 	}
+	if langtype == "languages" {
+		var obj interface{} // Parse json into an interface{}
+		err := json.Unmarshal(languageslang, &obj)
+		if err != nil {
+			panic(err)
+		}
+		m := obj.(map[string]interface{}) // Important: to access property
+		foomap := m[strings.ToLower(src)]
+		x1 := src
+		if foomap != nil {
+			x1 = foomap.(map[string]interface{})["value"].(string)
+		}
+
+		ret = x1
+	}
 	return ret
 
 }
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(len(platforms))
-	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 
+	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 	// mqtt client start
-	o := emitter.NewClientOptions().AddBroker("tcp://0.0.0.0:8090")
-	c := emitter.NewClient(o)
-	sToken := c.Connect()
-	if sToken.Wait() && sToken.Error() != nil {
-		panic("Error on Client.Connect(): " + sToken.Error().Error())
+	mqtt.DEBUG = log.New(os.Stdout, "", 0)
+	mqtt.ERROR = log.New(os.Stdout, "", 0)
+	opts := mqtt.NewClientOptions().AddBroker("tcp://localhost:1883").SetClientID("gotrivial")
+	//opts.SetKeepAlive(2 * time.Second)
+	opts.SetDefaultPublishHandler(f)
+	//opts.SetPingTimeout(1 * time.Second)
+
+	c := mqtt.NewClient(opts)
+	if token := c.Connect(); token.Wait() && token.Error() != nil {
+		panic(token.Error())
 	}
-	c.Subscribe("yyy", "test/")
+	if token := c.Subscribe("test/topic", 0, nil); token.Wait() && token.Error() != nil {
+		fmt.Println(token.Error())
+		os.Exit(1)
+	}
+	time.Sleep(1 * time.Second)
 	//mqtt client end
 
 	loadlangs()
-	for i := 0; i < len(platforms); i++ {
-
-		loadapidata(i)
-		parseInvasions(i, c)
-		wg.Done()
+	for x, v := range platforms {
+		fmt.Println("x:", x)
+		fmt.Println("v:", v)
+		apidata[x] = loadapidata(v)
 	}
-	wg.Wait()
 	PrintMemUsage()
+
+	for x, v := range platforms {
+		fmt.Println("x:", x)
+		fmt.Println("v:", v)
+		//parseTests(apidata[x], v, nil)
+		parseAlerts(apidata[x], v, c)
+		parseNews(apidata[x], v, c)
+		parseSorties(apidata[x], v, c)
+		parseSyndicateMissions(apidata[x], v, c)
+		parseActiveMissions(apidata[x], v, c)
+		parseInvasions(apidata[x], v, c)
+	}
+	ticker := time.NewTicker(time.Second * 60)
+	go func() {
+		for t := range ticker.C {
+			fmt.Println("Tick at", t)
+			for x, v := range platforms {
+				fmt.Println("x:", x)
+				fmt.Println("v:", v)
+				//parseTests(apidata[x], v, nil)
+				parseAlerts(apidata[x], v, c)
+				parseNews(apidata[x], v, c)
+				parseSorties(apidata[x], v, c)
+				parseSyndicateMissions(apidata[x], v, c)
+				parseActiveMissions(apidata[x], v, c)
+				parseInvasions(apidata[x], v, c)
+
+			}
+			PrintMemUsage()
+
+		}
+	}()
+	time.Sleep(time.Second * 180)
+
+	//ticker.Stop()
+	fmt.Println("Ticker stopped")
 	/*		parseAlerts(apidata[x], c)
 			parseNews(apidata[x], c)
 			parseSorties(apidata[x], c)
@@ -176,10 +268,19 @@ func main() {
 	parseActiveMissions(apidata[2], c)
 	parseActiveMissions(apidata[3], c)*/
 
-	PrintMemUsage()
-
 }
-func parseAlerts(apidata []byte, e emitter.Emitter) {
+
+func hiHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hi"))
+}
+func parseTests(apidata []byte, platform string, c mqtt.Client) {
+	fsion := gofasion.NewFasion(string(apidata[:]))
+	fmt.Println(fsion.Get("WorldSeed").ValueStr())
+	topicf := "/wf/" + platform + "/tests"
+	fmt.Println(topicf)
+}
+
+func parseAlerts(apidata []byte, platform string, c mqtt.Client) {
 	type Alerts struct {
 		ID                  string
 		Started             int
@@ -195,11 +296,9 @@ func parseAlerts(apidata []byte, e emitter.Emitter) {
 		RewardItemManyCount int    `json:",omitempty"`
 		RewardItem          string `json:",omitempty"`
 	}
-	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	fsion := gofasion.NewFasion(string(apidata[:]))
 	var alerts []Alerts
 	lang := string("en")
-	fmt.Println(fsion.Get("WorldSeed").ValueStr())
-
 	Alertarray := fsion.Get("Alerts").Array()
 	for _, v := range Alertarray {
 		rewarditemsmany := ""
@@ -218,12 +317,12 @@ func parseAlerts(apidata []byte, e emitter.Emitter) {
 		rewardcredits := v.Get("MissionInfo").Get("missionReward").Get("credits").ValueInt()
 		rewarditemsmanyarray := v.Get("MissionInfo").Get("missionReward").Get("countedItems").Array()
 		if len(rewarditemsmanyarray) != 0 {
-			rewarditemsmany = rewarditemsmanyarray[0].Get("ItemType").ValueStr()
+			rewarditemsmany = translatetest(rewarditemsmanyarray[0].Get("ItemType").ValueStr(), "languages", "en")
 			rewarditemsmanycount = rewarditemsmanyarray[0].Get("ItemCount").ValueInt()
 		}
 		rewarditemarray := v.Get("MissionInfo").Get("missionReward").Get("items").Array()
 		if len(rewarditemarray) != 0 {
-			rewarditem = rewarditemarray[0].Get("items").ValueStr()
+			rewarditem = translatetest(rewarditemarray[0].Get("items").ValueStr(), "languages", "en")
 		}
 		if ended > int(time.Now().Unix()) {
 			w := Alerts{id, started,
@@ -235,9 +334,14 @@ func parseAlerts(apidata []byte, e emitter.Emitter) {
 		}
 
 	}
+	topicf := "/wf/" + platform + "/alerts"
+	messageJSON, _ := json.Marshal(alerts)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+
 	fmt.Println(len(alerts))
 }
-func parseNews(apidata []byte, e emitter.Emitter) {
+func parseNews(apidata []byte, platform string, c mqtt.Client) {
 	type Newsmessage struct {
 		LanguageCode string
 		Message      string
@@ -248,15 +352,17 @@ func parseNews(apidata []byte, e emitter.Emitter) {
 		URL        string
 		Date       string
 		priority   bool
+		Image      string
 		mobileonly bool
 	}
-	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	fsion := gofasion.NewFasion(string(apidata[:]))
 	var news []News
 	lang := string("en")
 	Newsarray := fsion.Get("Events").Array()
 	fsion.ValueDefaultStr("-")
 	fsion.ValueDefaultInt(0)
 	for _, v := range Newsarray {
+		image := "http://n9e5v4d8.ssl.hwcdn.net/uploads/e0b4d18d3330bb0e62dcdcb364d5f004.png"
 		id := v.Get("_id").Get("$oid").ValueStr()
 		messagearray := v.Get("Messages").Array()
 		var test []Newsmessage
@@ -273,15 +379,23 @@ func parseNews(apidata []byte, e emitter.Emitter) {
 		}
 		url := v.Get("Prop").ValueStr()
 		date := v.Get("Date").Get("$date").Get("$numberLong").ValueStr()
+		if strings.HasPrefix(v.Get("ImageUrl").ValueStr(), "http") {
+			image = v.Get("ImageUrl").ValueStr()
+		}
 		priority := v.Get("Priority").ValueBool()
 		mobileonly := v.Get("MobileOnly").ValueBool()
-		w := News{ID: id, Message: test, URL: url, Date: date, priority: priority, mobileonly: mobileonly}
+		w := News{ID: id, Message: test, URL: url, Date: date, Image: image, priority: priority, mobileonly: mobileonly}
 		if len(test) != 0 {
 			news = append(news, w)
 		}
 	}
+	topicf := "/wf/" + platform + "/news"
+	messageJSON, _ := json.Marshal(news)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+
 }
-func parseSorties(apidata []byte, e emitter.Emitter) {
+func parseSorties(apidata []byte, platform string, c mqtt.Client) {
 	type Sortievariant struct {
 		MissionType     string
 		MissionMod      string
@@ -297,7 +411,7 @@ func parseSorties(apidata []byte, e emitter.Emitter) {
 		Variants []Sortievariant
 		Twitter  bool
 	}
-	fsion := gofasion.NewFasion(string(apidata[:][:]))
+	fsion := gofasion.NewFasion(string(apidata[:]))
 	var sortie []Sortie
 	lang := string("en")
 	Sortiearray := fsion.Get("Sorties").Array()
@@ -328,9 +442,13 @@ func parseSorties(apidata []byte, e emitter.Emitter) {
 			Twitter: twitter}
 		sortie = append(sortie, w)
 	}
+	topicf := "/wf/" + platform + "/sorties"
+	messageJSON, _ := json.Marshal(sortie)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
 
 }
-func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
+func parseSyndicateMissions(apidata []byte, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype            string
 		Rewards            string
@@ -346,7 +464,6 @@ func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
 		Syndicate string
 		Jobs      []SyndicateJobs
 	}
-
 	fsion := gofasion.NewFasion(string(apidata[:]))
 	var syndicates []SyndicateMissions
 	//lang := string("en")
@@ -364,8 +481,8 @@ func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
 				xparray := jobarray[i].Get("xpAmounts").Array()
 				//xp1 :=
 				jobs = append(jobs, SyndicateJobs{
-					Jobtype:            jobarray[i].Get("jobType").ValueStr(),
-					Rewards:            jobarray[i].Get("rewards").ValueStr(),
+					Jobtype:            translatetest(jobarray[i].Get("jobType").ValueStr(), "languages", "en"),
+					Rewards:            translatetest(jobarray[i].Get("rewards").ValueStr(), "languages", "en"),
 					MasterrankRequired: jobarray[i].Get("masteryReq").ValueInt(),
 					MinEnemyLevel:      jobarray[i].Get("minEnemyLevel").ValueInt(),
 					MaxEnemyLevel:      jobarray[i].Get("maxEnemyLevel").ValueInt(),
@@ -381,9 +498,13 @@ func parseSyndicateMissions(apidata []byte, e emitter.Emitter) {
 			syndicates = append(syndicates, w)
 		}
 	}
+	topicf := "/wf/" + platform + "/syndicates"
+	messageJSON, _ := json.Marshal(syndicates)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
 
 }
-func parseActiveMissions(apidata []byte, e emitter.Emitter) {
+func parseActiveMissions(apidata []byte, platform string, c mqtt.Client) {
 	type ActiveMissions struct {
 		ID          string
 		Started     int
@@ -420,9 +541,12 @@ func parseActiveMissions(apidata []byte, e emitter.Emitter) {
 		mission = append(mission, w)
 	}
 	fmt.Println(len(mission))
-
+	topicf := "/wf/" + platform + "/missions"
+	messageJSON, _ := json.Marshal(mission)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
 }
-func parseInvasions(id12 int, e emitter.Emitter) {
+func parseInvasions(apidata []byte, platform string, c mqtt.Client) {
 	type Invasion struct {
 		ID                  string
 		Location            string
@@ -437,17 +561,19 @@ func parseInvasions(id12 int, e emitter.Emitter) {
 		DefenderMissionInfo string `json:",omitempty"`
 	}
 
-	fsion := gofasion.NewFasion(string(apidata[id12][:]))
+	fsion := gofasion.NewFasion(string(apidata[:]))
 	var invasions []Invasion
 	lang := string("en")
-	fmt.Println(fsion.Get("WorldSeed").ValueStr())
+	//	text := fsion.Get("WorldSeed").ValueStr()
+
 	Invasionarray := fsion.Get("Invasions").Array()
 	for _, v := range Invasionarray {
 		attackeritem := ""
 		attackeritemcount := 0
 		defenderitem := ""
 		defenderitemcount := 0
-		id := v.Get("_id").Get("$oid").ValueStr()                                        //k
+		id := v.Get("_id").Get("$oid").ValueStr()
+		//k
 		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000 //k
 		location := translatetest(v.Get("Node").ValueStr(), "location", lang)
 		missiontype := v.Get("LocTag").ValueStr()
@@ -471,46 +597,13 @@ func parseInvasions(id12 int, e emitter.Emitter) {
 		invasions = append(invasions, w)
 
 	}
-	fmt.Println(len(invasions))
+	topicf := "/wf/" + platform + "/invasions"
+	messageJSON, _ := json.Marshal(invasions)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
 }
 
-/*
-func parseData(lang string, e emitter.Emitter) (ret []byte) {
-
-	type Main struct {
-		WorldSeed  string
-		Goals      string // As of  13.02.19 : no Goals reported from WF api
-		Testresult string // Test String
-	}
-	mainStruct := Main{Testresult: "Success"}
-
-	fsion := gofasion.NewFasion(string(apidata[:]))
-
-	//Goals Section
-	mainStruct.Goals = "No Goals"
-
-	// WorldSeed Section
-	mainStruct.WorldSeed = fsion.Get("WorldSeed").ValueStr()
-
-	// Alerts Section
-	/* test publish to local mqtt broker
-	var test, _ = json.Marshal(mainStruct.Alerts)
-	var test2 = string(test[:])
-	var test3 = `{ "msg":` + test2 + "}"
-	//fmt.Println(test2)
-	e.Publish("xx", "test/", test3)
-	// test publish end
-	// Sorties Section
-
-	//SyndicateMissions Section
-	// ActiveMissions Section
-
-	ret, _ = json.Marshal(mainStruct)
-	return ret
-}
-*/
-
-// PrintMemUsage - only fo debug
+// PrintMemUsage - only for debug
 func PrintMemUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
