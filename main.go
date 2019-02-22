@@ -230,7 +230,7 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 	}
 	if langtype == "location" {
 		x := src + ".value"
-		jsonParsed, _ := gabs.ParseJSON(languageslang)
+		jsonParsed, _ := gabs.ParseJSON(locationlang)
 		value, ok := jsonParsed.Path(x).Data().(string)
 
 		x1 := src
@@ -242,6 +242,7 @@ func translatetest(src string, langtype string, lang string) (ret string) {
 	}
 	if langtype == "languages" {
 		x := src + ".value"
+		x = strings.ToLower(x)
 		jsonParsed, _ := gabs.ParseJSON(languageslang)
 		value, ok := jsonParsed.Path(x).Data().(string)
 
