@@ -1,2 +1,3 @@
 bin/golangci-lint
 main
+test.go2

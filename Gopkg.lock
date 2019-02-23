@@ -10,14 +10,6 @@
   version = "v1.1"
 
 [[projects]]
-  digest = "1:608b2b045f70e1c7002181db5d614fe8edf6a70bd151c2abcb8928af002bc17b"
-  name = "github.com/Jeffail/gabs"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "74ef14cf8f407ee3ca8ec01bb6f52d6104edea80"
-  version = "v1.2.0"
-
-[[projects]]
   digest = "1:184008c955d6a3226b700c13ed0e875a7a051a759618f9bccba9b5c99f17faa5"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
@@ -53,6 +45,22 @@
   version = "1.0.1"
 
 [[projects]]
+  digest = "1:cfa0d7741863a0e1d30e0ccdd4b48a96a471cdb47892303de8b92c3713af3e77"
+  name = "github.com/pkg/profile"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5b67d428864e92711fcbd2f8629456121a56d91f"
+  version = "v1.2.1"
+
+[[projects]]
+  digest = "1:ed615c5430ecabbb0fb7629a182da65ecee6523900ac1ac932520860878ffcad"
+  name = "github.com/robfig/cron"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b41be1df696709bb6395fe435af20370037c0b4c"
+  version = "v1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:7b9fdf110cdbe98f41436d1d3b6e0c648920dab6f36a399a8e688c70ae3c7c92"
   name = "golang.org/x/net"
@@ -69,9 +77,10 @@
   analyzer-version = 1
   input-imports = [
     "github.com/Anderson-Lu/gofasion/gofasion",
-    "github.com/Jeffail/gabs",
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/json-iterator/go",
+    "github.com/pkg/profile",
+    "github.com/robfig/cron",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
