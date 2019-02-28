@@ -2,12 +2,12 @@
 
 
 [[projects]]
-  digest = "1:176f6905c83eeee949eda443cb1130b1da88d96c12f24075fcca4736a22e6057"
+  digest = "1:655cb9890d3814a04c493691e213b709d559ee27ab4359046351d4a4e9756113"
   name = "github.com/Anderson-Lu/gofasion"
   packages = ["gofasion"]
   pruneopts = "UT"
-  revision = "6a28a70a7265e838519bed59f953311a8b8c4975"
-  version = "v1.1"
+  revision = "eaab36385eeaac8e5c8371bb547da2f2dbd5a742"
+  version = "v1.2"
 
 [[projects]]
   digest = "1:184008c955d6a3226b700c13ed0e875a7a051a759618f9bccba9b5c99f17faa5"
