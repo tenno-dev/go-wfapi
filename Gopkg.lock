@@ -10,6 +10,14 @@
   version = "v1.2"
 
 [[projects]]
+  branch = "master"
+  digest = "1:69e7139f6d546cc6ffc9ca98e7f4cfe95be479f4044eb30bb92017b5b87c9d40"
+  name = "github.com/buger/jsonparser"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "bf1c66bbce23153d89b23f8960071a680dbef54b"
+
+[[projects]]
   digest = "1:184008c955d6a3226b700c13ed0e875a7a051a759618f9bccba9b5c99f17faa5"
   name = "github.com/eclipse/paho.mqtt.golang"
   packages = [
@@ -53,14 +61,6 @@
   version = "v1.2.1"
 
 [[projects]]
-  digest = "1:ed615c5430ecabbb0fb7629a182da65ecee6523900ac1ac932520860878ffcad"
-  name = "github.com/robfig/cron"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "b41be1df696709bb6395fe435af20370037c0b4c"
-  version = "v1.1"
-
-[[projects]]
   branch = "master"
   digest = "1:7b9fdf110cdbe98f41436d1d3b6e0c648920dab6f36a399a8e688c70ae3c7c92"
   name = "golang.org/x/net"
@@ -70,17 +70,17 @@
     "websocket",
   ]
   pruneopts = "UT"
-  revision = "3a22650c66bd7f4fb6d1e8072ffd7b75c8a27898"
+  revision = "92fc7df08ae7536330f5a21328292abfa70520a8"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/Anderson-Lu/gofasion/gofasion",
+    "github.com/buger/jsonparser",
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/json-iterator/go",
     "github.com/pkg/profile",
-    "github.com/robfig/cron",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

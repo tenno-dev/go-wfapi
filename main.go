@@ -88,8 +88,9 @@ func main() {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
 		apidata[x] = loadapidata(v)
-		parseAlerts(x, v, c)
-		parseNews(x, v, c)
+		//parseAlerts(x, v, c)
+		//parseNews(x, v, c)
+		parseSorties(x, v, c)
 
 	}
 	PrintMemUsage()
@@ -260,58 +261,67 @@ func parseNews(platformno int, platform string, c mqtt.Client) {
 	}, "news")
 }
 
-/*
 func parseSorties(platformno int, platform string, c mqtt.Client) {
 	type Sortievariant struct {
 		MissionType     string
 		MissionMod      string
+		MissionModDesc  string
 		MissionLocation string
 	}
 	type Sortie struct {
-		ID      string
-		Started int
-		Ends    int
-		Boss    string
-		//Reward   string
+		ID       string
+		Started  string
+		Ends     string
+		Boss     string
+		Reward   string
 		Variants []Sortievariant
-		Twitter  bool
+		Active   bool
 	}
-	data := &apidata[platformno]
-	fsion := gofasion.NewFasion(*data)
+	fmt.Println("reached sortie start")
+	data := apidata[platformno]
+	sortieactive, sortieerr := jsonparser.GetBoolean(data, "sortie", "active")
+	if sortieerr != nil || sortieactive != true {
+		fmt.Println("reached sortie error")
+
+		return
+	}
+	fmt.Println("reached sortie start2")
+
 	var sortie []Sortie
-	lang := string("en")
-	Sortiearray := fsion.Get("Sorties").Array()
-	for _, v := range Sortiearray {
+	id, _ := jsonparser.GetString(data, "sortie", "id")
+	started, _ := jsonparser.GetString(data, "sortie", "activation")
+	ended, _ := jsonparser.GetString(data, "sortie", "expiry")
+	boss, _ := jsonparser.GetString(data, "sortie", "boss")
+	reward, _ := jsonparser.GetString(data, "sortie", "rewardPool")
+	var variants []Sortievariant
 
-		id := v.Get("_id").Get("$oid").ValueStr()
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		mtype, _ := jsonparser.GetString(value, "missionType")
+		mmod, _ := jsonparser.GetString(value, "modifier")
+		mmoddesc, _ := jsonparser.GetString(value, "modifierDescription")
+		mloc, _ := jsonparser.GetString(value, "node")
 
-		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000
-		ended := v.Get("Expiry").Get("$date").Get("$numberLong").ValueInt() / 1000
-		boss := v.Get("Boss").ValueStr()
-		//reward := sortierewards
-		variantarray := v.Get("Variants").Array()
-		var variants []Sortievariant
-		for i := range variantarray {
-			variants = append(variants, Sortievariant{
-				MissionType:     variantarray[i].Get("missionType").ValueStr(),
-				MissionMod:      variantarray[i].Get("modifierType").ValueStr(),
-				MissionLocation: variantarray[i].Get("node").ValueStr(),
-			})
-		}
+		variants = append(variants, Sortievariant{
+			MissionType:     mtype,
+			MissionMod:      mmod,
+			MissionModDesc:  mmoddesc,
+			MissionLocation: mloc,
+		})
+	}, "sortie", "variants")
+	active, _ := jsonparser.GetBoolean(data, "sortie", "active")
+	w := Sortie{ID: id, Started: started,
+		Ends: ended, Boss: boss, Reward: reward, Variants: variants,
+		Active: active}
+	sortie = append(sortie, w)
 
-		twitter := v.Get("Twitter").ValueBool()
-
-		w := Sortie{ID: id, Started: started,
-			Ends: ended, Boss: boss, Variants: variants,
-			Twitter: twitter}
-		sortie = append(sortie, w)
-	}
 	topicf := "/wf/" + platform + "/sorties"
 	messageJSON, _ := json.Marshal(sortie)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 
 }
+
+/*
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype            string
