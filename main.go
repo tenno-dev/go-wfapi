@@ -89,6 +89,7 @@ func main() {
 		fmt.Println("v:", v)
 		apidata[x] = loadapidata(v)
 		parseAlerts(x, v, c)
+		parseNews(x, v, c)
 
 	}
 	PrintMemUsage()
@@ -179,8 +180,6 @@ func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	}
 	fmt.Println("alert reached")
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		fmt.Println(jsonparser.GetString(value, "id"))
-
 		id, _ := jsonparser.GetString(value, "id")
 		started, _ := jsonparser.GetString(value, "activation")
 		ended, _ := jsonparser.GetString(value, "expiry")
@@ -212,62 +211,56 @@ func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	fmt.Println(len(alerts))
 }
 
-/*
 func parseNews(platformno int, platform string, c mqtt.Client) {
 	type Newsmessage struct {
 		LanguageCode string
 		Message      string
 	}
 	type News struct {
-		ID         string
-		Message    []Newsmessage
-		URL        string
-		Date       string
-		priority   bool
-		Image      string
-		mobileonly bool
+		ID       string
+		Message  string
+		URL      string
+		Date     string
+		priority bool
+		Image    string
 	}
-	data := &apidata[platformno]
-	fsion := gofasion.NewFasion(*data)
+	data := apidata[platformno]
+	_, _, _, ernews := jsonparser.Get(data, "alerts")
+	fmt.Println(ernews)
+	if ernews != nil {
+		fmt.Println("error ernews reached")
+		return
+	}
 	var news []News
-	lang := string("en")
-	Newsarray := fsion.Get("Events").Array()
-	fsion.ValueDefaultStr("-")
-	fsion.ValueDefaultInt(0)
-	for _, v := range Newsarray {
-		image := "http://n9e5v4d8.ssl.hwcdn.net/uploads/e0b4d18d3330bb0e62dcdcb364d5f004.png"
-		id := v.Get("_id").Get("$oid").ValueStr()
-		messagearray := v.Get("Messages").Array()
-		var test []Newsmessage
-		for i := range messagearray {
-			if messagearray[i].Get("LanguageCode").ValueStr() == lang {
-				test = append(test, Newsmessage{
-					LanguageCode: messagearray[i].Get("LanguageCode").ValueStr(),
-					Message:      messagearray[i].Get("Message").ValueStr()})
-			}
-			// remove duplicate Items
-			if len(test) > 1 {
-				test = append(test[:1])
-			}
-		}
-		url := v.Get("Prop").ValueStr()
-		date := v.Get("Date").Get("$date").Get("$numberLong").ValueStr()
-		if strings.HasPrefix(v.Get("ImageUrl").ValueStr(), "http") {
-			image = v.Get("ImageUrl").ValueStr()
-		}
-		priority := v.Get("Priority").ValueBool()
-		mobileonly := v.Get("MobileOnly").ValueBool()
-		w := News{ID: id, Message: test, URL: url, Date: date, Image: image, priority: priority, mobileonly: mobileonly}
-		if len(test) != 0 {
-			news = append(news, w)
-		}
-	}
-	topicf := "/wf/" + platform + "/news"
-	messageJSON, _ := json.Marshal(news)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		_, _, _, translationerr := jsonparser.Get(value, "translations", "en")
+		if translationerr != nil {
+			return
+		}
+		image := "http://n9e5v4d8.ssl.hwcdn.net/uploads/e0b4d18d3330bb0e62dcdcb364d5f004.png"
+		message := ""
+		id, _ := jsonparser.GetString(value, "id")
+
+		message, _ = jsonparser.GetString(value, "translations", "en")
+		url, _ := jsonparser.GetString(value, "link")
+		image, _ = jsonparser.GetString(value, "imageLink")
+		date, _ := jsonparser.GetString(value, "date")
+		/**/
+		priority, _ := jsonparser.GetBoolean(value, "priority")
+		w := News{ID: id, Message: message, URL: url, Date: date, Image: image, priority: priority}
+		news = append(news, w)
+		fmt.Println(news)
+
+		topicf := "/wf/" + platform + "/news"
+		messageJSON, _ := json.Marshal(news)
+		token := c.Publish(topicf, 0, true, messageJSON)
+		token.Wait()
+
+	}, "news")
 }
+
+/*
 func parseSorties(platformno int, platform string, c mqtt.Client) {
 	type Sortievariant struct {
 		MissionType     string
