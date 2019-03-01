@@ -61,6 +61,14 @@
   version = "v1.2.1"
 
 [[projects]]
+  digest = "1:ed615c5430ecabbb0fb7629a182da65ecee6523900ac1ac932520860878ffcad"
+  name = "github.com/robfig/cron"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "b41be1df696709bb6395fe435af20370037c0b4c"
+  version = "v1.1"
+
+[[projects]]
   branch = "master"
   digest = "1:7b9fdf110cdbe98f41436d1d3b6e0c648920dab6f36a399a8e688c70ae3c7c92"
   name = "golang.org/x/net"
@@ -70,7 +78,7 @@
     "websocket",
   ]
   pruneopts = "UT"
-  revision = "92fc7df08ae7536330f5a21328292abfa70520a8"
+  revision = "16b79f2e4e95ea23b2bf9903c9809ff7b013ce85"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -81,6 +89,7 @@
     "github.com/eclipse/paho.mqtt.golang",
     "github.com/json-iterator/go",
     "github.com/pkg/profile",
+    "github.com/robfig/cron",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

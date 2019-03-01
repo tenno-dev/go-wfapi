@@ -11,6 +11,7 @@ import (
 	"runtime"
 
 	"github.com/buger/jsonparser"
+	"github.com/robfig/cron"
 
 	"github.com/Anderson-Lu/gofasion/gofasion"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -88,33 +89,43 @@ func main() {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
 		apidata[x] = loadapidata(v)
-		//parseAlerts(x, v, c)
-		//parseNews(x, v, c)
+		parseAlerts(x, v, c)
+		parseNews(x, v, c)
 		parseSorties(x, v, c)
+		parseSyndicateMissions(x, v, c)
+
+		PrintMemUsage()
 
 	}
 	PrintMemUsage()
-	/*
-		c1 := cron.New()
-		c1.AddFunc("@every 1m1s", func() {
 
-			fmt.Println("Tick")
-			for x, v := range platforms {
-				fmt.Println("x:", x)
-				fmt.Println("v:", v)
-				apidata[x] = loadapidata(v)
-				parseTests(x, v, nil)
-				/*
-					parseNews(x, v, c)
-					parseSyndicateMissions(x, v, c)
-					parseActiveMissions(x, v, c)
-					parseInvasions(x, v, c)
-					parseSorties(x, v, c)
+	c1 := cron.New()
+	c1.AddFunc("@every 1m1s", func() {
 
-			}
-		})
-		c1.Start()
-	*/
+		fmt.Println("Tick")
+		for x, v := range platforms {
+			fmt.Println("x:", x)
+			fmt.Println("v:", v)
+			apidata[x] = loadapidata(v)
+			parseAlerts(x, v, c)
+			parseNews(x, v, c)
+			parseSorties(x, v, c)
+			parseSyndicateMissions(x, v, c)
+
+			PrintMemUsage()
+
+		}
+		/*
+				parseNews(x, v, c)
+				parseSyndicateMissions(x, v, c)
+				parseActiveMissions(x, v, c)
+				parseInvasions(x, v, c)
+				parseSorties(x, v, c)
+
+		}*/
+	})
+	c1.Start()
+
 	PrintMemUsage()
 
 	// just for debuging - printing  full warframe api response
@@ -208,8 +219,6 @@ func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	messageJSON, _ := json.Marshal(alerts)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
-
-	fmt.Println(len(alerts))
 }
 
 func parseNews(platformno int, platform string, c mqtt.Client) {
@@ -226,8 +235,7 @@ func parseNews(platformno int, platform string, c mqtt.Client) {
 		Image    string
 	}
 	data := apidata[platformno]
-	_, _, _, ernews := jsonparser.Get(data, "alerts")
-	fmt.Println(ernews)
+	_, _, _, ernews := jsonparser.Get(data, "news")
 	if ernews != nil {
 		fmt.Println("error ernews reached")
 		return
@@ -251,8 +259,6 @@ func parseNews(platformno int, platform string, c mqtt.Client) {
 		priority, _ := jsonparser.GetBoolean(value, "priority")
 		w := News{ID: id, Message: message, URL: url, Date: date, Image: image, priority: priority}
 		news = append(news, w)
-		fmt.Println(news)
-
 		topicf := "/wf/" + platform + "/news"
 		messageJSON, _ := json.Marshal(news)
 		token := c.Publish(topicf, 0, true, messageJSON)
@@ -321,64 +327,72 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 
 }
 
-/*
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
-		Jobtype            string
-		Rewards            string
-		MasterrankRequired int
-		MinEnemyLevel      int
-		MaxEnemyLevel      int
-		XpReward           []int `json:"XPRewards"`
+		Jobtype        string
+		Rewards        []string
+		MinEnemyLevel  int64
+		MaxEnemyLevel  int64
+		StandingReward []int64
 	}
 	type SyndicateMissions struct {
 		ID        string
-		Started   int
-		Ends      int
+		Started   string
+		Ends      string
 		Syndicate string
 		Jobs      []SyndicateJobs
 	}
-	data := &apidata[platformno]
-	fsion := gofasion.NewFasion(*data)
+	data := apidata[platformno]
 	var syndicates []SyndicateMissions
-	//lang := string("en")
-	SyndicateMissionsarray := fsion.Get("SyndicateMissions").Array()
-	for _, v := range SyndicateMissionsarray {
-		faction := v.Get("Tag").ValueStr()
-		if faction == "SolarisSyndicate" || faction == "CetusSyndicate" {
-			id := v.Get("_id").Get("$oid").ValueStr()
-			started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000
-			ended := v.Get("Expiry").Get("$date").Get("$numberLong").ValueInt() / 1000
-			syndicate := faction
-			jobarray := v.Get("Jobs").Array()
-			var jobs []SyndicateJobs
-			for i := range jobarray {
-				xparray := jobarray[i].Get("xpAmounts").Array()
-				//xp1 :=
-				jobs = append(jobs, SyndicateJobs{
-					Jobtype:            jobarray[i].Get("jobType").ValueStr(),
-					Rewards:            jobarray[i].Get("rewards").ValueStr(),
-					MasterrankRequired: jobarray[i].Get("masteryReq").ValueInt(),
-					MinEnemyLevel:      jobarray[i].Get("minEnemyLevel").ValueInt(),
-					MaxEnemyLevel:      jobarray[i].Get("maxEnemyLevel").ValueInt(),
-					XpReward:           []int{int(xparray[0].ValueInt()), int(xparray[1].ValueInt()), int(xparray[2].ValueInt())},
-				})
-			}
-			w := SyndicateMissions{
-				ID:        id,
-				Started:   started,
-				Ends:      ended,
-				Syndicate: syndicate,
-				Jobs:      jobs}
-			syndicates = append(syndicates, w)
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		syndicatecheck, _ := jsonparser.GetString(value, "syndicate")
+		if syndicatecheck != "Ostrons" && syndicatecheck != "Solaris United" {
+			return
 		}
-	}
+		id, _ := jsonparser.GetString(value, "id")
+		started, _ := jsonparser.GetString(value, "activation")
+		ended, _ := jsonparser.GetString(value, "expiry")
+		syndicate, _ := jsonparser.GetString(value, "syndicate")
+		var jobs []SyndicateJobs
+		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
+			jobtype, _ := jsonparser.GetString(value1, "type")
+			rewards := make([]string, 0)
+			jsonparser.ArrayEach(value1, func(reward []byte, dataType jsonparser.ValueType, offset int, err error) {
+				rewards = append(rewards, string(reward))
+
+			}, "rewardPool")
+
+			minEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[0]")
+			maxEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[1]")
+			standing1, _ := jsonparser.GetInt(value1, "standingStages", "[0]")
+			standing2, _ := jsonparser.GetInt(value1, "standingStages", "[1]")
+			standing3, _ := jsonparser.GetInt(value1, "standingStages", "[2]")
+			jobs = append(jobs, SyndicateJobs{
+				Jobtype:        jobtype,
+				Rewards:        rewards,
+				MinEnemyLevel:  minEnemyLevel,
+				MaxEnemyLevel:  maxEnemyLevel,
+				StandingReward: []int64{standing1, standing2, standing3},
+			})
+		}, "jobs")
+
+		w := SyndicateMissions{
+			ID:        id,
+			Started:   started,
+			Ends:      ended,
+			Syndicate: syndicate,
+			Jobs:      jobs}
+		syndicates = append(syndicates, w)
+	}, "syndicateMissions")
+
 	topicf := "/wf/" + platform + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 
 }
+
+/*
 func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 	type ActiveMissions struct {
 		ID          string
