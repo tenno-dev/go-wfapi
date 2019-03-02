@@ -93,6 +93,7 @@ func main() {
 		parseNews(x, v, c)
 		parseSorties(x, v, c)
 		parseSyndicateMissions(x, v, c)
+		parseInvasions(x, v, c)
 
 		PrintMemUsage()
 
@@ -111,16 +112,14 @@ func main() {
 			parseNews(x, v, c)
 			parseSorties(x, v, c)
 			parseSyndicateMissions(x, v, c)
+			parseInvasions(x, v, c)
 
 			PrintMemUsage()
 
 		}
 		/*
-				parseNews(x, v, c)
-				parseSyndicateMissions(x, v, c)
 				parseActiveMissions(x, v, c)
 				parseInvasions(x, v, c)
-				parseSorties(x, v, c)
 
 		}*/
 	})
@@ -391,6 +390,66 @@ func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	token.Wait()
 
 }
+func parseInvasions(platformno int, platform string, c mqtt.Client) {
+	type Invasion struct {
+		ID                  string
+		Location            string
+		MissionType         string
+		Completed           bool
+		Started             string
+		VsInfested          bool
+		AttackerRewardItem  string `json:",omitempty"`
+		AttackerRewardCount int64  `json:",omitempty"`
+		AttackerMissionInfo string `json:",omitempty"`
+		DefenderRewardItem  string `json:",omitempty"`
+		DefenderRewardCount int64  `json:",omitempty"`
+		DefenderMissionInfo string `json:",omitempty"`
+		Completion          float64
+	}
+
+	data := apidata[platformno]
+	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
+	if len(invasioncheck) == 0 {
+		return
+	}
+	var invasions []Invasion
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		iscomplete, _ := jsonparser.GetBoolean(value, "completed")
+		if iscomplete != true {
+			attackeritem := ""
+			attackeritemcount := int64(0)
+			defenderitem := ""
+			defenderitemcount := int64(0)
+			id, _ := jsonparser.GetString(value, "id")
+			started, _ := jsonparser.GetString(value, "activation")
+			location, _ := jsonparser.GetString(value, "node")
+			missiontype, _ := jsonparser.GetString(value, "desc")
+			completed, _ := jsonparser.GetBoolean(value, "completed")
+			vsinfested, _ := jsonparser.GetBoolean(value, "vsInfestation")
+			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
+				attackeritem, _ = jsonparser.GetString(value1, "type")
+				attackeritemcount, _ = jsonparser.GetInt(value1, "count")
+			}, "attackerReward")
+			attackerfaction, _ := jsonparser.GetString(value, "attackingFaction")
+			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
+				defenderitem, _ = jsonparser.GetString(value1, "type")
+				defenderitemcount, _ = jsonparser.GetInt(value1, "count")
+			}, "defenderReward")
+
+			defenderfaction, _ := jsonparser.GetString(value, "defendingFaction")
+			completion, _ := jsonparser.GetFloat(value, "completion")
+			w := Invasion{id, location, missiontype, completed, started, vsinfested,
+				attackeritem, attackeritemcount, attackerfaction,
+				defenderitem, defenderitemcount, defenderfaction, completion}
+			invasions = append(invasions, w)
+		}
+	}, "invasions")
+
+	topicf := "/wf/" + platform + "/invasions"
+	messageJSON, _ := json.Marshal(invasions)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+}
 
 /*
 func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
@@ -436,62 +495,7 @@ func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-func parseInvasions(platformno int, platform string, c mqtt.Client) {
-	type Invasion struct {
-		ID                  string
-		Location            string
-		MissionType         string
-		Completed           bool
-		Started             int
-		AttackerRewardItem  string `json:",omitempty"`
-		AttackerRewardCount int    `json:",omitempty"`
-		AttackerMissionInfo string `json:",omitempty"`
-		DefenderRewardItem  string `json:",omitempty"`
-		DefenderRewardCount int    `json:",omitempty"`
-		DefenderMissionInfo string `json:",omitempty"`
-		Completion          float32
-	}
-
-	data := &apidata[platformno]
-	fsion := gofasion.NewFasion(*data)
-	var invasions []Invasion
-	lang := string("en")
-	Invasionarray := fsion.Get("Invasions").Array()
-	for _, v := range Invasionarray {
-		attackeritem := ""
-		attackeritemcount := 0
-		defenderitem := ""
-		defenderitemcount := 0
-		id := v.Get("_id").Get("$oid").ValueStr()
-		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000 //k
-		location := v.Get("Node").ValueStr()
-		missiontype := v.Get("LocTag").ValueStr()
-		completed := v.Get("Completed").ValueBool()
-		attackerrewardarray := v.Get("AttackerReward").Get("countedItems").Array()
-		if len(attackerrewardarray) != 0 {
-			attackeritem = attackerrewardarray[0].Get("ItemType").ValueStr()
-			attackeritemcount = attackerrewardarray[0].Get("ItemCount").ValueInt()
-		}
-		attackerfaction := v.Get("AttackerMissionInfo").Get("faction").ValueStr()
-		defenderrewardarray := v.Get("DefenderReward").Get("countedItems").Array()
-		if len(defenderrewardarray) != 0 {
-			defenderitem = defenderrewardarray[0].Get("ItemType").ValueStr()
-			defenderitemcount = defenderrewardarray[0].Get("ItemCount").ValueInt()
-		}
-		defenderfaction := v.Get("DefenderMissionInfo").Get("faction").ValueStr()
-		completion := calcCompletion(v.Get("Count").ValueInt(), v.Get("Goal").ValueInt(), attackerfaction)
-		if v.Get("Completed").ValueBool() != true {
-			w := Invasion{id, location, missiontype, completed, started,
-				attackeritem, attackeritemcount, attackerfaction,
-				defenderitem, defenderitemcount, defenderfaction, completion}
-			invasions = append(invasions, w)
-		}
-	}
-	topicf := "/wf/" + platform + "/invasions"
-	messageJSON, _ := json.Marshal(invasions)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}*/
+*/
 func calcCompletion(count int, goal int, attacker string) (complete float32) {
 	y := float32((1 + float32(count)/float32(goal)))
 	x := float32(y * 50)
