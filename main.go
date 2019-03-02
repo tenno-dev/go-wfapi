@@ -70,7 +70,7 @@ func main() {
 	// mqtt client start
 	mqtt.DEBUG = log.New(os.Stdout, "", 0)
 	mqtt.ERROR = log.New(os.Stdout, "", 0)
-	opts := mqtt.NewClientOptions().AddBroker("tcp://localhost:1883").SetClientID("gotrivial")
+	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:1883").SetClientID("gotrivial")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
@@ -94,7 +94,7 @@ func main() {
 		parseSorties(x, v, c)
 		parseSyndicateMissions(x, v, c)
 		parseInvasions(x, v, c)
-
+		parseCycles(x, v, c)
 		PrintMemUsage()
 
 	}
@@ -113,6 +113,7 @@ func main() {
 			parseSorties(x, v, c)
 			parseSyndicateMissions(x, v, c)
 			parseInvasions(x, v, c)
+			parseCycles(x, v, c)
 
 			PrintMemUsage()
 
@@ -219,7 +220,52 @@ func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
+func parseCycles(platformno int, platform string, c mqtt.Client) {
+	type Cycles struct {
+		EathID         string
+		EarthEnds      string
+		EarthIsDay     bool
+		EarthTimeleft  string
+		CetusID        string
+		CetusEnds      string
+		CetusIsDay     bool
+		CetusIsCetus   bool
+		CetusTimeleft  string
+		VallisID       string
+		VallisEnds     string
+		VallisIsWarm   bool
+		VallisTimeleft string
+	}
+	data := apidata[platformno]
+	var cycles []Cycles
+	fmt.Println("Cycles reached")
+	//  Earth
+	earthid, _ := jsonparser.GetString(data, "earthCycle", "id")
+	earthends, _ := jsonparser.GetString(data, "earthCycle", "expiry")
+	earthisday, _ := jsonparser.GetBoolean(data, "earthCycle", "isDay")
+	earthtimeleft, _ := jsonparser.GetString(data, "earthCycle", "timeLeft")
+	// Cetus
+	cetusid, _ := jsonparser.GetString(data, "cetusCycle", "id")
+	cetusends, _ := jsonparser.GetString(data, "cetusCycle", "expiry")
+	cetusisday, _ := jsonparser.GetBoolean(data, "cetusCycle", "isDay")
+	cetusiscetus, _ := jsonparser.GetBoolean(data, "cetusCycle", "isCetus")
+	cetustimeleft, _ := jsonparser.GetString(data, "cetusCycle", "timeLeft")
+	// Vallis
+	vallisid, _ := jsonparser.GetString(data, "vallisCycle", "id")
+	vallisends, _ := jsonparser.GetString(data, "vallisCycle", "expiry")
+	vallisiswarm, _ := jsonparser.GetBoolean(data, "vallisCycle", "isDay")
+	vallistimeleft, _ := jsonparser.GetString(data, "vallisCycle", "timeLeft")
 
+	w := Cycles{earthid, earthends, earthisday, earthtimeleft,
+		cetusid, cetusends, cetusisday, cetusiscetus, cetustimeleft,
+		vallisid, vallisends, vallisiswarm, vallistimeleft}
+	cycles = append(cycles, w)
+
+	topicf := "/wf/" + platform + "/cycles"
+	messageJSON, _ := json.Marshal(cycles)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+}
 func parseNews(platformno int, platform string, c mqtt.Client) {
 	type Newsmessage struct {
 		LanguageCode string
@@ -278,6 +324,7 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 		Started  string
 		Ends     string
 		Boss     string
+		Faction  string
 		Reward   string
 		Variants []Sortievariant
 		Active   bool
@@ -297,6 +344,7 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 	started, _ := jsonparser.GetString(data, "sortie", "activation")
 	ended, _ := jsonparser.GetString(data, "sortie", "expiry")
 	boss, _ := jsonparser.GetString(data, "sortie", "boss")
+	faction, _ := jsonparser.GetString(data, "sortie", "faction")
 	reward, _ := jsonparser.GetString(data, "sortie", "rewardPool")
 	var variants []Sortievariant
 
@@ -315,7 +363,7 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 	}, "sortie", "variants")
 	active, _ := jsonparser.GetBoolean(data, "sortie", "active")
 	w := Sortie{ID: id, Started: started,
-		Ends: ended, Boss: boss, Reward: reward, Variants: variants,
+		Ends: ended, Boss: boss, Faction: faction, Reward: reward, Variants: variants,
 		Active: active}
 	sortie = append(sortie, w)
 
