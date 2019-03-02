@@ -95,6 +95,7 @@ func main() {
 		parseSyndicateMissions(x, v, c)
 		parseInvasions(x, v, c)
 		parseCycles(x, v, c)
+		parseFissures(x, v, c)
 		PrintMemUsage()
 
 	}
@@ -114,6 +115,7 @@ func main() {
 			parseSyndicateMissions(x, v, c)
 			parseInvasions(x, v, c)
 			parseCycles(x, v, c)
+			parseFissures(x, v, c)
 
 			PrintMemUsage()
 
@@ -266,6 +268,52 @@ func parseCycles(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
+func parseFissures(platformno int, platform string, c mqtt.Client) {
+	type Fissures struct {
+		ID              string
+		Started         string
+		Ends            string
+		Active          bool
+		MissionType     string
+		MissionFaction  string
+		MissionLocation string
+		Tier            string
+		TierLevel       int64
+		Expired         bool
+	}
+	data := apidata[platformno]
+	var fissures []Fissures
+	fmt.Println("Fissues  reached")
+	_, _, _, errfissures := jsonparser.Get(data, "fissures")
+	if errfissures != nil {
+		fmt.Println("error alert reached")
+		return
+	}
+	fmt.Println("alert reached")
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		id, _ := jsonparser.GetString(value, "id")
+		started, _ := jsonparser.GetString(value, "activation")
+		ended, _ := jsonparser.GetString(value, "expiry")
+		active, _ := jsonparser.GetBoolean(value, "active")
+		location, _ := jsonparser.GetString(value, "node")
+		missiontype, _ := jsonparser.GetString(value, "missionType")
+		faction, _ := jsonparser.GetString(value, "enemy")
+		tier, _ := jsonparser.GetString(value, "tier")
+		tiernum, _ := jsonparser.GetInt(value, "tierNum")
+		expired, _ := jsonparser.GetBoolean(value, "expired")
+
+		w := Fissures{id, started, ended, active,
+			missiontype, faction, location, tier, tiernum,
+			expired}
+		fissures = append(fissures, w)
+	}, "fissures")
+
+	topicf := "/wf/" + platform + "/fissures"
+	messageJSON, _ := json.Marshal(fissures)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+}
+
 func parseNews(platformno int, platform string, c mqtt.Client) {
 	type Newsmessage struct {
 		LanguageCode string
