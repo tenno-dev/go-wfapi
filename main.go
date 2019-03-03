@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -23,6 +22,8 @@ import (
 var langid = map[string]int{
 	"en": 0,
 }
+var bempty = "[{}]"
+
 var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
 var missiontypelang map[string]interface{}
 var factionslang map[string]interface{}
@@ -66,15 +67,15 @@ func loadapidata(id1 string) (ret []byte) {
 }
 func main() {
 	defer profile.Start(profile.MemProfile).Stop()
+
 	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 	// mqtt client start
-	mqtt.DEBUG = log.New(os.Stdout, "", 0)
-	mqtt.ERROR = log.New(os.Stdout, "", 0)
-	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:1883").SetClientID("gotrivial")
+	//mqtt.DEBUG = log.New(os.Stdout, "", 0)
+	//mqtt.ERROR = log.New(os.Stdout, "", 0)
+	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
-
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
@@ -96,6 +97,9 @@ func main() {
 		parseInvasions(x, v, c)
 		parseCycles(x, v, c)
 		parseFissures(x, v, c)
+		parseDarvo(x, v, c)
+		parseEvents(x, v, c)
+
 		PrintMemUsage()
 
 	}
@@ -116,7 +120,8 @@ func main() {
 			parseInvasions(x, v, c)
 			parseCycles(x, v, c)
 			parseFissures(x, v, c)
-
+			parseDarvo(x, v, c)
+			parseEvents(x, v, c)
 			PrintMemUsage()
 
 		}
@@ -189,6 +194,9 @@ func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	_, _, _, erralert := jsonparser.Get(data, "alerts")
 	fmt.Println(erralert)
 	if erralert != nil {
+		topicf := "/wf/" + platform + "/alerts"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
 		fmt.Println("error alert reached")
 		return
 	}
@@ -286,6 +294,9 @@ func parseFissures(platformno int, platform string, c mqtt.Client) {
 	fmt.Println("Fissues  reached")
 	_, _, _, errfissures := jsonparser.Get(data, "fissures")
 	if errfissures != nil {
+		topicf := "/wf/" + platform + "/fissures"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
 		fmt.Println("error alert reached")
 		return
 	}
@@ -313,7 +324,97 @@ func parseFissures(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
+func parseDarvo(platformno int, platform string, c mqtt.Client) {
+	type DarvoDeals struct {
+		ID              string
+		Ends            string
+		Item            string
+		Price           int64
+		DealPrice       int64
+		DiscountPercent int64
+		Stock           int64
+		Sold            int64
+	}
+	data := apidata[platformno]
+	var deals []DarvoDeals
+	fmt.Println("Darvo  reached")
+	errfissures, _ := jsonparser.GetString(data, "dailyDeals")
+	if errfissures != "" {
+		topicf := "/wf/" + platform + "/darvodeals"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
+		fmt.Println("error Darvo reached")
+		return
+	}
+	fmt.Println("alert reached")
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		id, _ := jsonparser.GetString(value, "id")
+		ended, _ := jsonparser.GetString(value, "expiry")
+		item, _ := jsonparser.GetString(value, "item")
+		originalprice, _ := jsonparser.GetInt(value, "originalPrice")
+		dealprice, _ := jsonparser.GetInt(value, "salePrice")
+		stock, _ := jsonparser.GetInt(value, "total")
+		sold, _ := jsonparser.GetInt(value, "sold")
+		discount, _ := jsonparser.GetInt(value, "discount")
 
+		w := DarvoDeals{id, ended, item, originalprice, dealprice,
+			discount, stock, sold}
+		deals = append(deals, w)
+	}, "dailyDeals")
+
+	topicf := "/wf/" + platform + "/darvodeals"
+	messageJSON, _ := json.Marshal(deals)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+}
+func parseEvents(platformno int, platform string, c mqtt.Client) {
+	type Events struct {
+		ID              string
+		Started         string
+		Ends            string
+		Active          bool
+		MaxScore        int64
+		CurrScore       int64
+		Faction         string
+		Description     string
+		Tooltip         string
+		ConcurrentNodes string //subject to change when api  has data for it
+		Rewards         string //subject to change when api  has data for it
+		Expired         bool
+	}
+	data := apidata[platformno]
+	var events []Events
+	fmt.Println("Events  reached")
+	errfissures, _ := jsonparser.GetString(data, "Eveventsents")
+	if errfissures != "" {
+		topicf := "/wf/" + platform + "/events"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
+		fmt.Println("error Events reached")
+		return
+	}
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		id, _ := jsonparser.GetString(value, "id")
+		started, _ := jsonparser.GetString(value, "activation")
+		ended, _ := jsonparser.GetString(value, "expiry")
+		active, _ := jsonparser.GetBoolean(value, "active")
+		maximumScore, _ := jsonparser.GetInt(value, "maximumScore")
+		currentScore, _ := jsonparser.GetInt(value, "currentScore")
+		faction, _ := jsonparser.GetString(value, "faction")
+		description, _ := jsonparser.GetString(value, "description")
+		tooltip, _ := jsonparser.GetString(value, "tooltip")
+		expired, _ := jsonparser.GetBoolean(value, "expired")
+
+		w := Events{id, started, ended, active, maximumScore, currentScore, faction,
+			description, tooltip, "", "", expired}
+		events = append(events, w)
+	}, "events")
+
+	topicf := "/wf/" + platform + "/events"
+	messageJSON, _ := json.Marshal(events)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+}
 func parseNews(platformno int, platform string, c mqtt.Client) {
 	type Newsmessage struct {
 		LanguageCode string
@@ -381,6 +482,9 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 	data := apidata[platformno]
 	sortieactive, sortieerr := jsonparser.GetBoolean(data, "sortie", "active")
 	if sortieerr != nil || sortieactive != true {
+		topicf := "/wf/" + platform + "/sorties"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
 		fmt.Println("reached sortie error")
 
 		return
@@ -506,6 +610,9 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	data := apidata[platformno]
 	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
 	if len(invasioncheck) == 0 {
+		topicf := "/wf/" + platform + "/invasions"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
 		return
 	}
 	var invasions []Invasion
