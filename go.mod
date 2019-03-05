@@ -3,7 +3,7 @@ module github.com/bitti09/go-wfapi
 go 1.12
 
 require (
-	github.com/Anderson-Lu/gofasion v0.0.0-20190227113711-eaab36385eea
+	github.com/Anderson-Lu/gofasion v0.0.0-20190305171323-b543c3d48a9c
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
 	github.com/eclipse/paho.mqtt.golang v1.1.1
 	github.com/json-iterator/go v1.1.5

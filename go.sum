@@ -1,5 +1,6 @@
 github.com/Anderson-Lu/gofasion v0.0.0-20190227113711-eaab36385eea h1:5WIz1VDMKPZ/a5oE14oCDtqwQiDQbc66ujh57u2Dj7k=
 github.com/Anderson-Lu/gofasion v0.0.0-20190227113711-eaab36385eea/go.mod h1:nJfnu9e1b/lczgULa3laeoUzeadR3ylEgYj8zpXO+Wc=
+github.com/Anderson-Lu/gofasion v0.0.0-20190305171323-b543c3d48a9c/go.mod h1:nJfnu9e1b/lczgULa3laeoUzeadR3ylEgYj8zpXO+Wc=
 github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23 h1:D21IyuvjDCshj1/qq+pCNd3VZOAEI9jy6Bi131YlXgI=
 github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23/go.mod h1:bbYlZJ7hK1yFx9hf58LP0zeX7UjIGs20ufpu3evjr+s=
 github.com/eclipse/paho.mqtt.golang v1.1.1 h1:iPJYXJLaViCshRTW/PSqImSS6HJ2Rf671WR0bXZ2GIU=
