@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,9 +13,7 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/robfig/cron"
 
-	"github.com/Anderson-Lu/gofasion/gofasion"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/profile"
 )
 
@@ -37,7 +36,6 @@ var sortielang map[string]interface{}
 var languageslang map[string]interface{}
 var apidata = make([][]byte, 4)
 var sortierewards = ""
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("TOPIC: %s\n", msg.Topic())
@@ -68,7 +66,6 @@ func loadapidata(id1 string) (ret []byte) {
 func main() {
 	defer profile.Start(profile.MemProfile).Stop()
 
-	gofasion.SetJsonParser(jsoniter.ConfigCompatibleWithStandardLibrary.Marshal, jsoniter.ConfigCompatibleWithStandardLibrary.Unmarshal)
 	// mqtt client start
 	//mqtt.DEBUG = log.New(os.Stdout, "", 0)
 	//mqtt.ERROR = log.New(os.Stdout, "", 0)
@@ -170,13 +167,6 @@ func sayHello3(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(message))
 }
-func parseTests(nor int, platform string, c mqtt.Client) {
-	fsion := gofasion.NewFasion(string(apidata[nor]))
-	fmt.Println(fsion.Get("WorldSeed").ValueStr())
-	topicf := "/wf/" + platform + "/tests"
-	fmt.Println(topicf)
-}
-
 func parseAlerts(platformno int, platform string, c mqtt.Client) {
 	type Alerts struct {
 		ID                  string
