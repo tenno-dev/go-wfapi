@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/buger/jsonparser"
 	"github.com/robfig/cron"
@@ -465,6 +466,8 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		Active          bool
 		MaxScore        int64
 		CurrScore       int64
+		Health          float64
+		Health1         string
 		Faction         string
 		Description     string
 		Tooltip         string
@@ -492,12 +495,15 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		rewarditems := ""
 		rewardcredits := int64(0)
+		health := float64(0)
 		id, _ := jsonparser.GetString(value, "id")
 		started, _ := jsonparser.GetString(value, "activation")
 		ended, _ := jsonparser.GetString(value, "expiry")
 		active, _ := jsonparser.GetBoolean(value, "active")
 		maximumScore, _ := jsonparser.GetInt(value, "maximumScore")
 		currentScore, _ := jsonparser.GetInt(value, "currentScore")
+		health1, _ := jsonparser.GetString(value, "health")
+		health, _ = strconv.ParseFloat(health1, 64)
 		faction, _ := jsonparser.GetString(value, "faction")
 		description, _ := jsonparser.GetString(value, "description")
 		tooltip, _ := jsonparser.GetString(value, "tooltip")
@@ -507,7 +513,7 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		personal, _ := jsonparser.GetBoolean(value, "isPersonal")
 		commu, _ := jsonparser.GetBoolean(value, "isCommunity")
 
-		w := Events{id, started, ended, active, maximumScore, currentScore, faction,
+		w := Events{id, started, ended, active, maximumScore, currentScore, health, health1, faction,
 			description, tooltip, "", rewarditems, rewardcredits, "", "", personal, commu, expired}
 		events = append(events, w)
 	}, "events")
