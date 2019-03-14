@@ -69,7 +69,7 @@ func main() {
 	// mqtt client start
 	//mqtt.DEBUG = log.New(os.Stdout, "", 0)
 	//mqtt.ERROR = log.New(os.Stdout, "", 0)
-	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial")
+	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial2")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	opts.SetUsername("x")
@@ -142,7 +142,7 @@ func main() {
 	http.HandleFunc("/2", sayHello2)
 	http.HandleFunc("/3", sayHello3)
 
-	if err := http.ListenAndServe(":8090", nil); err != nil {
+	if err := http.ListenAndServe(":9090", nil); err != nil {
 		panic(err)
 	}
 
@@ -550,7 +550,6 @@ func parseNews(platformno int, platform string, c mqtt.Client) {
 
 	}, "news")
 }
-
 func parseSorties(platformno int, platform string, c mqtt.Client) {
 	type Sortievariant struct {
 		MissionType     string
@@ -615,7 +614,6 @@ func parseSorties(platformno int, platform string, c mqtt.Client) {
 	token.Wait()
 
 }
-
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype        string
@@ -719,16 +717,17 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 			missiontype, _ := jsonparser.GetString(value, "desc")
 			completed, _ := jsonparser.GetBoolean(value, "completed")
 			vsinfested, _ := jsonparser.GetBoolean(value, "vsInfestation")
-			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-				attackeritem, _ = jsonparser.GetString(value1, "type")
-				attackeritemcount, _ = jsonparser.GetInt(value1, "count")
-			}, "attackerReward")
+			_, _, _, ierror := jsonparser.Get(value, "attackerReward", "countedItems", "[0]", "type")
+			if ierror == nil {
+				attackeritem, _ = jsonparser.GetString(value, "attackerReward", "countedItems", "[0]", "type")
+				attackeritemcount, _ = jsonparser.GetInt(value, "attackerReward", "countedItems", "[0]", "count")
+			}
 			attackerfaction, _ := jsonparser.GetString(value, "attackingFaction")
-			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-				defenderitem, _ = jsonparser.GetString(value1, "type")
-				defenderitemcount, _ = jsonparser.GetInt(value1, "count")
-			}, "defenderReward")
-
+			_, _, _, ierror2 := jsonparser.Get(value, "defenderReward", "countedItems", "[0]", "type")
+			if ierror2 == nil {
+				defenderitem, _ = jsonparser.GetString(value, "defenderReward", "countedItems", "[0]", "type")
+				defenderitemcount, _ = jsonparser.GetInt(value, "defenderReward", "countedItems", "[0]", "count")
+			}
 			defenderfaction, _ := jsonparser.GetString(value, "defendingFaction")
 			completion, _ := jsonparser.GetFloat(value, "completion")
 			w := Invasion{id, location, missiontype, completed, started, vsinfested,
