@@ -469,11 +469,17 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		Description     string
 		Tooltip         string
 		ConcurrentNodes string //subject to change when api  has data for it
-		Rewards         string //subject to change when api  has data for it
+		Rewarditem      string
+		Rewardcredits   int64
+		interimSteps    string
+		progressSteps   string //subject to change when api  has data for it
+		PersonalEvent   bool
+		CommunityEvent  bool
 		Expired         bool
 	}
 	data := apidata[platformno]
 	var events []Events
+
 	fmt.Println("Events  reached")
 	errfissures, _ := jsonparser.GetString(data, "Eveventsents")
 	if errfissures != "" {
@@ -484,6 +490,8 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		return
 	}
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		rewarditems := ""
+		rewardcredits := int64(0)
 		id, _ := jsonparser.GetString(value, "id")
 		started, _ := jsonparser.GetString(value, "activation")
 		ended, _ := jsonparser.GetString(value, "expiry")
@@ -494,9 +502,13 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		description, _ := jsonparser.GetString(value, "description")
 		tooltip, _ := jsonparser.GetString(value, "tooltip")
 		expired, _ := jsonparser.GetBoolean(value, "expired")
+		rewarditems, _ = jsonparser.GetString(value, "rewards", "[0]", "items", "[0]")
+		rewardcredits, _ = jsonparser.GetInt(value, "rewards", "[0]", "credits", "[0]")
+		personal, _ := jsonparser.GetBoolean(value, "isPersonal")
+		commu, _ := jsonparser.GetBoolean(value, "isCommunity")
 
 		w := Events{id, started, ended, active, maximumScore, currentScore, faction,
-			description, tooltip, "", "", expired}
+			description, tooltip, "", rewarditems, rewardcredits, "", "", personal, commu, expired}
 		events = append(events, w)
 	}, "events")
 
