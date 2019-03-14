@@ -10,7 +10,7 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-
+	"strings"
 	"github.com/buger/jsonparser"
 	"github.com/robfig/cron"
 
@@ -556,6 +556,10 @@ func parseNews(platformno int, platform string, c mqtt.Client) {
 		message, _ = jsonparser.GetString(value, "translations", "en")
 		url, _ := jsonparser.GetString(value, "link")
 		image, _ = jsonparser.GetString(value, "imageLink")
+		if (strings.HasPrefix(image, "https://forums.warframe.com")) {
+			image =strings.Split(image, "=")[1]
+					image = strings.Split(image, "&key")[0]
+		}
 		date, _ := jsonparser.GetString(value, "date")
 		/**/
 		priority, _ := jsonparser.GetBoolean(value, "priority")
