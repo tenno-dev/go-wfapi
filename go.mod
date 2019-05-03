@@ -11,5 +11,5 @@ require (
 	github.com/pkg/profile v1.2.1
 	github.com/robfig/cron v0.0.0-20180505203441-b41be1df6967
 	github.com/stretchr/testify v1.3.0 // indirect
-	golang.org/x/net v0.0.0-20190311194143-d8887717615a // indirect
+	golang.org/x/net v0.0.0-20190503194553-f4e77d36d62c // indirect
 )
