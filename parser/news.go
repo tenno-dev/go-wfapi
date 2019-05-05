@@ -18,7 +18,7 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 		priority bool
 		Image    string
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	_, _, _, ernews := jsonparser.Get(data, "Events")
 	if ernews != nil {
 		fmt.Println("error ernews reached")

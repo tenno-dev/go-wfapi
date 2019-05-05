@@ -7,8 +7,8 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
-
-var apidata [][]byte
+// Apidata downloaded api data
+var Apidata [][]byte
 // ParseAlerts parsing Alerts data
 func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	type Alerts struct {
@@ -26,7 +26,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 		RewardItemManyCount int64  `json:",omitempty"`
 		RewardItem          string `json:",omitempty"`
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var alerts []Alerts
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
 	fmt.Println(erralert)

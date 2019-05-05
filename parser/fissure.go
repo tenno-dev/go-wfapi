@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -22,7 +23,7 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 		TierLevel       string
 		Expired         bool
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var fissures []Fissures
 	fmt.Println("Fissues  reached")
 	_, _, _, errfissures := jsonparser.Get(data, "ActiveMissions")
