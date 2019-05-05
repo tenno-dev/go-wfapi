@@ -1,6 +1,6 @@
 bin/golangci-lint
 main
 test.go2
-
+.vscode/
 *.exe
 filename
