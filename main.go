@@ -55,8 +55,8 @@ var synthTargets   map[string]interface{}
 var upgradeTypes   map[string]interface{}
 var warframes   map[string]interface{}//
 var weapons  map[string]interface{}
-// langdata end
-var Apidata = make([][]byte, 4)
+// Apidata downloaded api data
+var Apidata [][]byte
 var sortierewards = ""
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
