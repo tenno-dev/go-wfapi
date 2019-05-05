@@ -55,8 +55,8 @@ var synthTargets   map[string]interface{}
 var upgradeTypes   map[string]interface{}
 var warframes   map[string]interface{}//
 var weapons  map[string]interface{}
-// langdata end
-var apidata = make([][]byte, 4)
+// Apidata downloaded api data
+var Apidata [][]byte
 var sortierewards = ""
 
 var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -64,7 +64,7 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("MSG: %s\n", msg.Payload())
 }
 
-func loadapidata(id1 string) (ret []byte) {
+func loadApidata(id1 string) (ret []byte) {
 	// WF API Source
 	client := &http.Client{}
 
@@ -427,7 +427,7 @@ func main() {
 	for x, v := range platforms {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
-		apidata[x] = loadapidata(v)
+		Apidata[x] = loadApidata(v)
 			for x1, v1 := range langpool {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
@@ -460,7 +460,7 @@ func main() {
 		for x, v := range platforms {
 			fmt.Println("x:", x)
 			fmt.Println("v:", v)
-		apidata[x] = loadapidata(v)
+		Apidata[x] = loadApidata(v)
 			for x1, v1 := range langpool {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
@@ -508,7 +508,7 @@ func parseCycles(platformno int, platform string, c mqtt.Client , lang string) {
 		VallisIsWarm   bool
 		VallisTimeleft string
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var cycles []Cycles
 	fmt.Println("Cycles reached")
 	//  Earth
@@ -549,7 +549,7 @@ func parseDarvo(platformno int, platform string, c mqtt.Client) {
 		Stock           int64
 		Sold            int64
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var deals []DarvoDeals
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "dailyDeals")
@@ -623,7 +623,7 @@ func parseNightwave(platformno int, platform string, c mqtt.Client) {
 		WeeklyChallenges      []WeeklyChallenges
 		WeeklyEliteChallenges []WeeklyEliteChallenges
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var nightwave []Nightwave
 	var dchallenge []DailyChallenges
 	var wchallenge []WeeklyChallenges
@@ -699,7 +699,7 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		CommunityEvent  bool
 		Expired         bool
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var events []Events
 
 	fmt.Println("Events  reached")
@@ -759,7 +759,7 @@ func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 		Syndicate string
 		Jobs      []SyndicateJobs
 	}
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	var syndicates []SyndicateMissions
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		syndicatecheck, _ := jsonparser.GetString(value, "syndicate")
@@ -825,7 +825,7 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 		Completion          float64
 	}
 
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
 	if len(invasioncheck) == 0 {
 		topicf := "/wf/" + platform + "/"+ langtest + "/invasions"
@@ -884,7 +884,7 @@ func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 		MissionType string
 		Modifier    string
 	}
-	data := &apidata[platformno]
+	data := &Apidata[platformno]
 	fsion := gofasion.NewFasion(*data)
 	var mission []ActiveMissions
 	lang := string("en")

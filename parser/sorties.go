@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -27,7 +28,7 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 		Active   bool
 	}
 	fmt.Println("reached sortie start")
-	data := apidata[platformno]
+	data := Apidata[platformno]
 	_, _, _, sortieerr := jsonparser.Get(data, "Sorties")
 	if sortieerr != nil {
 		topicf := "/wf/" + lang + "/" + platform + "/sorties"
