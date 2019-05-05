@@ -26,7 +26,7 @@ WIP  Warframe API Parser with  MQTT publisher
 ## Demo
 
 + Web:  coming soon
-+ MQTT Client: 
++ MQTT Client:  (currently offline due to a bug)
   + Host: mybitti(.)de
   + Port: 1884
   + Protocol: wss
