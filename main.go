@@ -8,9 +8,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"github.com/bitti09/go-wfapi/parser"
 	"runtime"
 	"strconv"
-	"strings"
 	"github.com/buger/jsonparser"
 	"github.com/robfig/cron"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -431,10 +431,10 @@ func main() {
 			for x1, v1 := range langpool {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
-		parseSorties(x, v, c,v1)
-		parseNews(x, v, c,v1)
-		parseAlerts(x, v, c,v1)
-		parseFissures(x, v, c,v1)
+		parser.ParseSorties(x, v, c,v1)
+		parser.ParseNews(x, v, c,v1)
+		parser.ParseAlerts(x, v, c,v1)
+		parser.ParseFissures(x, v, c,v1)
 			}
 		/*
 		parseAlerts(x, v, c)
@@ -464,19 +464,15 @@ func main() {
 			for x1, v1 := range langpool {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
-		parseSorties(x, v, c,v1)
-		parseNews(x, v, c,v1)
-		parseAlerts(x, v, c,v1)
-		parseFissures(x, v, c,v1)
+		parser.ParseSorties(x, v, c,v1)
+		parser.ParseNews(x, v, c,v1)
+		parser.ParseAlerts(x, v, c,v1)
+		parser.ParseFissures(x, v, c,v1)
 			}
 			/*
-			parseAlerts(x, v, c)
-			parseNews(x, v, c)
-			parseSorties(x, v, c)
 			parseSyndicateMissions(x, v, c)
 			parseInvasions(x, v, c)
 			parseCycles(x, v, c)
-			parseFissures(x, v, c)
 			parseDarvo(x, v, c)
 			parseEvents(x, v, c)
 			parseNightwave(x, v, c)
@@ -496,134 +492,6 @@ func main() {
 
 }
 
-func parseAlerts(platformno int, platform string, c mqtt.Client , lang string) {
-	type Alerts struct {
-		ID                  string
-		Started             string
-		Ends                string
-		MissionType         string
-		MissionFaction      string
-		MissionLocation     string
-		MinEnemyLevel       int64
-		MaxEnemyLevel       int64
-		EnemyWaves          int64 `json:",omitempty"`
-		RewardCredits       int64
-		RewardItemMany      string `json:",omitempty"`
-		RewardItemManyCount int64  `json:",omitempty"`
-		RewardItem          string `json:",omitempty"`
-	}
-	data := apidata[platformno]
-	var alerts []Alerts
-	_, _, _, erralert := jsonparser.Get(data, "Alerts")
-	fmt.Println(erralert)
-	if erralert != nil  || erralert == nil {  // disable  parsing until api returns data
-		topicf := "/wf/" +  lang +"/"+ platform + "/alerts"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		fmt.Println("error alert reached")
-		return
-	}
-	fmt.Println("alert reached")
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		id, _ := jsonparser.GetString(value, "id")
-		started, _ := jsonparser.GetString(value, "activation")
-		ended, _ := jsonparser.GetString(value, "expiry")
-		missiontype, _ := jsonparser.GetString(value, "mission", "type")
-		missionfaction, _ := jsonparser.GetString(value, "mission", "faction")
-		missionlocation, _ := jsonparser.GetString(value, "mission", "node")
-		minEnemyLevel, _ := jsonparser.GetInt(value, "mission", "minEnemyLevel")
-		maxEnemyLevel, _ := jsonparser.GetInt(value, "mission", "maxEnemyLevel")
-		enemywaves, _ := jsonparser.GetInt(value, "mission", "maxWaveNum")
-		rewardcredits, _ := jsonparser.GetInt(value, "mission", "reward", "credits")
-		rewarditemsmany, _ := jsonparser.GetString(value, "mission", "reward", "countedItems", "[0]", "type")
-		rewarditemsmanycount, _ := jsonparser.GetInt(value, "mission", "reward", "countedItems", "[0]", "count")
-		rewarditem, _ := jsonparser.GetString(value, "mission", "reward", "items", "[0]")
-
-		w := Alerts{id, started,
-			ended, missiontype,
-			missionfaction, missionlocation,
-			minEnemyLevel, maxEnemyLevel, enemywaves,
-			rewardcredits, rewarditemsmany, rewarditemsmanycount, rewarditem}
-		alerts = append(alerts, w)
-
-	}, "Alerts")
-
-	topicf := "/wf/" +  lang +"/"+ platform + "/alerts"
-	messageJSON, _ := json.Marshal(alerts)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-
-func parseNews(platformno int, platform string, c mqtt.Client , lang string) {
-	type News struct {
-		ID       string
-		Message  string
-		URL      string
-		Date     string
-		priority bool
-		Image    string
-	}
-	data := apidata[platformno]
-	_, _, _, ernews := jsonparser.Get(data, "Events")
-	if ernews != nil {
-		fmt.Println("error ernews reached")
-		return
-	}
-	var errnews2 bool
-	var message string
-
-	var news []News
-		fmt.Println("news reached")
-
-
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		message =""
-					jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-				newstemp1,_ :=jsonparser.GetString(value1, "LanguageCode")
-
-		if (newstemp1 == lang) {
-			message, _ = jsonparser.GetString(value1, "Message")
-			 	fmt.Println("news lang", newstemp1)
- 	fmt.Println("news lang1", lang)
- 	fmt.Println("news ", message)
-
-		}
-			}, "Messages")	
-
-	if (message !=""){
-	errnews2 = false
-	  	fmt.Println("errnews2 ", message)
-
-	} else {
-	errnews2 = true
-	}
-
-
-	if errnews2 == false {
-				image := "http://n9e5v4d8.ssl.hwcdn.net/uploads/e0b4d18d3330bb0e62dcdcb364d5f004.png"
-		id, _ := jsonparser.GetString(value, "_id", "$oid")
-
-	
-		url, _ := jsonparser.GetString(value, "Prop")
-		image, _ = jsonparser.GetString(value, "ImageUrl")
-
-		if (strings.HasPrefix(image, "https://forums.warframe.com")) {
-			image =strings.Split(image, "=")[1]
-					image = strings.Split(image, "&key")[0]
-
-		}
-		date, _ := jsonparser.GetString(value, "Date","$date","$numberLong")
-		/**/
-		priority, _ := jsonparser.GetBoolean(value, "priority")
-		w := News{ID: id, Message: message, URL: url, Date: date, Image: image, priority: priority}
-		news = append(news, w)
-		topicf := "/wf/" + lang + "/"+ platform + "/news"
-		messageJSON, _ := json.Marshal(news)
-		token := c.Publish(topicf, 0, true, messageJSON)
-		token.Wait()
-	}
-	}, "Events")
-}
 func parseCycles(platformno int, platform string, c mqtt.Client , lang string) {
 	type Cycles struct {
 		EathID         string
@@ -667,55 +535,6 @@ func parseCycles(platformno int, platform string, c mqtt.Client , lang string) {
 
 	topicf := "/wf/" + platform + "/"+ langtest + "/cycles"
 	messageJSON, _ := json.Marshal(cycles)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-func parseFissures(platformno int, platform string, c mqtt.Client , lang string) {
-	type Fissures struct {
-		ID              string
-		Started         string
-		Ends            string
-		Active          bool
-		MissionType     string
-		MissionFaction  string
-		MissionLocation string
-		Tier            string
-		TierLevel       string
-		Expired         bool
-	}
-	data := apidata[platformno]
-	var fissures []Fissures
-	fmt.Println("Fissues  reached")
-	_, _, _, errfissures := jsonparser.Get(data, "ActiveMissions")
-	if errfissures != nil  {
-		topicf := "/wf/" + lang + "/"+ platform + "/fissures"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		fmt.Println("error alert reached")
-		return
-	}
-	fmt.Println("Fissues 2 reached")
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		id, _ := jsonparser.GetString(value, "_id","$oid")
-		started, _ := jsonparser.GetString(value, "Activation","$date","$numberLong")
-		ended, _ := jsonparser.GetString(value, "Expiry","$date","$numberLong")
-		active := true
-		location1, _ := jsonparser.GetString(value, "Node")
-		location := sortietranslate(location1,"sortieloc",lang)
-		missiontype1, _ := jsonparser.GetString(value, "MissionType")
-		missiontype := missionranslate(missiontype1,lang)
-		tier1, _ := jsonparser.GetString(value, "Modifier")
-		tier := voidranslate(tier1,lang)
-		expired, _ := jsonparser.GetBoolean(value, "expired")
-
-		w := Fissures{id, started, ended, active,
-			missiontype, location[1], location[0], tier[0],tier[1],
-			expired}
-		fissures = append(fissures, w)
-	}, "ActiveMissions")
-
-	topicf := "/wf/" + lang + "/"+ platform + "/fissures"
-	messageJSON, _ := json.Marshal(fissures)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
@@ -924,71 +743,7 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-func parseSorties(platformno int, platform string, c mqtt.Client , lang string) {
-	type Sortievariant struct {
-		MissionType     string
-		MissionMod      string
-		MissionModDesc  string
-		MissionLocation string
-	}
-	type Sortie struct {
-		ID       string
-		Started  string
-		Ends     string
-		Boss     string
-		Faction  string
-		Reward   string
-		Variants []Sortievariant
-		Active   bool
-	}
-	fmt.Println("reached sortie start")
-	data := apidata[platformno]
-	_,_,_, sortieerr := jsonparser.Get(data, "Sorties")
-	if sortieerr != nil  {
-		topicf := "/wf/" + lang + "/"+ platform + "/sorties"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		fmt.Println("reached sortie error")
 
-		return
-	}
-	fmt.Println("reached sortie start")
-
-	var sortie []Sortie
-	id, _ := jsonparser.GetString(data, "Sorties", "[0]","_id","$oid")
-	started, _ := jsonparser.GetString(data, "Sorties", "[0]", "Activation","$date","$numberLong")
-	ended, _ := jsonparser.GetString(data, "Sorties", "[0]", "Expiry","$date","$numberLong")
-	boss1, _ := jsonparser.GetString(data, "Sorties", "[0]", "Boss")
-	boss := sortietranslate(boss1,"sortiemodboss",lang)
-	reward, _ := jsonparser.GetString(data, "Sorties", "[0]", "Reward")
-	var variants []Sortievariant
-
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		mtype, _ := jsonparser.GetString(value, "missionType")
-		mmod1, _ := jsonparser.GetString(value, "modifierType")
-		mmod  := sortietranslate(mmod1,"sortiemod",lang)
-		mloc1, _ := jsonparser.GetString(value, "node")
-		mloc  := sortietranslate(mloc1,"sortieloc",lang)
-
-		variants = append(variants, Sortievariant{
-			MissionType:     mtype,
-			MissionMod:      mmod[0],
-			MissionModDesc:  mmod[1],
-			MissionLocation: mloc[0],
-		})
-	}, "Sorties", "[0]", "Variants")
-	active := true
-	w := Sortie{ID: id, Started: started,
-		Ends: ended, Boss: boss[1], Faction: boss[0], Reward: reward, Variants: variants,
-		Active: active}
-	sortie = append(sortie, w)
-
-	topicf := "/wf/" + lang + "/"+ platform + "/sorties"
-	messageJSON, _ := json.Marshal(sortie)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
-}
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype        string
@@ -1188,87 +943,7 @@ func PrintMemUsage() {
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }
-func sortietranslate(src string, langtype string, lang string) (ret [2]string) {
-	if langtype == "sortiemod" {
-		var x1 [2]string
-		x1[0] = src
-		x1[1] = src
 
-		result, ok := sortiemodtypes[lang][src]
-		if ok != false {
-			x1[0] = result.(string)
-		}
-		result2, ok := sortiemoddesc[lang][src]
-		if ok != false {
-			x1[1] = result2.(string)
-		}
-
-		ret = x1
-	}
-
-	if langtype == "sortiemodboss" {
-		var x1 [2]string
-
-		x1[0] = src
-		x1[1] = src
-
-		result, ok := sortiemodbosses[lang][src].(map[string]interface{})
- 		if ok != false {
-			x1[0] = result["faction"].(string)
-			x1[1] = result["name"].(string)
-
-		}
-
-		ret = x1
-
-	}
-	
-	if langtype == "sortieloc" {
-		var x1 [2]string
-
-		x1[0] = src
-		x1[1] = src
-		result, ok := sortieloc[lang][src].(map[string]interface{})
-	fmt.Println("test2",sortieloc[lang][src])
-		
- 		if ok != false {
-			x1[0] = result["value"].(string)
-			x1[1] = result["enemy"].(string)
-
-		}
-	/**/
-		ret = x1
-
-	}
-	/**/
-	return ret
-}
-func voidranslate(src string, lang string) (ret [2]string) {
-		var x1 [2]string
-		x1[0] = src
-		x1[1] = src
-
-		result, ok := fissureModifiers[lang][src].(map[string]interface{})
-		if ok != false {
-			x1[0] = result["value"].(string)
-			x1[1] =fmt.Sprintf("%.0f", result["num"].(float64))
-
-		}
-		ret = x1
-		return ret
-}
-func missionranslate(src string, lang string) (ret string) {
-		var x1 string
-		x1 = src
-
-		result, ok := missionTypes[lang][src].(map[string]interface{})
-		if ok != false {
-			x1 = result["value"].(string)
-
-		}
-		ret = x1
-		return ret
-}
 // FloatToString convert
 func FloatToString(inputnum float64) string {
 	// to convert a float number to a string

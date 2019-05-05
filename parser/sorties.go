@@ -1,0 +1,76 @@
+package parser
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/bitti09/go-wfapi/helper"
+	"github.com/buger/jsonparser"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+)
+
+// ParseSorties parsing Sorties data
+func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
+	type Sortievariant struct {
+		MissionType     string
+		MissionMod      string
+		MissionModDesc  string
+		MissionLocation string
+	}
+	type Sortie struct {
+		ID       string
+		Started  string
+		Ends     string
+		Boss     string
+		Faction  string
+		Reward   string
+		Variants []Sortievariant
+		Active   bool
+	}
+	fmt.Println("reached sortie start")
+	data := apidata[platformno]
+	_, _, _, sortieerr := jsonparser.Get(data, "Sorties")
+	if sortieerr != nil {
+		topicf := "/wf/" + lang + "/" + platform + "/sorties"
+		token := c.Publish(topicf, 0, true, []byte("{}"))
+		token.Wait()
+		fmt.Println("reached sortie error")
+
+		return
+	}
+	fmt.Println("reached sortie start")
+
+	var sortie []Sortie
+	id, _ := jsonparser.GetString(data, "Sorties", "[0]", "_id", "$oid")
+	started, _ := jsonparser.GetString(data, "Sorties", "[0]", "Activation", "$date", "$numberLong")
+	ended, _ := jsonparser.GetString(data, "Sorties", "[0]", "Expiry", "$date", "$numberLong")
+	boss1, _ := jsonparser.GetString(data, "Sorties", "[0]", "Boss")
+	boss := helper.Sortietranslate(boss1, "sortiemodboss", lang)
+	reward, _ := jsonparser.GetString(data, "Sorties", "[0]", "Reward")
+	var variants []Sortievariant
+
+	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		mtype, _ := jsonparser.GetString(value, "missionType")
+		mmod1, _ := jsonparser.GetString(value, "modifierType")
+		mmod := helper.Sortietranslate(mmod1, "sortiemod", lang)
+		mloc1, _ := jsonparser.GetString(value, "node")
+		mloc := helper.Sortietranslate(mloc1, "sortieloc", lang)
+
+		variants = append(variants, Sortievariant{
+			MissionType:     mtype,
+			MissionMod:      mmod[0],
+			MissionModDesc:  mmod[1],
+			MissionLocation: mloc[0],
+		})
+	}, "Sorties", "[0]", "Variants")
+	active := true
+	w := Sortie{ID: id, Started: started,
+		Ends: ended, Boss: boss[1], Faction: boss[0], Reward: reward, Variants: variants,
+		Active: active}
+	sortie = append(sortie, w)
+
+	topicf := "/wf/" + lang + "/" + platform + "/sorties"
+	messageJSON, _ := json.Marshal(sortie)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
+
+}
