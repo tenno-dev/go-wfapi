@@ -12,23 +12,18 @@ import (
 	"strconv"
 	"strings"
 	"github.com/buger/jsonparser"
-//	"github.com/robfig/cron"
-
+	"github.com/robfig/cron"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pkg/profile"
-	/**/
 )
 
 //current supported lang
-var langid = map[string]int{
-	"en": 0,
-}
 var langpool =  [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
 // lang end
 // platforms start
 var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
 // platforms end
-var translationtype = [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"} 
+// var translationtype = [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"} 
 var bempty = "[{}]"
 var langtest = "en"
 // LangMap start
@@ -78,9 +73,7 @@ func loadapidata(id1 string) (ret []byte) {
 		url = "http://content." + id1 + ".warframe.com/dynamic/worldState.php"
 	}
 		fmt.Println("url:", url)
-
 	req, _ := http.NewRequest("GET", url, nil)
-
 	res, err := client.Do(req)
 
 	if err != nil {
@@ -442,9 +435,7 @@ func main() {
 		parseNews(x, v, c,v1)
 		parseAlerts(x, v, c,v1)
 		parseFissures(x, v, c,v1)
-
 			}
-			//fmt.Println("test:", languageslang)
 		/*
 		parseAlerts(x, v, c)
 		parseNews(x, v, c)
@@ -461,7 +452,7 @@ func main() {
 
 	}
 	PrintMemUsage()
-	/*
+	
 	c1 := cron.New()
 	c1.AddFunc("@every 1m1s", func() {
 
@@ -469,7 +460,15 @@ func main() {
 		for x, v := range platforms {
 			fmt.Println("x:", x)
 			fmt.Println("v:", v)
-			apidata[x] = loadapidata(v)
+		apidata[x] = loadapidata(v)
+			for x1, v1 := range langpool {
+		fmt.Println("x1:", x1)
+		fmt.Println("v1:", v1)
+		parseSorties(x, v, c,v1)
+		parseNews(x, v, c,v1)
+		parseAlerts(x, v, c,v1)
+		parseFissures(x, v, c,v1)
+			}
 			/*
 			parseAlerts(x, v, c)
 			parseNews(x, v, c)
@@ -481,24 +480,16 @@ func main() {
 			parseDarvo(x, v, c)
 			parseEvents(x, v, c)
 			parseNightwave(x, v, c)
-			 
+			 */
 			PrintMemUsage()
-
 		}
-		
 		/*
 				parseActiveMissions(x, v, c)
 				parseInvasions(x, v, c)
-
-		
+		*/
 	})
 	c1.Start()
-	*/
 	PrintMemUsage()
-
-	// just for debuging - printing  full warframe api response
-	 
-
 	if err := http.ListenAndServe(":9090", nil); err != nil {
 		panic(err)
 	}
