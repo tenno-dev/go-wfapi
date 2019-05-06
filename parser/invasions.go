@@ -8,6 +8,7 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 // ParseInvasions parse active Invasions
 func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
 	type Invasion struct {
@@ -27,7 +28,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 	}
 
 	data := datasources.Apidata[platformno]
-	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
+	invasioncheck, _, _, _ := jsonparser.Get(data, "Invasions")
 	if len(invasioncheck) == 0 {
 		topicf := "/wf/" + lang + "/" + platform + "/invasions"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
@@ -70,7 +71,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 				defenderitem, defenderitemcount, defenderfaction, completion}
 			invasions = append(invasions, w)
 		}
-	}, "invasions")
+	}, "Invasions")
 
 	topicf := "/wf/" + lang + "/" + platform + "/invasions"
 	messageJSON, _ := json.Marshal(invasions)
