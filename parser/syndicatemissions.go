@@ -32,8 +32,8 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 		fmt.Println(syndicatecheck)
 		if syndicatecheck == "CetusSyndicate" || syndicatecheck == "SolarisSyndicate" {
 			id, _ := jsonparser.GetString(value, "_id", "$oid")
-			started := "xxxx"
-			ended := "xxxx"
+			started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
+			ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 			syndicate, _ := jsonparser.GetString(value, "Tag")
 			var jobs []SyndicateJobs
 			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -72,7 +72,6 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 
 	topicf := "/wf/" + lang + "/" + platform + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
-	fmt.Println("test 1", messageJSON)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
