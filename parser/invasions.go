@@ -43,7 +43,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			attackeritemcount := int64(0)
 			defenderitem := ""
 			defenderitemcount := int64(0)
-			id, _ := jsonparser.GetString(value,  "_id", "$oid")
+			id, _ := jsonparser.GetString(value, "_id", "$oid")
 			started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 			location1, _ := jsonparser.GetString(value, "Node")
 			location := helper.Sortietranslate(location1, "sortieloc", lang)
