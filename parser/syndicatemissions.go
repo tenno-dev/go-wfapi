@@ -33,8 +33,8 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			return
 		}
 		id, _ := jsonparser.GetString(value, "_id", "$oid")
-		started, _ := jsonparser.GetString(value, "$date", "$numberLong")
-		ended, _ := jsonparser.GetString(value, "$date", "$numberLong")
+		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
+		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		syndicate, _ := jsonparser.GetString(value, "Tag")
 		var jobs []SyndicateJobs
 		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
