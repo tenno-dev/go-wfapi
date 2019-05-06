@@ -3,58 +3,52 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
-	"github.com/bitti09/go-wfapi/parser"
 	"runtime"
 	"strconv"
+
+	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/parser"
 	"github.com/buger/jsonparser"
-	"github.com/robfig/cron"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/pkg/profile"
+	"github.com/robfig/cron"
 )
 
 //current supported lang
-var langpool =  [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
+var langpool = [10]string{"en", "de", "es", "fr", "it", "ko", "pl", "pt", "ru", "zh"}
+
 // lang end
 // platforms start
 var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
+
 // platforms end
-// var translationtype = [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"} 
+// var translationtype = [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
 var bempty = "[{}]"
 var langtest = "en"
+
 // LangMap start
 type LangMap map[string]interface{}
-// LangMap2 d
-type LangMap2  interface{}
 
-var sortieloc = make(map[string]map[string]interface{})
-var sortiemodtypes= make(map[string]map[string]interface{})
-var sortiemoddesc= make(map[string]map[string]interface{})
-var sortiemodbosses= make(map[string]map[string]interface{})
-var sortielang = make(map[string]map[string]interface{})// temp
-var sortielang1  map[string]interface{}// temp
-var sortielang2  map[string]string// temp
-var fissureModifiers= make(map[string]map[string]interface{})
-var missionTypes  =make(map[string]map[string]interface{})
+// LangMap2 d
 
 // todo
-var arcanesData  map[string]interface{}
-var conclaveData   map[string]interface{}
-var eventsData  map[string]interface{}
-var factionsData   map[string]interface{}
-var languages =  map[string]string{}
-var operationTypes =  map[string]string{}
-var persistentEnemyData   map[string]interface{}
+var arcanesData map[string]interface{}
+var conclaveData map[string]interface{}
+var eventsData map[string]interface{}
+var factionsData map[string]interface{}
+var languages = map[string]string{}
+var operationTypes = map[string]string{}
+var persistentEnemyData map[string]interface{}
 
-var syndicatesData =  map[string]string{}
-var synthTargets   map[string]interface{}
-var upgradeTypes   map[string]interface{}
-var warframes   map[string]interface{}//
-var weapons  map[string]interface{}
+var syndicatesData = map[string]string{}
+var synthTargets map[string]interface{}
+var upgradeTypes map[string]interface{}
+var warframes map[string]interface{} //
+var weapons map[string]interface{}
+
 // Apidata downloaded api data
 var Apidata [][]byte
 var sortierewards = ""
@@ -64,342 +58,6 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	fmt.Printf("MSG: %s\n", msg.Payload())
 }
 
-func loadApidata(id1 string) (ret []byte) {
-	// WF API Source
-	client := &http.Client{}
-
-	url := "http://content.warframe.com/dynamic/worldState.php"
-	if id1 != "pc" {
-		url = "http://content." + id1 + ".warframe.com/dynamic/worldState.php"
-	}
-		fmt.Println("url:", url)
-	req, _ := http.NewRequest("GET", url, nil)
-	res, err := client.Do(req)
-
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	return body[:]	 
-}
-func loadlangdata(id1 string,id2 int) {
-	
-	client := &http.Client{}
-	/*
-	// arcanesData
-
-	url := "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/arcanesData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/arcanesData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ := http.NewRequest("GET", url, nil)
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-	arcanesData[id1] = string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// conclaveData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/conclaveData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/conclaveData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	conclaveData[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// eventsData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/eventsData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/eventsData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	eventsData[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// factionsData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/factionsData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	factionsData[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-
-	// languages
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/languages.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/languages.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	languages[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// missionTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/missionTypes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	missionTypes[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// operationTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/operationTypes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/operationTypes.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	operationTypes[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// persistentEnemyData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/persistentEnemyData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/persistentEnemyData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	persistentEnemyData[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	*/
-	// solNodes
-	url := "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/solNodes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
-	}
-	fmt.Println("url:", url)
-	req, _ := http.NewRequest("GET", url, nil)
-	res, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-		fmt.Println(id1)
-		var result map[string]interface{}
-	json.Unmarshal([]byte(body), &result)
-		sortieloc[id1] = result
-
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	
-	// sortieData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/sortieData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/sortieData.json"
-	}
-	//fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-		err = json.Unmarshal(body, &sortielang)
-		fmt.Println("test2")
-	//		sortielang = body.(map[string]interface{})
-	sortiemodtypes[id1] = make(LangMap)
-			fmt.Println("test3")
-
-	 sortiemodtypes[id1] = sortielang["modifierTypes"]
-	//	 fmt.Println("test2",sortiemodtypes[id1]["SORTIE_MODIFIER_ARMOR"])
-	sortiemoddesc[id1] = sortielang["modifierDescriptions"]
-	sortiemodbosses[id1] = sortielang["bosses"]
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// fissureModifiers
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/fissureModifiers.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/fissureModifiers.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	json.Unmarshal([]byte(body), &result)
-	fissureModifiers[id1]= result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// missionTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/missionTypes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	json.Unmarshal([]byte(body), &result)
-	missionTypes[id1]= result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-
-	/*
-	// syndicatesData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/syndicatesData.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/syndicatesData.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	syndicatesData[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// synthTargets
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/synthTargets.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/synthTargets.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	synthTargets[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
-	// upgradeTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/upgradeTypes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/upgradeTypes.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	upgradeTypes[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	
-	// warframes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/warframes.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/warframes.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	warframes[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-	
-	// weapons
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/weapons.json"
-	if (id1 =="en"){
-			url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/weapons.json"
-	}
-	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
-	weapons[id1]= string(body[:])
-	_, _ = io.Copy(ioutil.Discard, res.Body)		
-	*/
-	return
-}
 func main() {
 	defer profile.Start(profile.MemProfile).Stop()
 
@@ -419,40 +77,40 @@ func main() {
 		os.Exit(1)
 	}
 	//mqtt client end
-			for x1, v1 := range langpool {
+	for x1, v1 := range langpool {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
-		loadlangdata(v1,x1)
-			}/**/
+		datasources.Loadlangdata(v1, x1)
+	} /**/
 	for x, v := range platforms {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
-		Apidata[x] = loadApidata(v)
-			for x1, v1 := range langpool {
-		fmt.Println("x1:", x1)
-		fmt.Println("v1:", v1)
-		parser.ParseSorties(x, v, c,v1)
-		parser.ParseNews(x, v, c,v1)
-		parser.ParseAlerts(x, v, c,v1)
-		parser.ParseFissures(x, v, c,v1)
-			}
+		datasources.LoadApidata(v, x)
+		for x1, v1 := range langpool {
+			fmt.Println("x1:", x1)
+			fmt.Println("v1:", v1)
+			parser.ParseSorties(x, v, c, v1)
+			parser.ParseNews(x, v, c, v1)
+			parser.ParseAlerts(x, v, c, v1)
+			parser.ParseFissures(x, v, c, v1)
+		}
 		/*
-		parseAlerts(x, v, c)
-		parseNews(x, v, c)
-		parseSorties(x, v, c)
-		parseSyndicateMissions(x, v, c)
-		parseInvasions(x, v, c)
-		parseCycles(x, v, c)
-		parseFissures(x, v, c)
-		parseDarvo(x, v, c)
-		parseEvents(x, v, c)
-		parseNightwave(x, v, c)
-	*/
+			parseAlerts(x, v, c)
+			parseNews(x, v, c)
+			parseSorties(x, v, c)
+			parseSyndicateMissions(x, v, c)
+			parseInvasions(x, v, c)
+			parseCycles(x, v, c)
+			parseFissures(x, v, c)
+			parseDarvo(x, v, c)
+			parseEvents(x, v, c)
+			parseNightwave(x, v, c)
+		*/
 		PrintMemUsage()
 
 	}
 	PrintMemUsage()
-	
+
 	c1 := cron.New()
 	c1.AddFunc("@every 1m1s", func() {
 
@@ -460,28 +118,28 @@ func main() {
 		for x, v := range platforms {
 			fmt.Println("x:", x)
 			fmt.Println("v:", v)
-		Apidata[x] = loadApidata(v)
+			datasources.LoadApidata(v, x)
 			for x1, v1 := range langpool {
-		fmt.Println("x1:", x1)
-		fmt.Println("v1:", v1)
-		parser.ParseSorties(x, v, c,v1)
-		parser.ParseNews(x, v, c,v1)
-		parser.ParseAlerts(x, v, c,v1)
-		parser.ParseFissures(x, v, c,v1)
+				fmt.Println("x1:", x1)
+				fmt.Println("v1:", v1)
+				parser.ParseSorties(x, v, c, v1)
+				parser.ParseNews(x, v, c, v1)
+				parser.ParseAlerts(x, v, c, v1)
+				parser.ParseFissures(x, v, c, v1)
 			}
 			/*
-			parseSyndicateMissions(x, v, c)
-			parseInvasions(x, v, c)
-			parseCycles(x, v, c)
-			parseDarvo(x, v, c)
-			parseEvents(x, v, c)
-			parseNightwave(x, v, c)
-			 */
+				parseSyndicateMissions(x, v, c)
+				parseInvasions(x, v, c)
+				parseCycles(x, v, c)
+				parseDarvo(x, v, c)
+				parseEvents(x, v, c)
+				parseNightwave(x, v, c)
+			*/
 			PrintMemUsage()
 		}
 		/*
-				parseActiveMissions(x, v, c)
-				parseInvasions(x, v, c)
+			parseActiveMissions(x, v, c)
+			parseInvasions(x, v, c)
 		*/
 	})
 	c1.Start()
@@ -492,7 +150,7 @@ func main() {
 
 }
 
-func parseCycles(platformno int, platform string, c mqtt.Client , lang string) {
+func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 	type Cycles struct {
 		EathID         string
 		EarthEnds      string
@@ -533,7 +191,7 @@ func parseCycles(platformno int, platform string, c mqtt.Client , lang string) {
 		vallisid, vallisends, vallisiswarm, vallistimeleft}
 	cycles = append(cycles, w)
 
-	topicf := "/wf/" + platform + "/"+ langtest + "/cycles"
+	topicf := "/wf/" + platform + "/" + langtest + "/cycles"
 	messageJSON, _ := json.Marshal(cycles)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
@@ -554,7 +212,7 @@ func parseDarvo(platformno int, platform string, c mqtt.Client) {
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "dailyDeals")
 	if errfissures != "" {
-		topicf := "/wf/" + platform + "/"+ langtest + "/darvodeals"
+		topicf := "/wf/" + platform + "/" + langtest + "/darvodeals"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error Darvo reached")
@@ -576,7 +234,7 @@ func parseDarvo(platformno int, platform string, c mqtt.Client) {
 		deals = append(deals, w)
 	}, "dailyDeals")
 
-	topicf := "/wf/" + platform + "/"+ langtest + "/darvodeals"
+	topicf := "/wf/" + platform + "/" + langtest + "/darvodeals"
 	messageJSON, _ := json.Marshal(deals)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
@@ -632,7 +290,7 @@ func parseNightwave(platformno int, platform string, c mqtt.Client) {
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "nightwave")
 	if errfissures != "" {
-		topicf := "/wf/" + platform + "/"+ langtest + "/nightwave"
+		topicf := "/wf/" + platform + "/" + langtest + "/nightwave"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error Nightwave reached")
@@ -672,7 +330,7 @@ func parseNightwave(platformno int, platform string, c mqtt.Client) {
 	w := Nightwave{id, ended, acvtivation, season, tag1,
 		phase, "", "", dchallenge, wchallenge, welitechallenge}
 	nightwave = append(nightwave, w)
-	topicf := "/wf/" + platform + "/"+ langtest + "/nightwave"
+	topicf := "/wf/" + platform + "/" + langtest + "/nightwave"
 	messageJSON, _ := json.Marshal(nightwave)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
@@ -705,7 +363,7 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	fmt.Println("Events  reached")
 	errfissures, _ := jsonparser.GetString(data, "Eveventsents")
 	if errfissures != "" {
-		topicf := "/wf/" + platform + "/"+ langtest + "/events"
+		topicf := "/wf/" + platform + "/" + langtest + "/events"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error Events reached")
@@ -738,12 +396,11 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 		events = append(events, w)
 	}, "events")
 
-	topicf := "/wf/" + platform + "/"+ langtest + "/events"
+	topicf := "/wf/" + platform + "/" + langtest + "/events"
 	messageJSON, _ := json.Marshal(events)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype        string
@@ -802,7 +459,7 @@ func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 		syndicates = append(syndicates, w)
 	}, "syndicateMissions")
 
-	topicf := "/wf/" + platform + "/"+ langtest + "/syndicates"
+	topicf := "/wf/" + platform + "/" + langtest + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
@@ -828,7 +485,7 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	data := Apidata[platformno]
 	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
 	if len(invasioncheck) == 0 {
-		topicf := "/wf/" + platform + "/"+ langtest + "/invasions"
+		topicf := "/wf/" + platform + "/" + langtest + "/invasions"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		return
@@ -867,13 +524,12 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 		}
 	}, "invasions")
 
-	topicf := "/wf/" + platform + "/"+ langtest + "/invasions"
+	topicf := "/wf/" + platform + "/" + langtest + "/invasions"
 	messageJSON, _ := json.Marshal(invasions)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-
-	/*
+/*
 func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 	type ActiveMissions struct {
 		ID          string
@@ -917,7 +573,7 @@ func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-	*/
+*/
 func calcCompletion(count int, goal int, attacker string) (complete float32) {
 	y := float32((1 + float32(count)/float32(goal)))
 	x := float32(y * 50)
@@ -947,5 +603,5 @@ func bToMb(b uint64) uint64 {
 // FloatToString convert
 func FloatToString(inputnum float64) string {
 	// to convert a float number to a string
-    return strconv.FormatFloat(inputnum, 'f', 6, 64)
+	return strconv.FormatFloat(inputnum, 'f', 6, 64)
 }

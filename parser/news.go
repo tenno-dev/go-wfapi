@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 // ParseNews parsing news data (Called Events in warframe api)
 func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 	type News struct {
@@ -18,7 +20,7 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 		priority bool
 		Image    string
 	}
-	data := Apidata[platformno]
+	data := datasources.Apidata[platformno]
 	_, _, _, ernews := jsonparser.Get(data, "Events")
 	if ernews != nil {
 		fmt.Println("error ernews reached")
