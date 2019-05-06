@@ -94,6 +94,7 @@ func main() {
 			parser.ParseAlerts(x, v, c, v1)
 			parser.ParseFissures(x, v, c, v1)
 			parser.ParseSyndicateMissions(x, v, c, v1)
+			parser.ParseInvasions(x, v, c, v1)
 		}
 		/*
 			parseInvasions(x, v, c)
@@ -123,6 +124,7 @@ func main() {
 				parser.ParseAlerts(x, v, c, v1)
 				parser.ParseFissures(x, v, c, v1)
 				parser.ParseSyndicateMissions(x, v, c, v1)
+				parser.ParseInvasions(x, v, c, v1)
 			}
 			/*
 				parseInvasions(x, v, c)
@@ -457,16 +459,7 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-func calcCompletion(count int, goal int, attacker string) (complete float32) {
-	y := float32((1 + float32(count)/float32(goal)))
-	x := float32(y * 50)
-	if attacker == "Infested" {
-		x = float32(y * 100)
 
-	}
-	//fmt.Println(y)
-	return x
-}
 
 // PrintMemUsage - only for debug
 func PrintMemUsage() {

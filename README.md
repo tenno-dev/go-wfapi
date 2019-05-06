@@ -10,7 +10,7 @@ WIP  Warframe API Parser with  MQTT publisher
  - [ ] Alerts (waiting for api response)
  - [ ] Darvo's Deals
  - [ ] Nightwave
- - [ ] Syndicate Missions
+ - [x] Syndicate Missions ( untranslated )
  - [ ] Invasions
  - [ ] Void Trader
  - [ ] World Events
@@ -18,15 +18,15 @@ WIP  Warframe API Parser with  MQTT publisher
 
 ### General
 
-- [ ] Code Rewrite  
-- [ ] Code Spliting
+- [ ] **Code Rewrite  ( in progress )**
+- [ ] **Code Spliting ( in progress )**
 - [ ] Rewrite of the  current "hacky" ways for json parsing
 
 
 ## Demo
 
 + Web:  coming soon
-+ MQTT Client:  (currently offline due to a bug)
++ MQTT Client:  (sometimes offline when i'm testing new updates)
   + Host: mybitti(.)de
   + Port: 1884
   + Protocol: wss
