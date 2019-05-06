@@ -95,7 +95,7 @@ func main() {
 			parser.ParseFissures(x, v, c, v1)
 			parser.ParseSyndicateMissions(x, v, c, v1)
 			parser.ParseInvasions(x, v, c, v1)
-		}
+			parser.ParseDarvoDeal(x, v, c, v1)
 		/*
 			parseInvasions(x, v, c)
 			parseCycles(x, v, c)
@@ -125,6 +125,7 @@ func main() {
 				parser.ParseFissures(x, v, c, v1)
 				parser.ParseSyndicateMissions(x, v, c, v1)
 				parser.ParseInvasions(x, v, c, v1)
+				parser.ParseDarvoDeal(x, v, c, v1)
 			}
 			/*
 				parseInvasions(x, v, c)
@@ -187,49 +188,6 @@ func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 
 	topicf := "/wf/" + platform + "/" + langtest + "/cycles"
 	messageJSON, _ := json.Marshal(cycles)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-func parseDarvo(platformno int, platform string, c mqtt.Client) {
-	type DarvoDeals struct {
-		ID              string
-		Ends            string
-		Item            string
-		Price           int64
-		DealPrice       int64
-		DiscountPercent int64
-		Stock           int64
-		Sold            int64
-	}
-	data := Apidata[platformno]
-	var deals []DarvoDeals
-	fmt.Println("Darvo  reached")
-	errfissures, _ := jsonparser.GetString(data, "dailyDeals")
-	if errfissures != "" {
-		topicf := "/wf/" + platform + "/" + langtest + "/darvodeals"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		fmt.Println("error Darvo reached")
-		return
-	}
-	fmt.Println("alert reached")
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		id, _ := jsonparser.GetString(value, "id")
-		ended, _ := jsonparser.GetString(value, "expiry")
-		item, _ := jsonparser.GetString(value, "item")
-		originalprice, _ := jsonparser.GetInt(value, "originalPrice")
-		dealprice, _ := jsonparser.GetInt(value, "salePrice")
-		stock, _ := jsonparser.GetInt(value, "total")
-		sold, _ := jsonparser.GetInt(value, "sold")
-		discount, _ := jsonparser.GetInt(value, "discount")
-
-		w := DarvoDeals{id, ended, item, originalprice, dealprice,
-			discount, stock, sold}
-		deals = append(deals, w)
-	}, "dailyDeals")
-
-	topicf := "/wf/" + platform + "/" + langtest + "/darvodeals"
-	messageJSON, _ := json.Marshal(deals)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
@@ -395,71 +353,6 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-func parseInvasions(platformno int, platform string, c mqtt.Client) {
-	type Invasion struct {
-		ID                  string
-		Location            string
-		MissionType         string
-		Completed           bool
-		Started             string
-		VsInfested          bool
-		AttackerRewardItem  string `json:",omitempty"`
-		AttackerRewardCount int64  `json:",omitempty"`
-		AttackerMissionInfo string `json:",omitempty"`
-		DefenderRewardItem  string `json:",omitempty"`
-		DefenderRewardCount int64  `json:",omitempty"`
-		DefenderMissionInfo string `json:",omitempty"`
-		Completion          float64
-	}
-
-	data := Apidata[platformno]
-	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
-	if len(invasioncheck) == 0 {
-		topicf := "/wf/" + platform + "/" + langtest + "/invasions"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		return
-	}
-	var invasions []Invasion
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		iscomplete, _ := jsonparser.GetBoolean(value, "completed")
-		if iscomplete != true {
-			attackeritem := ""
-			attackeritemcount := int64(0)
-			defenderitem := ""
-			defenderitemcount := int64(0)
-			id, _ := jsonparser.GetString(value, "id")
-			started, _ := jsonparser.GetString(value, "activation")
-			location, _ := jsonparser.GetString(value, "node")
-			missiontype, _ := jsonparser.GetString(value, "desc")
-			completed, _ := jsonparser.GetBoolean(value, "completed")
-			vsinfested, _ := jsonparser.GetBoolean(value, "vsInfestation")
-			_, _, _, ierror := jsonparser.Get(value, "attackerReward", "countedItems", "[0]", "type")
-			if ierror == nil {
-				attackeritem, _ = jsonparser.GetString(value, "attackerReward", "countedItems", "[0]", "type")
-				attackeritemcount, _ = jsonparser.GetInt(value, "attackerReward", "countedItems", "[0]", "count")
-			}
-			attackerfaction, _ := jsonparser.GetString(value, "attackingFaction")
-			_, _, _, ierror2 := jsonparser.Get(value, "defenderReward", "countedItems", "[0]", "type")
-			if ierror2 == nil {
-				defenderitem, _ = jsonparser.GetString(value, "defenderReward", "countedItems", "[0]", "type")
-				defenderitemcount, _ = jsonparser.GetInt(value, "defenderReward", "countedItems", "[0]", "count")
-			}
-			defenderfaction, _ := jsonparser.GetString(value, "defendingFaction")
-			completion, _ := jsonparser.GetFloat(value, "completion")
-			w := Invasion{id, location, missiontype, completed, started, vsinfested,
-				attackeritem, attackeritemcount, attackerfaction,
-				defenderitem, defenderitemcount, defenderfaction, completion}
-			invasions = append(invasions, w)
-		}
-	}, "invasions")
-
-	topicf := "/wf/" + platform + "/" + langtest + "/invasions"
-	messageJSON, _ := json.Marshal(invasions)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-
 
 // PrintMemUsage - only for debug
 func PrintMemUsage() {
