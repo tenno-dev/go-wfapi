@@ -186,7 +186,6 @@ func Loadlangdata(id1 string, id2 int) {
 	if id1 == "en" {
 		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
 	}
-	fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 	if err != nil {
@@ -217,13 +216,8 @@ func Loadlangdata(id1 string, id2 int) {
 	defer res.Body.Close()
 	body, _ = ioutil.ReadAll(res.Body)
 	err = json.Unmarshal(body, &Sortielang)
-	fmt.Println("test2")
-	//		Sortielang = body.(map[string]interface{})
 	Sortiemodtypes[id1] = make(LangMap)
-	fmt.Println("test3")
-
 	Sortiemodtypes[id1] = Sortielang["modifierTypes"]
-	//	 fmt.Println("test2",Sortiemodtypes[id1]["SORTIE_MODIFIER_ARMOR"])
 	Sortiemoddesc[id1] = Sortielang["modifierDescriptions"]
 	Sortiemodbosses[id1] = Sortielang["bosses"]
 	_, _ = io.Copy(ioutil.Discard, res.Body)
@@ -233,7 +227,6 @@ func Loadlangdata(id1 string, id2 int) {
 	if id1 == "en" {
 		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/fissureModifiers.json"
 	}
-	// fmt.Println("url:", url)
 	req, _ = http.NewRequest("GET", url, nil)
 	res, err = client.Do(req)
 	if err != nil {
@@ -251,7 +244,6 @@ func Loadlangdata(id1 string, id2 int) {
 	if id1 == "en" {
 		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
 	}
-	// fmt.Println("url:", url)
 	req, _ = http.NewRequest("GET", url, nil)
 	res, err = client.Do(req)
 	if err != nil {

@@ -93,15 +93,11 @@ func main() {
 			parser.ParseNews(x, v, c, v1)
 			parser.ParseAlerts(x, v, c, v1)
 			parser.ParseFissures(x, v, c, v1)
+			parser.ParseSyndicateMissions(x, v, c, v1)
 		}
 		/*
-			parseAlerts(x, v, c)
-			parseNews(x, v, c)
-			parseSorties(x, v, c)
-			parseSyndicateMissions(x, v, c)
 			parseInvasions(x, v, c)
 			parseCycles(x, v, c)
-			parseFissures(x, v, c)
 			parseDarvo(x, v, c)
 			parseEvents(x, v, c)
 			parseNightwave(x, v, c)
@@ -126,9 +122,9 @@ func main() {
 				parser.ParseNews(x, v, c, v1)
 				parser.ParseAlerts(x, v, c, v1)
 				parser.ParseFissures(x, v, c, v1)
+				parser.ParseSyndicateMissions(x, v, c, v1)
 			}
 			/*
-				parseSyndicateMissions(x, v, c)
 				parseInvasions(x, v, c)
 				parseCycles(x, v, c)
 				parseDarvo(x, v, c)
@@ -137,10 +133,6 @@ func main() {
 			*/
 			PrintMemUsage()
 		}
-		/*
-			parseActiveMissions(x, v, c)
-			parseInvasions(x, v, c)
-		*/
 	})
 	c1.Start()
 	PrintMemUsage()
@@ -150,7 +142,7 @@ func main() {
 
 }
 
-func arseCycles(platformno int, platform string, c mqtt.Client, lang string) {
+func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 	type Cycles struct {
 		EathID         string
 		EarthEnds      string
@@ -401,71 +393,6 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-
-func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
-	type SyndicateJobs struct {
-		Jobtype        string
-		Rewards        []string
-		MinEnemyLevel  int64
-		MaxEnemyLevel  int64
-		StandingReward []int64
-	}
-	type SyndicateMissions struct {
-		ID        string
-		Started   string
-		Ends      string
-		Syndicate string
-		Jobs      []SyndicateJobs
-	}
-	data := Apidata[platformno]
-	var syndicates []SyndicateMissions
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		syndicatecheck, _ := jsonparser.GetString(value, "syndicate")
-		if syndicatecheck != "Ostrons" && syndicatecheck != "Solaris United" {
-			return
-		}
-		id, _ := jsonparser.GetString(value, "id")
-		started, _ := jsonparser.GetString(value, "activation")
-		ended, _ := jsonparser.GetString(value, "expiry")
-		syndicate, _ := jsonparser.GetString(value, "syndicate")
-		var jobs []SyndicateJobs
-		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-			jobtype, _ := jsonparser.GetString(value1, "type")
-			rewards := make([]string, 0)
-			jsonparser.ArrayEach(value1, func(reward []byte, dataType jsonparser.ValueType, offset int, err error) {
-				rewards = append(rewards, string(reward))
-
-			}, "rewardPool")
-
-			minEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[0]")
-			maxEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[1]")
-			standing1, _ := jsonparser.GetInt(value1, "standingStages", "[0]")
-			standing2, _ := jsonparser.GetInt(value1, "standingStages", "[1]")
-			standing3, _ := jsonparser.GetInt(value1, "standingStages", "[2]")
-			jobs = append(jobs, SyndicateJobs{
-				Jobtype:        jobtype,
-				Rewards:        rewards,
-				MinEnemyLevel:  minEnemyLevel,
-				MaxEnemyLevel:  maxEnemyLevel,
-				StandingReward: []int64{standing1, standing2, standing3},
-			})
-		}, "jobs")
-
-		w := SyndicateMissions{
-			ID:        id,
-			Started:   started,
-			Ends:      ended,
-			Syndicate: syndicate,
-			Jobs:      jobs}
-		syndicates = append(syndicates, w)
-	}, "syndicateMissions")
-
-	topicf := "/wf/" + platform + "/" + langtest + "/syndicates"
-	messageJSON, _ := json.Marshal(syndicates)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
-}
 func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	type Invasion struct {
 		ID                  string
@@ -530,52 +457,6 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
-
-/*
-func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
-	type ActiveMissions struct {
-		ID          string
-		Started     int
-		Ends        int
-		Region      int
-		Node        string
-		MissionType string
-		Modifier    string
-	}
-	data := &Apidata[platformno]
-	fsion := gofasion.NewFasion(*data)
-	var mission []ActiveMissions
-	lang := string("en")
-	ActiveMissionsarray := fsion.Get("ActiveMissions").Array()
-	fmt.Println(len(ActiveMissionsarray))
-
-	for _, v := range ActiveMissionsarray {
-		id := v.Get("_id").Get("$oid").ValueStr()
-		started := v.Get("Activation").Get("$date").Get("$numberLong").ValueInt() / 1000
-		ended := v.Get("Expiry").Get("$date").Get("$numberLong").ValueInt() / 1000
-		region := v.Get("Region").ValueInt()
-		node := v.Get("Node").ValueStr()
-		missiontype := v.Get("MissionType").ValueStr()
-		modifier := v.Get("Modifier").ValueStr()
-
-		w := ActiveMissions{
-			ID:          id,
-			Started:     started,
-			Ends:        ended,
-			Region:      region,
-			Node:        node,
-			MissionType: missiontype,
-			Modifier:    modifier,
-		}
-		mission = append(mission, w)
-	}
-	fmt.Println(len(mission))
-	topicf := "/wf/" + platform + "/"+ langtest + "/missions"
-	messageJSON, _ := json.Marshal(mission)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-*/
 func calcCompletion(count int, goal int, attacker string) (complete float32) {
 	y := float32((1 + float32(count)/float32(goal)))
 	x := float32(y * 50)
