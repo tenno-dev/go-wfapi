@@ -96,37 +96,6 @@ func main() {
 			parser.ParseSyndicateMissions(x, v, c, v1)
 			parser.ParseInvasions(x, v, c, v1)
 			parser.ParseDarvoDeal(x, v, c, v1)
-		/*
-			parseInvasions(x, v, c)
-			parseCycles(x, v, c)
-			parseDarvo(x, v, c)
-			parseEvents(x, v, c)
-			parseNightwave(x, v, c)
-		*/
-		PrintMemUsage()
-
-	}
-	PrintMemUsage()
-
-	c1 := cron.New()
-	c1.AddFunc("@every 1m1s", func() {
-
-		fmt.Println("Tick")
-		for x, v := range platforms {
-			fmt.Println("x:", x)
-			fmt.Println("v:", v)
-			datasources.LoadApidata(v, x)
-			for x1, v1 := range langpool {
-				fmt.Println("x1:", x1)
-				fmt.Println("v1:", v1)
-				parser.ParseSorties(x, v, c, v1)
-				parser.ParseNews(x, v, c, v1)
-				parser.ParseAlerts(x, v, c, v1)
-				parser.ParseFissures(x, v, c, v1)
-				parser.ParseSyndicateMissions(x, v, c, v1)
-				parser.ParseInvasions(x, v, c, v1)
-				parser.ParseDarvoDeal(x, v, c, v1)
-			}
 			/*
 				parseInvasions(x, v, c)
 				parseCycles(x, v, c)
@@ -135,16 +104,47 @@ func main() {
 				parseNightwave(x, v, c)
 			*/
 			PrintMemUsage()
+
 		}
-	})
-	c1.Start()
-	PrintMemUsage()
-	if err := http.ListenAndServe(":9090", nil); err != nil {
-		panic(err)
+		PrintMemUsage()
+
+		c1 := cron.New()
+		c1.AddFunc("@every 1m1s", func() {
+
+			fmt.Println("Tick")
+			for x, v := range platforms {
+				fmt.Println("x:", x)
+				fmt.Println("v:", v)
+				datasources.LoadApidata(v, x)
+				for x1, v1 := range langpool {
+					fmt.Println("x1:", x1)
+					fmt.Println("v1:", v1)
+					parser.ParseSorties(x, v, c, v1)
+					parser.ParseNews(x, v, c, v1)
+					parser.ParseAlerts(x, v, c, v1)
+					parser.ParseFissures(x, v, c, v1)
+					parser.ParseSyndicateMissions(x, v, c, v1)
+					parser.ParseInvasions(x, v, c, v1)
+					parser.ParseDarvoDeal(x, v, c, v1)
+				}
+				/*
+					parseInvasions(x, v, c)
+					parseCycles(x, v, c)
+					parseDarvo(x, v, c)
+					parseEvents(x, v, c)
+					parseNightwave(x, v, c)
+				*/
+				PrintMemUsage()
+			}
+		})
+		c1.Start()
+		PrintMemUsage()
+		if err := http.ListenAndServe(":9090", nil); err != nil {
+			panic(err)
+		}
+
 	}
-
 }
-
 func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 	type Cycles struct {
 		EathID         string
