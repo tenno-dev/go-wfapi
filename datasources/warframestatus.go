@@ -229,9 +229,9 @@ func Loadlangdata(id1 string, id2 int) {
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// FissureModifiers
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/FissureModifiers.json"
+	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/fissureModifiers.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/FissureModifiers.json"
+		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/fissureModifiers.json"
 	}
 	// fmt.Println("url:", url)
 	req, _ = http.NewRequest("GET", url, nil)
@@ -247,9 +247,9 @@ func Loadlangdata(id1 string, id2 int) {
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// MissionTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/MissionTypes.json"
+	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/missionTypes.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/MissionTypes.json"
+		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
 	}
 	// fmt.Println("url:", url)
 	req, _ = http.NewRequest("GET", url, nil)
