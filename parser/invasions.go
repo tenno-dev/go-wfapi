@@ -8,6 +8,7 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 // ParseInvasions parse active Invasions
 func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
 	type Invasion struct {
@@ -27,7 +28,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 	}
 
 	data := datasources.Apidata[platformno]
-	invasioncheck, _, _, _ := jsonparser.Get(data, "invasions")
+	invasioncheck, _, _, _ := jsonparser.Get(data, "Invasions")
 	if len(invasioncheck) == 0 {
 		topicf := "/wf/" + lang + "/" + platform + "/invasions"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
@@ -42,9 +43,9 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			attackeritemcount := int64(0)
 			defenderitem := ""
 			defenderitemcount := int64(0)
-			id, _ := jsonparser.GetString(value, "id")
+			id, _ := jsonparser.GetString(value,  "_id", "$oid")
 			started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
-			location1, _ := jsonparser.GetString(value, "node")
+			location1, _ := jsonparser.GetString(value, "Node")
 			location := helper.Sortietranslate(location1, "sortieloc", lang)
 			missiontype, _ := jsonparser.GetString(value, "LocTag")
 			completed, _ := jsonparser.GetBoolean(value, "Completed")
@@ -70,7 +71,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 				defenderitem, defenderitemcount, defenderfaction, completion}
 			invasions = append(invasions, w)
 		}
-	}, "invasions")
+	}, "Invasions")
 
 	topicf := "/wf/" + lang + "/" + platform + "/invasions"
 	messageJSON, _ := json.Marshal(invasions)
