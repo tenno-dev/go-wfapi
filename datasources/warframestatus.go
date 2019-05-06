@@ -38,6 +38,9 @@ var FissureModifiers = make(map[string]map[string]interface{})
 // MissionTypes MissionTypes lang strings
 var MissionTypes = make(map[string]map[string]interface{})
 
+// Languages General Lang strings
+var Languages = make(map[string]map[string]interface{})
+
 // Loadlangdata load lang string from warframestat.us repo
 func Loadlangdata(id1 string, id2 int) {
 
@@ -113,39 +116,6 @@ func Loadlangdata(id1 string, id2 int) {
 		_, _ = io.Copy(ioutil.Discard, res.Body)
 
 
-		// languages
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/languages.json"
-		if (id1 =="en"){
-				url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/languages.json"
-		}
-		// fmt.Println("url:", url)
-		req, _ = http.NewRequest("GET", url, nil)
-		res, err = client.Do(req)
-		if err != nil {
-			fmt.Println("Errored when sending request to the server")
-			return
-		}
-		defer res.Body.Close()
-		body, _ = ioutil.ReadAll(res.Body)
-		languages[id1]= string(body[:])
-		_, _ = io.Copy(ioutil.Discard, res.Body)
-
-		// MissionTypes
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/MissionTypes.json"
-		if (id1 =="en"){
-				url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/MissionTypes.json"
-		}
-		// fmt.Println("url:", url)
-		req, _ = http.NewRequest("GET", url, nil)
-		res, err = client.Do(req)
-		if err != nil {
-			fmt.Println("Errored when sending request to the server")
-			return
-		}
-		defer res.Body.Close()
-		body, _ = ioutil.ReadAll(res.Body)
-		MissionTypes[id1]= string(body[:])
-		_, _ = io.Copy(ioutil.Discard, res.Body)
 
 		// operationTypes
 		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/operationTypes.json"
@@ -254,6 +224,24 @@ func Loadlangdata(id1 string, id2 int) {
 	body, _ = ioutil.ReadAll(res.Body)
 	json.Unmarshal([]byte(body), &result)
 	MissionTypes[id1] = result
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
+	// languages
+	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/languages.json"
+	if id1 == "en" {
+		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/languages.json"
+	}
+	// fmt.Println("url:", url)
+	req, _ = http.NewRequest("GET", url, nil)
+	res, err = client.Do(req)
+	if err != nil {
+		fmt.Println("Errored when sending request to the server")
+		return
+	}
+	defer res.Body.Close()
+	body, _ = ioutil.ReadAll(res.Body)
+	json.Unmarshal([]byte(body), &result)
+	Languages[id1] = result
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	/*

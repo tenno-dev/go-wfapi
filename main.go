@@ -96,6 +96,7 @@ func main() {
 			parser.ParseSyndicateMissions(x, v, c, v1)
 			parser.ParseInvasions(x, v, c, v1)
 			parser.ParseDarvoDeal(x, v, c, v1)
+			parser.ParseNightwave(x, v, c, v1)
 			/*
 				parseInvasions(x, v, c)
 				parseCycles(x, v, c)
@@ -126,6 +127,7 @@ func main() {
 					parser.ParseSyndicateMissions(x, v, c, v1)
 					parser.ParseInvasions(x, v, c, v1)
 					parser.ParseDarvoDeal(x, v, c, v1)
+					parser.ParseNightwave(x, v, c, v1)
 				}
 				/*
 					parseInvasions(x, v, c)
@@ -188,102 +190,6 @@ func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 
 	topicf := "/wf/" + platform + "/" + langtest + "/cycles"
 	messageJSON, _ := json.Marshal(cycles)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-}
-func parseNightwave(platformno int, platform string, c mqtt.Client) {
-
-	type DailyChallenges struct {
-		ID          string
-		Ends        string
-		Started     string
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type WeeklyChallenges struct {
-		ID          string
-		Ends        string
-		Started     string
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type WeeklyEliteChallenges struct {
-		ID          string
-		Ends        string
-		Started     string
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type Nightwave struct {
-		ID                    string
-		Ends                  string
-		Started               string
-		Season                int64
-		Tag                   string
-		Phase                 int64
-		params                string
-		possibleChallenges    string
-		DailyChallenges       []DailyChallenges
-		WeeklyChallenges      []WeeklyChallenges
-		WeeklyEliteChallenges []WeeklyEliteChallenges
-	}
-	data := Apidata[platformno]
-	var nightwave []Nightwave
-	var dchallenge []DailyChallenges
-	var wchallenge []WeeklyChallenges
-	var welitechallenge []WeeklyEliteChallenges
-
-	fmt.Println("Darvo  reached")
-	errfissures, _ := jsonparser.GetString(data, "nightwave")
-	if errfissures != "" {
-		topicf := "/wf/" + platform + "/" + langtest + "/nightwave"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		fmt.Println("error Nightwave reached")
-		return
-	}
-	fmt.Println("nightwave reached")
-	id, _ := jsonparser.GetString(data, "nightwave", "id")
-	ended, _ := jsonparser.GetString(data, "nightwave", "expiry")
-	acvtivation, _ := jsonparser.GetString(data, "nightwave", "activation")
-	season, _ := jsonparser.GetInt(data, "nightwave", "season")
-	tag1, _ := jsonparser.GetString(data, "nightwave", "tag")
-	phase, _ := jsonparser.GetInt(data, "nightwave", "phase")
-
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		idc, _ := jsonparser.GetString(value, "id")
-		endedc, _ := jsonparser.GetString(value, "expiry")
-		activationc, _ := jsonparser.GetString(value, "activation")
-		cdesc, _ := jsonparser.GetString(value, "desc")
-		ctitle, _ := jsonparser.GetString(value, "title")
-		reputation, _ := jsonparser.GetInt(value, "reputation")
-		active, _ := jsonparser.GetBoolean(value, "active")
-		daily, _ := jsonparser.GetBoolean(value, "isDaily")
-		elite, _ := jsonparser.GetBoolean(value, "isElite")
-		if daily == true {
-			dailyc := DailyChallenges{idc, endedc, activationc, active, reputation, cdesc, ctitle}
-			dchallenge = append(dchallenge, dailyc)
-		}
-		if daily == false && elite == false {
-			weekc := WeeklyChallenges{idc, endedc, activationc, active, reputation, cdesc, ctitle}
-			wchallenge = append(wchallenge, weekc)
-		}
-		if daily == false && elite == true {
-			weekelitec := WeeklyEliteChallenges{idc, endedc, activationc, active, reputation, cdesc, ctitle}
-			welitechallenge = append(welitechallenge, weekelitec)
-		}
-	}, "nightwave", "activeChallenges")
-	w := Nightwave{id, ended, acvtivation, season, tag1,
-		phase, "", "", dchallenge, wchallenge, welitechallenge}
-	nightwave = append(nightwave, w)
-	topicf := "/wf/" + platform + "/" + langtest + "/nightwave"
-	messageJSON, _ := json.Marshal(nightwave)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
