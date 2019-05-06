@@ -1,13 +1,15 @@
 package helper
 
-var missionTypes map[string]map[string]interface{}
+import (
+	"github.com/bitti09/go-wfapi/datasources"
+)
 
 // Missiontranslate translate mission types
 func Missiontranslate(src string, lang string) (ret string) {
 	var x1 string
 	x1 = src
 
-	result, ok := missionTypes[lang][src].(map[string]interface{})
+	result, ok := datasources.MissionTypes[lang][src].(map[string]interface{})
 	if ok != false {
 		x1 = result["value"].(string)
 

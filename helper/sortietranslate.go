@@ -1,11 +1,8 @@
 package helper
 
-import "fmt"
-
-var sortieloc map[string]map[string]interface{}
-var sortiemodtypes map[string]map[string]interface{}
-var sortiemoddesc map[string]map[string]interface{}
-var sortiemodbosses map[string]map[string]interface{}
+import (
+	"github.com/bitti09/go-wfapi/datasources"
+)
 
 // Sortietranslate translate sortie data
 func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
@@ -14,11 +11,11 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 		x1[0] = src
 		x1[1] = src
 
-		result, ok := sortiemodtypes[lang][src]
+		result, ok := datasources.Sortiemodtypes[lang][src]
 		if ok != false {
 			x1[0] = result.(string)
 		}
-		result2, ok := sortiemoddesc[lang][src]
+		result2, ok := datasources.Sortiemoddesc[lang][src]
 		if ok != false {
 			x1[1] = result2.(string)
 		}
@@ -32,7 +29,7 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 		x1[0] = src
 		x1[1] = src
 
-		result, ok := sortiemodbosses[lang][src].(map[string]interface{})
+		result, ok := datasources.Sortiemodbosses[lang][src].(map[string]interface{})
 		if ok != false {
 			x1[0] = result["faction"].(string)
 			x1[1] = result["name"].(string)
@@ -48,8 +45,7 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 
 		x1[0] = src
 		x1[1] = src
-		result, ok := sortieloc[lang][src].(map[string]interface{})
-		fmt.Println("test2", sortieloc[lang][src])
+		result, ok := datasources.Sortieloc[lang][src].(map[string]interface{})
 
 		if ok != false {
 			x1[0] = result["value"].(string)
