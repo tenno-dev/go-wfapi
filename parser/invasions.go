@@ -8,8 +8,8 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
-
-func parseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
+// ParseInvasions parse active Invasions
+func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
 	type Invasion struct {
 		ID          string
 		Location    string
