@@ -150,7 +150,7 @@ func main() {
 
 }
 
-func parseCycles(platformno int, platform string, c mqtt.Client, lang string) {
+func arseCycles(platformno int, platform string, c mqtt.Client, lang string) {
 	type Cycles struct {
 		EathID         string
 		EarthEnds      string
@@ -401,6 +401,7 @@ func parseEvents(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
+
 func parseSyndicateMissions(platformno int, platform string, c mqtt.Client) {
 	type SyndicateJobs struct {
 		Jobtype        string
@@ -529,6 +530,7 @@ func parseInvasions(platformno int, platform string, c mqtt.Client) {
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }
+
 /*
 func parseActiveMissions(platformno int, platform string, c mqtt.Client) {
 	type ActiveMissions struct {
