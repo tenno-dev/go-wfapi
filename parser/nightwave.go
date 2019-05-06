@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strconv"
+	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -16,8 +18,8 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 
 	type DailyChallenges struct {
 		ID          string
-		Ends        string
-		Started     string
+		Ends        int64
+		Started     int64
 		Active      bool
 		Reputation  int64
 		Description string
@@ -25,8 +27,8 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	}
 	type WeeklyChallenges struct {
 		ID          string
-		Ends        string
-		Started     string
+		Ends        int64
+		Started     int64
 		Active      bool
 		Reputation  int64
 		Description string
@@ -34,8 +36,8 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	}
 	type WeeklyEliteChallenges struct {
 		ID          string
-		Ends        string
-		Started     string
+		Ends        int64
+		Started     int64
 		Active      bool
 		Reputation  int64
 		Description string
@@ -59,7 +61,6 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	var dchallenge []DailyChallenges
 	var wchallenge []WeeklyChallenges
 	var welitechallenge []WeeklyEliteChallenges
-
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "SeasonInfo")
 	if errfissures != "" {
@@ -69,10 +70,11 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 		fmt.Println("error Nightwave reached")
 		return
 	}
+	timenow := time.Now().Unix()
 	fmt.Println("nightwave reached")
 	id := "1"
 	ended, _ := jsonparser.GetString(data, "SeasonInfo", "Expiry", "$date", "$numberLong")
-	acvtivation, _ := jsonparser.GetString(data, "SeasonInfo", "Activation", "$date", "$numberLong")
+	activation, _ := jsonparser.GetString(data, "SeasonInfo", "Activation", "$date", "$numberLong")
 	season, _ := jsonparser.GetInt(data, "SeasonInfo", "Season")
 	tag1, _ := jsonparser.GetString(data, "SeasonInfo", "AffiliationTag")
 	phase, _ := jsonparser.GetInt(data, "SeasonInfo", "Phase")
@@ -80,28 +82,35 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		idc, _ := jsonparser.GetString(value, "_id", "$oid")
 		endedc, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
+		endedc1, _ := strconv.ParseInt(endedc, 10, 64)
+		endedc2 := endedc1 / 1000
 		activationc, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
+		activationc1, _ := strconv.ParseInt(activationc, 10, 64)
+		activationc2 := activationc1 / 1000
+
 		mission, _ := jsonparser.GetString(value, "Challenge")
 		cdesc := helper.Langtranslate2(mission, lang)
-		ctitle, _ := jsonparser.GetString(value, "title")
 		reputation, _ := jsonparser.GetInt(value, "reputation")
-		active, _ := jsonparser.GetBoolean(value, "active")
+		active := true // temp
+		if  endedc2 > timenow {
+			active = true // temp
+		}
 		daily, _ := jsonparser.GetBoolean(value, "Daily")
 		elite, _ := regexp.MatchString(`WeeklyHard.*`, mission)
 		if daily == true {
-			dailyc := DailyChallenges{idc, endedc, activationc, active, reputation, cdesc[1], ctitle}
+			dailyc := DailyChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			dchallenge = append(dchallenge, dailyc)
 		}
 		if daily == false && elite == false {
-			weekc := WeeklyChallenges{idc, endedc, activationc, active, reputation, cdesc[1], ctitle}
+			weekc := WeeklyChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			wchallenge = append(wchallenge, weekc)
 		}
 		if daily == false && elite == true {
-			weekelitec := WeeklyEliteChallenges{idc, endedc, activationc, active, reputation, cdesc[1], ctitle}
+			weekelitec := WeeklyEliteChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			welitechallenge = append(welitechallenge, weekelitec)
 		}
 	}, "SeasonInfo", "ActiveChallenges")
-	w := Nightwave{id, ended, acvtivation, season + 1, tag1,
+	w := Nightwave{id, ended, activation, season + 1, tag1,
 		phase, "", "", dchallenge, wchallenge, welitechallenge}
 	nightwave = append(nightwave, w)
 	topicf := "/wf/" + lang + "/" + platform + "/nightwave"
