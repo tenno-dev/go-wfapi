@@ -7,14 +7,16 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 // ParseSyndicateMissions Parse Ostrons & Solaris United Missions
 func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string) {
 	type SyndicateJobs struct {
-		Jobtype        string
-		Rewards        []string
+		Jobtype string
+		//Rewards        []string
+		Rewards        string // temp until translator is added
 		MinEnemyLevel  int64
 		MaxEnemyLevel  int64
-		StandingReward []int64
+		StandingReward []string
 	}
 	type SyndicateMissions struct {
 		ID        string
@@ -26,36 +28,38 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 	data := datasources.Apidata[platformno]
 	var syndicates []SyndicateMissions
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		syndicatecheck, _ := jsonparser.GetString(value, "syndicate")
-		if syndicatecheck != "Ostrons" && syndicatecheck != "Solaris United" {
+		syndicatecheck, _ := jsonparser.GetString(value, "Tag")
+		if syndicatecheck != "CetusSyndicate" && syndicatecheck != "SolarisSyndicate" {
 			return
 		}
-		id, _ := jsonparser.GetString(value, "id")
-		started, _ := jsonparser.GetString(value, "activation")
-		ended, _ := jsonparser.GetString(value, "expiry")
-		syndicate, _ := jsonparser.GetString(value, "syndicate")
+		id, _ := jsonparser.GetString(value, "_id", "$oid")
+		started, _ := jsonparser.GetString(value, "$date", "$numberLong")
+		ended, _ := jsonparser.GetString(value, "$date", "$numberLong")
+		syndicate, _ := jsonparser.GetString(value, "Tag")
 		var jobs []SyndicateJobs
 		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-			jobtype, _ := jsonparser.GetString(value1, "type")
-			rewards := make([]string, 0)
+			jobtype, _ := jsonparser.GetString(value1, "jobType")
+			rewards, _ := jsonparser.GetString(value1, "rewards") // temp until translator is added
+			/*rewards := make([]string, 0)
 			jsonparser.ArrayEach(value1, func(reward []byte, dataType jsonparser.ValueType, offset int, err error) {
 				rewards = append(rewards, string(reward))
 
-			}, "rewardPool")
+			}, "rewardPool")*/
+			minEnemyLevel, _ := jsonparser.GetInt(value1, "minEnemyLevel")
+			maxEnemyLevel, _ := jsonparser.GetInt(value1, "maxEnemyLevel")
+			standing := make([]string, 0)
+			jsonparser.ArrayEach(value1, func(xpam []byte, dataType jsonparser.ValueType, offset int, err error) {
+				standing = append(standing, string(xpam))
 
-			minEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[0]")
-			maxEnemyLevel, _ := jsonparser.GetInt(value1, "enemyLevels", "[1]")
-			standing1, _ := jsonparser.GetInt(value1, "standingStages", "[0]")
-			standing2, _ := jsonparser.GetInt(value1, "standingStages", "[1]")
-			standing3, _ := jsonparser.GetInt(value1, "standingStages", "[2]")
+			}, "xpAmounts")
 			jobs = append(jobs, SyndicateJobs{
 				Jobtype:        jobtype,
 				Rewards:        rewards,
 				MinEnemyLevel:  minEnemyLevel,
 				MaxEnemyLevel:  maxEnemyLevel,
-				StandingReward: []int64{standing1, standing2, standing3},
+				StandingReward: standing,
 			})
-		}, "jobs")
+		}, "Jobs")
 
 		w := SyndicateMissions{
 			ID:        id,
@@ -64,7 +68,7 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			Syndicate: syndicate,
 			Jobs:      jobs}
 		syndicates = append(syndicates, w)
-	}, "syndicateMissions")
+	}, "SyndicateMissions")
 
 	topicf := "/wf/" + lang + "/" + platform + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
