@@ -7,6 +7,7 @@ import (
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
+
 // ParseSyndicateMissions Parse Ostrons & Solaris United Missions
 func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string) {
 	type SyndicateJobs struct {
@@ -26,8 +27,8 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 	data := datasources.Apidata[platformno]
 	var syndicates []SyndicateMissions
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		syndicatecheck, _ := jsonparser.GetString(value, "syndicate")
-		if syndicatecheck != "Ostrons" && syndicatecheck != "Solaris United" {
+		syndicatecheck, _ := jsonparser.GetString(value, "Tag")
+		if syndicatecheck != "CetusSyndicate" && syndicatecheck != "SolarisSyndicate" {
 			return
 		}
 		id, _ := jsonparser.GetString(value, "id")
@@ -64,7 +65,7 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			Syndicate: syndicate,
 			Jobs:      jobs}
 		syndicates = append(syndicates, w)
-	}, "syndicateMissions")
+	}, "SyndicateMissions")
 
 	topicf := "/wf/" + lang + "/" + platform + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
