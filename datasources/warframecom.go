@@ -8,7 +8,7 @@ import (
 )
 
 // Apidata Result of LoadApidata
-var Apidata [][]byte
+var Apidata [4][]byte
 
 // LoadApidata loads data from Warframe.com api
 func LoadApidata(id1 string, id2 int) (ret []byte) {
