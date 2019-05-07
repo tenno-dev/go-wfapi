@@ -59,8 +59,10 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 			id, _ := jsonparser.GetString(value, "_id", "$oid")
 
 			url, _ := jsonparser.GetString(value, "Prop")
-			image, _ = jsonparser.GetString(value, "ImageUrl")
-
+			_, imgerr := jsonparser.GetString(value, "ImageUrl")
+			if imgerr == nil {
+				image, _ = jsonparser.GetString(value, "ImageUrl")
+			}
 			if strings.HasPrefix(image, "https://forums.warframe.com") {
 				image = strings.Split(image, "=")[1]
 				image = strings.Split(image, "&key")[0]
