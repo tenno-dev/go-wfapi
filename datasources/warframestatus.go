@@ -26,6 +26,9 @@ var Sortiemoddesc = make(map[string]map[string]interface{})
 // Sortiemodbosses Boss lang strings
 var Sortiemodbosses = make(map[string]map[string]interface{})
 
+// FactionsData Factions lang strings
+var FactionsData = make(map[string]map[string]interface{})
+
 // Sortielang --
 var Sortielang = make(map[string]map[string]interface{}) // temp
 // Sortielang1 --
@@ -97,25 +100,6 @@ func Loadlangdata(id1 string, id2 int) {
 		body, _ = ioutil.ReadAll(res.Body)
 		eventsData[id1]= string(body[:])
 		_, _ = io.Copy(ioutil.Discard, res.Body)
-
-		// factionsData
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/factionsData.json"
-		if (id1 =="en"){
-				url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
-		}
-		// fmt.Println("url:", url)
-		req, _ = http.NewRequest("GET", url, nil)
-		res, err = client.Do(req)
-		if err != nil {
-			fmt.Println("Errored when sending request to the server")
-			return
-		}
-		defer res.Body.Close()
-		body, _ = ioutil.ReadAll(res.Body)
-		factionsData[id1]= string(body[:])
-		_, _ = io.Copy(ioutil.Discard, res.Body)
-
-
 
 		// operationTypes
 		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/"+id1+"/operationTypes.json"
@@ -242,6 +226,24 @@ func Loadlangdata(id1 string, id2 int) {
 	body, _ = ioutil.ReadAll(res.Body)
 	json.Unmarshal([]byte(body), &result)
 	Languages[id1] = result
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
+	// FactionsData
+	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/factionsData.json"
+	if id1 == "en" {
+		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
+	}
+	// fmt.Println("url:", url)
+	req, _ = http.NewRequest("GET", url, nil)
+	res, err = client.Do(req)
+	if err != nil {
+		fmt.Println("Errored when sending request to the server")
+		return
+	}
+	defer res.Body.Close()
+	body, _ = ioutil.ReadAll(res.Body)
+	json.Unmarshal([]byte(body), &result)
+	FactionsData[id1] = result
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	/*

@@ -56,7 +56,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 				attackeritemcount, _ = jsonparser.GetInt(value, "AttackerReward", "countedItems", "[0]", "ItemCount")
 			}
 			attackerfaction1, _ := jsonparser.GetString(value, "AttackerMissionInfo", "faction")
-			attackerfaction := helper.Sortietranslate(attackerfaction1, "sortiemodboss", lang)
+			attackerfaction := helper.Factionstranslate(attackerfaction1, lang)
 			//attackerfaction := helper.Sortietranslate(attackerfaction1, "sortieloc", lang)
 			_, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "type")
 			if ierror2 == nil {
@@ -64,13 +64,13 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 				defenderitemcount, _ = jsonparser.GetInt(value, "DefenderReward", "countedItems", "[0]", "ItemCount")
 			}
 			defenderfaction1, _ := jsonparser.GetString(value, "DefenderMissionInfo", "faction")
-			defenderfaction := helper.Sortietranslate(defenderfaction1, "sortiemodboss", lang)
+			defenderfaction := helper.Factionstranslate(defenderfaction1, lang)
 			completion1, _ := jsonparser.GetInt(value, "Count")
 			completion2, _ := jsonparser.GetInt(value, "Goal")
-			completion := calcCompletion(completion1, completion2, attackerfaction[0])
+			completion := calcCompletion(completion1, completion2, attackerfaction)
 			w := Invasion{id, location[0], missiontype, completed, started,
-				attackeritem, attackeritemcount, attackerfaction[0],
-				defenderitem, defenderitemcount, defenderfaction[0], completion}
+				attackeritem, attackeritemcount, attackerfaction,
+				defenderitem, defenderitemcount, defenderfaction, completion}
 			invasions = append(invasions, w)
 		}
 	}, "Invasions")
