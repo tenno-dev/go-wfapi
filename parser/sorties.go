@@ -49,7 +49,7 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 	boss := helper.Sortietranslate(boss1, "sortiemodboss", lang)
 	reward, _ := jsonparser.GetString(data, "Sorties", "[0]", "Reward")
 	reward1 := helper.Sortietranslate2(reward, lang)
-	reward, _ = jsonparser.GetString(reward1, "sortieRewards")
+	reward = string(reward1[:]) // temp
 	var variants []Sortievariant
 
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
