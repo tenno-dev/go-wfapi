@@ -38,7 +38,6 @@ type LangMap map[string]interface{}
 var arcanesData map[string]interface{}
 var conclaveData map[string]interface{}
 var eventsData map[string]interface{}
-var factionsData map[string]interface{}
 var languages = map[string]string{}
 var operationTypes = map[string]string{}
 var persistentEnemyData map[string]interface{}

@@ -59,3 +59,20 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 	/**/
 	return ret
 }
+
+// Sortietranslate2 - Sortie Rewards "translate"
+func Sortietranslate2(src string, lang string) (ret string) {
+	var x1 string
+
+	x1 = src
+	result, ok := datasources.SortieRewards[lang]["sortieRewards"].(string)
+
+	if ok != false {
+		x1 = result
+
+	}
+	ret = x1
+
+	return ret
+
+}

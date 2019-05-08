@@ -44,6 +44,9 @@ var MissionTypes = make(map[string]map[string]interface{})
 // Languages General Lang strings
 var Languages = make(map[string]map[string]interface{})
 
+// SortieRewards General Lang strings
+var SortieRewards = make(map[string]map[string]interface{})
+
 // Loadlangdata load lang string from warframestat.us repo
 func Loadlangdata(id1 string, id2 int) {
 
@@ -244,6 +247,24 @@ func Loadlangdata(id1 string, id2 int) {
 	body, _ = ioutil.ReadAll(res.Body)
 	json.Unmarshal([]byte(body), &result)
 	FactionsData[id1] = result
+	_, _ = io.Copy(ioutil.Discard, res.Body)
+
+	// sortieRewards
+	url = "https://drops.warframestat.us/data/sortieRewards.json"
+	if id1 == "en" {
+		url = "https://drops.warframestat.us/data/sortieRewards.json"
+	}
+	// fmt.Println("url:", url)
+	req, _ = http.NewRequest("GET", url, nil)
+	res, err = client.Do(req)
+	if err != nil {
+		fmt.Println("Errored when sending request to the server")
+		return
+	}
+	defer res.Body.Close()
+	body, _ = ioutil.ReadAll(res.Body)
+	json.Unmarshal([]byte(body), &result)
+	SortieRewards[id1] = result
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	/*

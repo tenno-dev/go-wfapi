@@ -21,3 +21,16 @@ func Langtranslate2(src string, lang string) (ret [2]string) {
 	ret = x1
 	return ret
 }
+
+// Langtranslate1 translate mission types - returns 1 result
+func Langtranslate1(src string, lang string) (ret string) {
+	var x1 string
+	x1 = src
+	src = strings.ToLower(src)
+	result, ok := datasources.Languages[lang][src].(map[string]interface{})
+	if ok != false {
+		x1 = result["value"].(string)
+	}
+	ret = x1
+	return ret
+}
