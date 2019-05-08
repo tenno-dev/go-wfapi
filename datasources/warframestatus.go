@@ -45,7 +45,7 @@ var MissionTypes = make(map[string]map[string]interface{})
 var Languages = make(map[string]map[string]interface{})
 
 // SortieRewards General Lang strings
-var SortieRewards string
+var SortieRewards []byte
 
 // Loadlangdata load lang string from warframestat.us repo
 func Loadlangdata(id1 string, id2 int) {
@@ -267,7 +267,7 @@ func Loadlangdata(id1 string, id2 int) {
 	var result2 string
 
 	json.Unmarshal([]byte(body), &result2)
-	SortieRewards = result2
+	SortieRewards = body
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	/*

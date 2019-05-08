@@ -62,15 +62,11 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 	return ret
 }
 
-// Sortietranslate2 - Sortie Rewards "translate"
-func Sortietranslate2(src string, lang string) (ret string) {
-	var x1 string
-
-	x1 = src
+// Sortietranslate2 - Sortie Rewards "translate "
+func Sortietranslate2(src string, lang string) (ret []byte) {
 	result := datasources.SortieRewards
-	fmt.Println(string(result))
-	x1 = string(result)
-	ret = x1
+	fmt.Println(result)
+	ret = result
 
 	return ret
 
