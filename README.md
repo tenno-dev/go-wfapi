@@ -25,7 +25,14 @@ WIP  Warframe API Parser with  MQTT publisher
 
 ## Demo
 
-+ Web:  coming soon
++ Web: https://api.mybitti.de
+  + Ping:   /
+  + Worldstate(unparsed) /:platform
+  + Darvos Deal: /:platform/platform/  (Accept-Language required)
+  + News /:platform/news/ (Accept-Language required)
+  only first two chars  of  (Accept-Language) is used.
+
+
 + MQTT Client:  (sometimes offline when i'm testing new updates)
   + Host: mybitti(.)de
   + Port: 1884
