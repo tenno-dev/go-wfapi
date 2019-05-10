@@ -10,18 +10,26 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// DarvoDeals struct
+type DarvoDeals struct {
+	ID              string
+	Start           string
+	Ends            string
+	Item            string
+	Price           int64
+	DealPrice       int64
+	DiscountPercent int64
+	Stock           int64
+	Sold            int64
+}
+
+// Testdata for http export
+var Testdata = make(map[int]map[string][]DarvoDeals)
+
 // ParseDarvoDeal Parse current Darvo Deal
 func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string) {
-	type DarvoDeals struct {
-		ID              string
-		Start           string
-		Ends            string
-		Item            string
-		Price           int64
-		DealPrice       int64
-		DiscountPercent int64
-		Stock           int64
-		Sold            int64
+	if _, ok := Testdata[platformno]; !ok {
+		Testdata[platformno] = make(map[string][]DarvoDeals)
 	}
 	data := datasources.Apidata[platformno]
 	var deals []DarvoDeals
@@ -41,7 +49,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		item, _ := jsonparser.GetString(value, "StoreItem")
-		item = helper.Langtranslate1(item,lang)
+		item = helper.Langtranslate1(item, lang)
 		originalprice, _ := jsonparser.GetInt(value, "OriginalPrice")
 		dealprice, _ := jsonparser.GetInt(value, "SalePrice")
 		stock, _ := jsonparser.GetInt(value, "AmountTotal")
@@ -55,6 +63,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 
 	topicf := "/wf/" + lang + "/" + platform + "/darvodeals"
 	messageJSON, _ := json.Marshal(deals)
+	Testdata[platformno][lang] = deals
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }

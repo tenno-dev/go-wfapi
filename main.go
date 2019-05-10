@@ -8,8 +8,9 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"github.com/bitti09/go-wfapi/outputs"
+
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -141,15 +142,17 @@ func main() {
 		c1.Start()
 		PrintMemUsage()
 
-			// static root, matches http://localhost:8080
-	// or http://localhost:8080/ (even if PathCorrection is false).
-	mux.HandleFunc("/", outputs.IndexHandler)
+		// static root, matches http://localhost:8080
+		// or http://localhost:8080/ (even if PathCorrection is false).
+		mux.HandleFunc("/", outputs.IndexHandler)
 
-	// named parameter, matches /profile/$something_here
-	// but NOT /profile/anything/here neither /profile
-	// and /profile/ (if PathCorrection is true).
-	mux.HandleFunc("/:platform", outputs.ProfileHandler)
-			fmt.Println("Server started at http://localhost:9090")
+		// named parameter, matches /profile/$something_here
+		// but NOT /profile/anything/here neither /profile
+		// and /profile/ (if PathCorrection is true).
+		mux.HandleFunc("/:platform", outputs.ProfileHandler)
+		mux.HandleFunc("/darvo/:platform/:lang", outputs.ProfileHandler2)
+
+		fmt.Println("Server started at http://localhost:9090")
 
 		if err := http.ListenAndServe(":9090", mux); err != nil {
 			panic(err)
