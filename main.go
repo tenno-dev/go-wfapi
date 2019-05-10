@@ -14,7 +14,7 @@ import (
 	"github.com/bitti09/go-wfapi/parser"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/kataras/muxie"
+	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
 )
 
@@ -59,8 +59,8 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
-	mux := muxie.NewMux()
-	mux.PathCorrection = true
+	r := mux.NewRouter()
+
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial2")
 	//opts.SetKeepAlive(2 * time.Second)
@@ -149,12 +149,12 @@ func main() {
 		// named parameter, matches /profile/$something_here
 		// but NOT /profile/anything/here neither /profile
 		// and /profile/ (if PathCorrection is true).
-		mux.HandleFunc("/:platform", outputs.ProfileHandler)
-		mux.HandleFunc("/darvo/:platform/:lang", outputs.ProfileHandler2)
+		r.HandleFunc("/:platform", outputs.ProfileHandler)
+		r.HandleFunc("/:platform/darvo/", outputs.ProfileHandler2)
 
 		fmt.Println("Server started at http://localhost:9090")
 
-		if err := http.ListenAndServe(":9090", mux); err != nil {
+		if err := http.ListenAndServe(":9090", r); err != nil {
 			panic(err)
 		}
 

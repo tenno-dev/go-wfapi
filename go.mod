@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
 	github.com/eclipse/paho.mqtt.golang v1.2.0
+	github.com/gorilla/mux v1.7.1
 	github.com/json-iterator/go v1.1.6
 	github.com/kataras/muxie v1.0.7
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
