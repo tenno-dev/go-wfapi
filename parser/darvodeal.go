@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -40,6 +41,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		item, _ := jsonparser.GetString(value, "StoreItem")
+		item = helper.Langtranslate1(item,lang)
 		originalprice, _ := jsonparser.GetInt(value, "OriginalPrice")
 		dealprice, _ := jsonparser.GetInt(value, "SalePrice")
 		stock, _ := jsonparser.GetInt(value, "AmountTotal")
