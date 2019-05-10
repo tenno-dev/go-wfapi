@@ -23,14 +23,17 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	value, _ := intMap[platform]
+    w.Header().Set("Content-Type", "application/json")
 	w.Write(datasources.Apidata[value])
 }
 
 // ProfileHandler2 test 2
 func ProfileHandler2(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+    w.Header().Set("Content-Type", "application/json")
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")
+	token = token[0:2]
 	value, _ := intMap[platform]
 	messageJSON, _ := json.Marshal(parser.Testdata[value][token])
 
@@ -43,6 +46,8 @@ func ProfileHandler3(w http.ResponseWriter, r *http.Request) {
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")
 	value, _ := intMap[platform]
+	token = token[0:2]
+    w.Header().Set("Content-Type", "application/json")
 	messageJSON, _ := json.Marshal(parser.Testdata2[value][token])
 
 	w.Write(messageJSON)
