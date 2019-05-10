@@ -48,7 +48,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		sold, _ := jsonparser.GetInt(value, "AmountSold")
 		discount, _ := jsonparser.GetInt(value, "Discount")
 
-		w := DarvoDeals{id, ended, started, item, originalprice, dealprice,
+		w := DarvoDeals{id, started, ended, item, originalprice, dealprice,
 			discount, stock, sold}
 		deals = append(deals, w)
 	}, "DailyDeals")
