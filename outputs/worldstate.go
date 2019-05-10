@@ -35,3 +35,14 @@ func ProfileHandler2(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(messageJSON)
 }
+
+// ProfileHandler3 test 3
+func ProfileHandler3(w http.ResponseWriter, r *http.Request) {
+	lang := muxie.GetParam(w, "lang")
+	name := muxie.GetParam(w, "platform")
+
+	value, _ := intMap[name]
+	messageJSON, _ := json.Marshal(parser.Testdata2[value][lang])
+
+	w.Write(messageJSON)
+}
