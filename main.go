@@ -8,12 +8,12 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-
+	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/parser"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/pkg/profile"
+	"github.com/kataras/muxie"
 	"github.com/robfig/cron"
 )
 
@@ -58,8 +58,8 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
-	defer profile.Start(profile.MemProfile).Stop()
-
+	mux := muxie.NewMux()
+	mux.PathCorrection = true
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial2")
 	//opts.SetKeepAlive(2 * time.Second)
@@ -140,7 +140,18 @@ func main() {
 		})
 		c1.Start()
 		PrintMemUsage()
-		if err := http.ListenAndServe(":9090", nil); err != nil {
+
+			// static root, matches http://localhost:8080
+	// or http://localhost:8080/ (even if PathCorrection is false).
+	mux.HandleFunc("/", outputs.IndexHandler)
+
+	// named parameter, matches /profile/$something_here
+	// but NOT /profile/anything/here neither /profile
+	// and /profile/ (if PathCorrection is true).
+	mux.HandleFunc("/:platform", outputs.ProfileHandler)
+			fmt.Println("Server started at http://localhost:9090")
+
+		if err := http.ListenAndServe(":9090", mux); err != nil {
 			panic(err)
 		}
 
