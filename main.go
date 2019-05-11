@@ -59,6 +59,8 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
+
+	datasources.InitLangDir()	
 	r := mux.NewRouter()
 
 	// mqtt client start
@@ -81,7 +83,7 @@ func main() {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
 		datasources.Loadlangdata(v1, x1)
-	} /**/
+	} 
 	for x, v := range platforms {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
@@ -135,7 +137,7 @@ func main() {
 					parseDarvo(x, v, c)
 					parseEvents(x, v, c)
 					parseNightwave(x, v, c)
-				*/
+			*/
 				PrintMemUsage()
 			}
 		})

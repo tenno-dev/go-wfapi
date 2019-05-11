@@ -3,9 +3,10 @@ package datasources
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"net/http"
+	"os"
+
+	git "gopkg.in/src-d/go-git.v4"
 )
 
 // LangMap type fore json unmarshall
@@ -47,10 +48,36 @@ var Languages = make(map[string]map[string]interface{})
 // SortieRewards General Lang strings
 var SortieRewards []byte
 
+// Dirpath path to lang  git dir
+var Dirpath = "./langsource/"
+
+// InitLangDir test new ways
+func InitLangDir() {
+	_, err := os.Stat("./langsource/")
+
+	if os.IsNotExist(err) {
+		fmt.Println(err) //Shows error if file not exists
+		_, _ = git.PlainClone("./langsource/", false, &git.CloneOptions{
+			URL:      "https://github.com/WFCD/warframe-worldstate-data",
+			Progress: os.Stdout,
+		})
+	}
+	if !os.IsNotExist(err) {
+		fmt.Println("path exist") // Shows success message like file is there
+		r, _ := git.PlainOpen("./langsource")
+		w, _ := r.Worktree()
+		err3 := w.Pull(&git.PullOptions{
+			Progress: os.Stdout,
+			Force:    true,
+		})
+		fmt.Println(err3)
+
+	}
+}
+
 // Loadlangdata load lang string from warframestat.us repo
 func Loadlangdata(id1 string, id2 int) {
 
-	client := &http.Client{}
 	/*
 		// arcanesData
 
@@ -139,136 +166,115 @@ func Loadlangdata(id1 string, id2 int) {
 		_, _ = io.Copy(ioutil.Discard, res.Body)
 	*/
 	// solNodes
-	url := "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/solNodes.json"
+	url := Dirpath + "data/" + id1 + "/solNodes.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/solNodes.json"
+		url = Dirpath + "data/" + "solNodes.json"
 	}
-	req, _ := http.NewRequest("GET", url, nil)
-	res, err := client.Do(req)
+	req, err := os.Open(url)
+	// if we os.Open returns an error then handle it
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
+
+	defer req.Close()
+	body, _ := ioutil.ReadAll(req)
 	fmt.Println(id1)
 	var result map[string]interface{}
 	json.Unmarshal([]byte(body), &result)
 	Sortieloc[id1] = result
 
-	_, _ = io.Copy(ioutil.Discard, res.Body)
-
 	// sortieData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/sortieData.json"
+	url = Dirpath + "data/" + id1 + "/sortieData.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/sortieData.json"
+		url = Dirpath + "data/" + "sortieData.json"
 	}
-	//fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	err = json.Unmarshal(body, &Sortielang)
 	Sortiemodtypes[id1] = make(LangMap)
 	Sortiemodtypes[id1] = Sortielang["modifierTypes"]
 	Sortiemoddesc[id1] = Sortielang["modifierDescriptions"]
 	Sortiemodbosses[id1] = Sortielang["bosses"]
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// FissureModifiers
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/fissureModifiers.json"
+	url = Dirpath + "data/" + id1 + "/fissureModifiers.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/fissureModifiers.json"
+		url = Dirpath + "data/" + "fissureModifiers.json"
 	}
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	json.Unmarshal([]byte(body), &result)
 	FissureModifiers[id1] = result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// MissionTypes
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/missionTypes.json"
+	url = Dirpath + "data/" + id1 + "/missionTypes.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/missionTypes.json"
+		url = Dirpath + "data/" + "missionTypes.json"
 	}
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	json.Unmarshal([]byte(body), &result)
 	MissionTypes[id1] = result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// languages
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/languages.json"
+	url = Dirpath + "data/" + id1 + "/languages.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/languages.json"
+		url = Dirpath + "data/" + "languages.json"
 	}
 	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	json.Unmarshal([]byte(body), &result)
 	Languages[id1] = result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// FactionsData
-	url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/" + id1 + "/factionsData.json"
+	url = Dirpath + "data/" + id1 + "/factionsData.json"
 	if id1 == "en" {
-		url = "https://raw.githubusercontent.com/WFCD/warframe-worldstate-data/master/data/factionsData.json"
+		url = Dirpath + "data/" + "factionsData.json"
 	}
 	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	json.Unmarshal([]byte(body), &result)
 	FactionsData[id1] = result
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	// sortieRewards
-	url = "https://drops.warframestat.us/data/sortieRewards.json"
+	url = Dirpath + "data/" + id1 + "/sortieRewards.json"
 	if id1 != "en" {
 		// url = "https://drops.warframestat.us/data/sortieRewards.json"
 		return
 	}
 	// fmt.Println("url:", url)
-	req, _ = http.NewRequest("GET", url, nil)
-	res, err = client.Do(req)
+	req, err = os.Open(url)
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		fmt.Println(err)
 	}
-	defer res.Body.Close()
-	body, _ = ioutil.ReadAll(res.Body)
+	defer req.Close()
+	body, _ = ioutil.ReadAll(req)
 	var result2 string
 
 	json.Unmarshal([]byte(body), &result2)
 	SortieRewards = body
-	_, _ = io.Copy(ioutil.Discard, res.Body)
 
 	/*
 		// syndicatesData
