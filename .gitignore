@@ -4,3 +4,4 @@ test.go2
 .vscode/
 *.exe
 filename
+langsource/
