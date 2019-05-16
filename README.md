@@ -30,6 +30,10 @@ WIP  Warframe API Parser with  MQTT publisher
   - Worldstate(unparsed) /:platform
   - Darvos Deal: /:platform/platform/  (Accept-Language required)
   - News /:platform/news/ (Accept-Language required)
+  - Alerts /:platform/alerts/ (Accept-Language required)
+  - Fissures /:platform/fissures/ (Accept-Language required)
+  - Nightwave /:platform/nightwave/ (Accept-Language required)
+
   only first two chars  of  (Accept-Language) is used.
 
 

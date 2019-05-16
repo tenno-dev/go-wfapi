@@ -24,12 +24,12 @@ type DarvoDeals struct {
 }
 
 // Testdata for http export
-var Testdata = make(map[int]map[string][]DarvoDeals)
+var Darvodata = make(map[int]map[string][]DarvoDeals)
 
 // ParseDarvoDeal Parse current Darvo Deal
 func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string) {
-	if _, ok := Testdata[platformno]; !ok {
-		Testdata[platformno] = make(map[string][]DarvoDeals)
+	if _, ok := Darvodata[platformno]; !ok {
+		Darvodata[platformno] = make(map[string][]DarvoDeals)
 	}
 	data := datasources.Apidata[platformno]
 	var deals []DarvoDeals
@@ -63,7 +63,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 
 	topicf := "/wf/" + lang + "/" + platform + "/darvodeals"
 	messageJSON, _ := json.Marshal(deals)
-	Testdata[platformno][lang] = deals
+	Darvodata[platformno][lang] = deals
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
 }

@@ -20,13 +20,13 @@ type News struct {
 	Image    string
 }
 
-// Testdata2 - test news output
-var Testdata2 = make(map[int]map[string][]News)
+// Newsdata - test news output
+var Newsdata = make(map[int]map[string][]News)
 
 // ParseNews parsing news data (Called Events in warframe api)
 func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
-	if _, ok := Testdata2[platformno]; !ok {
-		Testdata2[platformno] = make(map[string][]News)
+	if _, ok := Newsdata[platformno]; !ok {
+		Newsdata[platformno] = make(map[string][]News)
 	}
 	data := datasources.Apidata[platformno]
 	_, _, _, ernews := jsonparser.Get(data, "Events")
@@ -81,7 +81,7 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 			w := News{ID: id, Message: message, URL: url, Date: date, Image: image, priority: priority}
 			news = append(news, w)
 			topicf := "/wf/" + lang + "/" + platform + "/news"
-			Testdata2[platformno][lang] = news
+			Newsdata[platformno][lang] = news
 			messageJSON, _ := json.Marshal(news)
 			token := c.Publish(topicf, 0, true, messageJSON)
 			token.Wait()

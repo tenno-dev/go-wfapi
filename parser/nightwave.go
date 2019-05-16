@@ -13,48 +13,61 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// DailyChallenges - DailyChallenges
+type DailyChallenges struct {
+	ID          string
+	Ends        int64
+	Started     int64
+	Active      bool
+	Reputation  int64
+	Description string
+	Title       string
+}
+
+// WeeklyChallenges - WeeklyChallenges
+type WeeklyChallenges struct {
+	ID          string
+	Ends        int64
+	Started     int64
+	Active      bool
+	Reputation  int64
+	Description string
+	Title       string
+}
+
+// WeeklyEliteChallenges - WeeklyEliteChallenges
+type WeeklyEliteChallenges struct {
+	ID          string
+	Ends        int64
+	Started     int64
+	Active      bool
+	Reputation  int64
+	Description string
+	Title       string
+}
+
+// Nightwave - Nightwave
+type Nightwave struct {
+	ID                    string
+	Ends                  string
+	Started               string
+	Season                int64
+	Tag                   string
+	Phase                 int64
+	params                string
+	possibleChallenges    string
+	DailyChallenges       []DailyChallenges
+	WeeklyChallenges      []WeeklyChallenges
+	WeeklyEliteChallenges []WeeklyEliteChallenges
+}
+
+// Nightwavedata export Alertsdata
+var Nightwavedata = make(map[int]map[string][]Nightwave)
+
 // ParseNightwave Parse Nightwave Season Info
 func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string) {
-
-	type DailyChallenges struct {
-		ID          string
-		Ends        int64
-		Started     int64
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type WeeklyChallenges struct {
-		ID          string
-		Ends        int64
-		Started     int64
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type WeeklyEliteChallenges struct {
-		ID          string
-		Ends        int64
-		Started     int64
-		Active      bool
-		Reputation  int64
-		Description string
-		Title       string
-	}
-	type Nightwave struct {
-		ID                    string
-		Ends                  string
-		Started               string
-		Season                int64
-		Tag                   string
-		Phase                 int64
-		params                string
-		possibleChallenges    string
-		DailyChallenges       []DailyChallenges
-		WeeklyChallenges      []WeeklyChallenges
-		WeeklyEliteChallenges []WeeklyEliteChallenges
+	if _, ok := Nightwavedata[platformno]; !ok {
+		Nightwavedata[platformno] = make(map[string][]Nightwave)
 	}
 	data := datasources.Apidata[platformno]
 	var nightwave []Nightwave
@@ -92,7 +105,7 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 		cdesc := helper.Langtranslate2(mission, lang)
 		reputation, _ := jsonparser.GetInt(value, "reputation")
 		active := true // temp
-		if  endedc2 > timenow {
+		if endedc2 > timenow {
 			active = true // temp
 		}
 		daily, _ := jsonparser.GetBoolean(value, "Daily")
@@ -114,6 +127,7 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 		phase, "", "", dchallenge, wchallenge, welitechallenge}
 	nightwave = append(nightwave, w)
 	topicf := "/wf/" + lang + "/" + platform + "/nightwave"
+	Nightwavedata[platformno][lang] = nightwave
 	messageJSON, _ := json.Marshal(nightwave)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
