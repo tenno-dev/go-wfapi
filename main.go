@@ -144,16 +144,15 @@ func main() {
 		c1.Start()
 		PrintMemUsage()
 
-		// static root, matches http://localhost:8080
-		// or http://localhost:8080/ (even if PathCorrection is false).
 		r.HandleFunc("/", outputs.IndexHandler)
 
-		// named parameter, matches /profile/$something_here
-		// but NOT /profile/anything/here neither /profile
-		// and /profile/ (if PathCorrection is true).
+		// routes for multilang http output
 		r.HandleFunc("/{platform}", outputs.ProfileHandler)
 		r.HandleFunc("/{platform}/darvo/", outputs.ProfileHandler2)
 		r.HandleFunc("/{platform}/news/", outputs.ProfileHandler3)
+		r.HandleFunc("/{platform}/alerts/", outputs.ProfileHandler4)
+		r.HandleFunc("/{platform}/fissures/", outputs.ProfileHandler5)
+		r.HandleFunc("/{platform}/nightwave/", outputs.ProfileHandler6)
 
 		fmt.Println("Server started at http://localhost:9090")
 

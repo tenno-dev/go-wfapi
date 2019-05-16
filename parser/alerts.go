@@ -9,23 +9,30 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// Alerts struct
+type Alerts struct {
+	ID                  string
+	Started             string
+	Ends                string
+	MissionType         string
+	MissionFaction      string
+	MissionLocation     string
+	MinEnemyLevel       int64
+	MaxEnemyLevel       int64
+	EnemyWaves          int64 `json:",omitempty"`
+	RewardCredits       int64
+	RewardItemMany      string `json:",omitempty"`
+	RewardItemManyCount int64  `json:",omitempty"`
+	RewardItem          string `json:",omitempty"`
+}
+
+// Alertsdata export Alertsdata
+var Alertsdata = make(map[int]map[string][]Alerts)
 
 // ParseAlerts parsing Alerts data
 func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
-	type Alerts struct {
-		ID                  string
-		Started             string
-		Ends                string
-		MissionType         string
-		MissionFaction      string
-		MissionLocation     string
-		MinEnemyLevel       int64
-		MaxEnemyLevel       int64
-		EnemyWaves          int64 `json:",omitempty"`
-		RewardCredits       int64
-		RewardItemMany      string `json:",omitempty"`
-		RewardItemManyCount int64  `json:",omitempty"`
-		RewardItem          string `json:",omitempty"`
+	if _, ok := Alertsdata[platformno]; !ok {
+		Alertsdata[platformno] = make(map[string][]Alerts)
 	}
 	data := datasources.Apidata[platformno]
 	var alerts []Alerts
@@ -64,6 +71,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	}, "Alerts")
 
 	topicf := "/wf/" + lang + "/" + platform + "/alerts"
+	Alertsdata[platformno][lang] = alerts
 	messageJSON, _ := json.Marshal(alerts)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()

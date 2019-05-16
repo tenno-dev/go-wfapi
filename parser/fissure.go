@@ -10,19 +10,27 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// Fissures struct
+type Fissures struct {
+	ID              string
+	Started         string
+	Ends            string
+	Active          bool
+	MissionType     string
+	MissionFaction  string
+	MissionLocation string
+	Tier            string
+	TierLevel       string
+	Expired         bool
+}
+
+// Fissuresdata export Fissuresdata
+var Fissuresdata = make(map[int]map[string][]Fissures)
+
 // ParseFissures  parse Fissure data
 func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) {
-	type Fissures struct {
-		ID              string
-		Started         string
-		Ends            string
-		Active          bool
-		MissionType     string
-		MissionFaction  string
-		MissionLocation string
-		Tier            string
-		TierLevel       string
-		Expired         bool
+	if _, ok := Fissuresdata[platformno]; !ok {
+		Fissuresdata[platformno] = make(map[string][]Fissures)
 	}
 	data := datasources.Apidata[platformno]
 	var fissures []Fissures
@@ -56,6 +64,7 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 	}, "ActiveMissions")
 
 	topicf := "/wf/" + lang + "/" + platform + "/fissures"
+	Fissuresdata[platformno][lang] = fissures
 	messageJSON, _ := json.Marshal(fissures)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
