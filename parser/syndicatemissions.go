@@ -3,8 +3,10 @@ package parser
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -13,7 +15,7 @@ import (
 func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string) {
 	type SyndicateJobs struct {
 		Jobtype        string
-		Rewards        string // temp until translator is added
+		Rewards        []string
 		MinEnemyLevel  int64
 		MaxEnemyLevel  int64
 		StandingReward []string
@@ -38,12 +40,9 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			var jobs []SyndicateJobs
 			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
 				jobtype, _ := jsonparser.GetString(value1, "jobType")
-				rewards, _ := jsonparser.GetString(value1, "rewards") // temp until translator is added
-				/*rewards := make([]string, 0)
-				jsonparser.ArrayEach(value1, func(reward []byte, dataType jsonparser.ValueType, offset int, err error) {
-					rewards = append(rewards, string(reward))
-
-				}, "rewardPool")*/
+				rewards0, _ := jsonparser.GetString(value1, "rewards")
+				rewards1 := helper.Langtranslate1(rewards0, lang)
+				rewards := strings.Split(rewards1, ",")
 				minEnemyLevel, _ := jsonparser.GetInt(value1, "minEnemyLevel")
 				maxEnemyLevel, _ := jsonparser.GetInt(value1, "maxEnemyLevel")
 				standing := make([]string, 0)

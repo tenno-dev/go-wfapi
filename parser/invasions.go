@@ -17,7 +17,6 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 		MissionType string
 		Completed   bool
 		Started     string
-		//VsInfested          bool
 		AttackerRewardItem  string `json:",omitempty"`
 		AttackerRewardCount int64  `json:",omitempty"`
 		AttackerMissionInfo string `json:",omitempty"`
@@ -50,7 +49,6 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			missiontype, _ := jsonparser.GetString(value, "LocTag")
 			missiontype = helper.Langtranslate1(missiontype, lang)
 			completed, _ := jsonparser.GetBoolean(value, "Completed")
-			//vsinfested, _ := jsonparser.GetBoolean(value, "vsInfestation")
 			_, _, _, ierror := jsonparser.Get(value, "AttackerReward", "countedItems", "[0]", "ItemType")
 			if ierror == nil {
 				attackeritem, _ = jsonparser.GetString(value, "AttackerReward", "countedItems", "[0]", "ItemType")
@@ -58,7 +56,6 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			}
 			attackerfaction, _ := jsonparser.GetString(value, "AttackerMissionInfo", "faction")
 			attackerfaction = helper.Factionstranslate(attackerfaction, lang)
-			//attackerfaction := helper.Sortietranslate(attackerfaction1, "sortieloc", lang)
 			_, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "type")
 			if ierror2 == nil {
 				defenderitem, _ = jsonparser.GetString(value, "DefenderReward", "countedItems", "[0]", "ItemType")
@@ -75,7 +72,6 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			invasions = append(invasions, w)
 		}
 	}, "Invasions")
-
 	topicf := "/wf/" + lang + "/" + platform + "/invasions"
 	messageJSON, _ := json.Marshal(invasions)
 	token := c.Publish(topicf, 0, true, messageJSON)
@@ -86,8 +82,6 @@ func calcCompletion(count int64, goal int64, attacker string) (complete float32)
 	x := float32(y * 50)
 	if attacker == "Infested" || attacker == "FC_INFESTATION" {
 		x = float32(y * 100)
-
 	}
-	//fmt.Println(y)
 	return x
 }
