@@ -97,12 +97,10 @@ func main() {
 			parser.ParseInvasions(x, v, c, v1)
 			parser.ParseDarvoDeal(x, v, c, v1)
 			parser.ParseNightwave(x, v, c, v1)
+			parser.ParseVoidTrader(x, v, c, v1)
 			/*
-				parseInvasions(x, v, c)
 				parseCycles(x, v, c)
-				parseDarvo(x, v, c)
 				parseEvents(x, v, c)
-				parseNightwave(x, v, c)
 			*/
 			PrintMemUsage()
 
@@ -128,13 +126,11 @@ func main() {
 					parser.ParseInvasions(x, v, c, v1)
 					parser.ParseDarvoDeal(x, v, c, v1)
 					parser.ParseNightwave(x, v, c, v1)
+					parser.ParseVoidTrader(x, v, c, v1)
 				}
 				/*
-					parseInvasions(x, v, c)
 					parseCycles(x, v, c)
-					parseDarvo(x, v, c)
 					parseEvents(x, v, c)
-					parseNightwave(x, v, c)
 			*/
 				PrintMemUsage()
 			}
