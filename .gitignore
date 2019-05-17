@@ -5,3 +5,4 @@ test.go2
 *.exe
 filename
 langsource/
+download\.json
