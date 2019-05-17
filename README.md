@@ -12,7 +12,7 @@ WIP  Warframe API Parser with  MQTT publisher
  - [x] Nightwave
  - [x] Syndicate Missions ( untranslated )
  - [x] Invasions  ( half translated )
- - [ ] Void Trader (waiting for api response)
+ - [x] Void Trader (waiting for api response)
  - [ ] World Events
 
 

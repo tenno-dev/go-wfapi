@@ -16,6 +16,7 @@ type DarvoDeals struct {
 	Start           string
 	Ends            string
 	Item            string
+	Itemtest        string
 	Price           int64
 	DealPrice       int64
 	DiscountPercent int64
@@ -23,7 +24,7 @@ type DarvoDeals struct {
 	Sold            int64
 }
 
-// Testdata for http export
+// Darvodata for http export
 var Darvodata = make(map[int]map[string][]DarvoDeals)
 
 // ParseDarvoDeal Parse current Darvo Deal
@@ -50,13 +51,14 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		item, _ := jsonparser.GetString(value, "StoreItem")
 		item = helper.Langtranslate1(item, lang)
+itemdetails := "PH"
 		originalprice, _ := jsonparser.GetInt(value, "OriginalPrice")
 		dealprice, _ := jsonparser.GetInt(value, "SalePrice")
 		stock, _ := jsonparser.GetInt(value, "AmountTotal")
 		sold, _ := jsonparser.GetInt(value, "AmountSold")
 		discount, _ := jsonparser.GetInt(value, "Discount")
 
-		w := DarvoDeals{id, started, ended, item, originalprice, dealprice,
+		w := DarvoDeals{id, started, ended, item, itemdetails, originalprice, dealprice,
 			discount, stock, sold}
 		deals = append(deals, w)
 	}, "DailyDeals")
