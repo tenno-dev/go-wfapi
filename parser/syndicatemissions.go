@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -31,7 +30,6 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 	var syndicates []SyndicateMissions
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		syndicatecheck, _ := jsonparser.GetString(value, "Tag")
-		fmt.Println(syndicatecheck)
 		if syndicatecheck == "CetusSyndicate" || syndicatecheck == "SolarisSyndicate" {
 			id, _ := jsonparser.GetString(value, "_id", "$oid")
 			started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")

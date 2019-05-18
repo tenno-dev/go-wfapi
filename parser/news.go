@@ -38,7 +38,6 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 	var message string
 
 	var news []News
-	fmt.Println("news reached")
 
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		message = ""
@@ -47,17 +46,12 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 
 			if newstemp1 == lang {
 				message, _ = jsonparser.GetString(value1, "Message")
-				fmt.Println("news lang", newstemp1)
-				fmt.Println("news lang1", lang)
-				fmt.Println("news ", message)
 
 			}
 		}, "Messages")
 
 		if message != "" {
 			errnews2 = false
-			fmt.Println("errnews2 ", message)
-
 		} else {
 			errnews2 = true
 		}

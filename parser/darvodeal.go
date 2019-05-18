@@ -50,7 +50,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		item, _ := jsonparser.GetString(value, "StoreItem")
-		// item = helper.Langtranslate1(item, lang)
+		item = helper.Langtranslate1(item, lang)
 		// itemtest := helper.Langtranslate1(item, "en")
 		// itemdetails := helper.Getitemdetails(itemtest)
 		itemdetails := "PH"
