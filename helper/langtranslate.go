@@ -2,6 +2,7 @@ package helper
 
 import (
 	"strings"
+	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 )
@@ -31,9 +32,11 @@ func Langtranslate1(src string, lang string) (ret string) {
 	if ok != false {
 		x1 = result["value"].(string)
 	} else {
-		src1 := strings.Split(src, "/")
-		src2 := src1[len(src1)-1]
-		result, ok := datasources.Languages[lang][src2].(map[string]interface{})
+			fmt.Println("translate error",src)
+
+		src1 := strings.Replace(src, "storeitems/", "", -1)
+					fmt.Println("translate error2", src1)
+		result, ok := datasources.Languages[lang][src1].(map[string]interface{})
 		if ok != false {
 			x1 = result["value"].(string)
 		}
