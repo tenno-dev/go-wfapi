@@ -30,6 +30,13 @@ func Langtranslate1(src string, lang string) (ret string) {
 	result, ok := datasources.Languages[lang][src].(map[string]interface{})
 	if ok != false {
 		x1 = result["value"].(string)
+	} else {
+		src1 := strings.Split(src, "/")
+		src2 := src1[len(src1)-1]
+		result, ok := datasources.Languages[lang][src2].(map[string]interface{})
+		if ok != false {
+			x1 = result["value"].(string)
+		}
 	}
 	ret = x1
 	return ret
