@@ -25,7 +25,7 @@ require (
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
-	golang.org/x/sys v0.0.0-20190529164535-6a60838ec259 // indirect
+	golang.org/x/sys v0.0.0-20190530223933-ad28b68e88f1 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190530043710-12d73424210d // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect
