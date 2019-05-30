@@ -38,6 +38,7 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			var jobs []SyndicateJobs
 			jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
 				jobtype, _ := jsonparser.GetString(value1, "jobType")
+				jobtype = helper.Langtranslate1(jobtype, lang)
 				rewards0, _ := jsonparser.GetString(value1, "rewards")
 				rewards1 := helper.Langtranslate1(rewards0, lang)
 				rewards := strings.Split(rewards1, ",")
