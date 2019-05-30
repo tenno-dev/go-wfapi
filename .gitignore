@@ -1,5 +1,6 @@
 bin/golangci-lint
 main
+langsource/
 test.go2
 .vscode/
 *.exe

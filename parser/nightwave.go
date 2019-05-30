@@ -77,7 +77,7 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "SeasonInfo")
 	if errfissures != "" {
-		topicf := "/wf/" + lang + "/" + platform + "/nightwave"
+		topicf := "wf/" + lang + "/" + platform + "/nightwave"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error Nightwave reached")
@@ -126,7 +126,7 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	w := Nightwave{id, ended, activation, season + 1, tag1,
 		phase, "", "", dchallenge, wchallenge, welitechallenge}
 	nightwave = append(nightwave, w)
-	topicf := "/wf/" + lang + "/" + platform + "/nightwave"
+	topicf := "wf/" + lang + "/" + platform + "/nightwave"
 	Nightwavedata[platformno][lang] = nightwave
 	messageJSON, _ := json.Marshal(nightwave)
 	token := c.Publish(topicf, 0, true, messageJSON)

@@ -37,7 +37,7 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 	fmt.Println("Fissues  reached")
 	_, _, _, errfissures := jsonparser.Get(data, "ActiveMissions")
 	if errfissures != nil {
-		topicf := "/wf/" + lang + "/" + platform + "/fissures"
+		topicf := "wf/" + lang + "/" + platform + "/fissures"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error alert reached")
@@ -63,7 +63,7 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 		fissures = append(fissures, w)
 	}, "ActiveMissions")
 
-	topicf := "/wf/" + lang + "/" + platform + "/fissures"
+	topicf := "wf/" + lang + "/" + platform + "/fissures"
 	Fissuresdata[platformno][lang] = fissures
 	messageJSON, _ := json.Marshal(fissures)
 	token := c.Publish(topicf, 0, true, messageJSON)

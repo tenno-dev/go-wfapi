@@ -32,7 +32,7 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 	data := datasources.Apidata[platformno]
 	_, _, _, sortieerr := jsonparser.Get(data, "Sorties")
 	if sortieerr != nil {
-		topicf := "/wf/" + lang + "/" + platform + "/sorties"
+		topicf := "wf/" + lang + "/" + platform + "/sorties"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("reached sortie error")
@@ -73,7 +73,7 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 		Active: active}
 	sortie = append(sortie, w)
 
-	topicf := "/wf/" + lang + "/" + platform + "/sorties"
+	topicf := "wf/" + lang + "/" + platform + "/sorties"
 	messageJSON, _ := json.Marshal(sortie)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()

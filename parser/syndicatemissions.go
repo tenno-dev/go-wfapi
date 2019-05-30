@@ -67,7 +67,7 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 		}
 	}, "SyndicateMissions")
 
-	topicf := "/wf/" + lang + "/" + platform + "/syndicates"
+	topicf := "wf/" + lang + "/" + platform + "/syndicates"
 	messageJSON, _ := json.Marshal(syndicates)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()

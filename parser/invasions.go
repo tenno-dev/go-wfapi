@@ -29,7 +29,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 	data := datasources.Apidata[platformno]
 	invasioncheck, _, _, _ := jsonparser.Get(data, "Invasions")
 	if len(invasioncheck) == 0 {
-		topicf := "/wf/" + lang + "/" + platform + "/invasions"
+		topicf := "wf/" + lang + "/" + platform + "/invasions"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		return
@@ -52,6 +52,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			_, _, _, ierror := jsonparser.Get(value, "AttackerReward", "countedItems", "[0]", "ItemType")
 			if ierror == nil {
 				attackeritem, _ = jsonparser.GetString(value, "AttackerReward", "countedItems", "[0]", "ItemType")
+				attackeritem = helper.Langtranslate1(attackeritem, lang)
 				attackeritemcount, _ = jsonparser.GetInt(value, "AttackerReward", "countedItems", "[0]", "ItemCount")
 			}
 			attackerfaction, _ := jsonparser.GetString(value, "AttackerMissionInfo", "faction")
@@ -59,6 +60,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			_, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "type")
 			if ierror2 == nil {
 				defenderitem, _ = jsonparser.GetString(value, "DefenderReward", "countedItems", "[0]", "ItemType")
+				defenderitem = helper.Langtranslate1(defenderitem, lang)
 				defenderitemcount, _ = jsonparser.GetInt(value, "DefenderReward", "countedItems", "[0]", "ItemCount")
 			}
 			defenderfaction, _ := jsonparser.GetString(value, "DefenderMissionInfo", "faction")
@@ -72,7 +74,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			invasions = append(invasions, w)
 		}
 	}, "Invasions")
-	topicf := "/wf/" + lang + "/" + platform + "/invasions"
+	topicf := "wf/" + lang + "/" + platform + "/invasions"
 	messageJSON, _ := json.Marshal(invasions)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()

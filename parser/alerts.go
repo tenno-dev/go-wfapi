@@ -39,7 +39,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
 	fmt.Println(erralert)
 	if erralert != nil || erralert == nil { // disable  parsing until api returns data
-		topicf := "/wf/" + lang + "/" + platform + "/alerts"
+		topicf := "wf/" + lang + "/" + platform + "/alerts"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error alert reached")
@@ -70,7 +70,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 
 	}, "Alerts")
 
-	topicf := "/wf/" + lang + "/" + platform + "/alerts"
+	topicf := "wf/" + lang + "/" + platform + "/alerts"
 	Alertsdata[platformno][lang] = alerts
 	messageJSON, _ := json.Marshal(alerts)
 	token := c.Publish(topicf, 0, true, messageJSON)

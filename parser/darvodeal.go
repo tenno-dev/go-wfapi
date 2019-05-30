@@ -37,7 +37,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "DailyDeals")
 	if errfissures != "" {
-		topicf := "/wf/" + lang + "/" + platform + "/darvodeals"
+		topicf := "wf/" + lang + "/" + platform + "/darvodeals"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("error Darvo reached")
@@ -66,7 +66,7 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 		deals = append(deals, w)
 	}, "DailyDeals")
 
-	topicf := "/wf/" + lang + "/" + platform + "/darvodeals"
+	topicf := "wf/" + lang + "/" + platform + "/darvodeals"
 	messageJSON, _ := json.Marshal(deals)
 	Darvodata[platformno][lang] = deals
 	token := c.Publish(topicf, 0, true, messageJSON)

@@ -34,7 +34,7 @@ func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string
 
 	_, _, _, voiderr := jsonparser.Get(data, "VoidTraders")
 	if voiderr != nil {
-		topicf := "/wf/" + lang + "/" + platform + "/voidtrader"
+		topicf := "wf/" + lang + "/" + platform + "/voidtrader"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
 		fmt.Println("reached void error")
@@ -66,7 +66,7 @@ func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string
 		Ends: ended, NPC: npc, Node: location[0], Offers: voidoffers}
 	voidtrader = append(voidtrader, w)
 
-	topicf := "/wf/" + lang + "/" + platform + "/voidtrader"
+	topicf := "wf/" + lang + "/" + platform + "/voidtrader"
 	messageJSON, _ := json.Marshal(voidtrader)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()

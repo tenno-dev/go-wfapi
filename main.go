@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
 	"runtime"
 	"strconv"
 
@@ -62,19 +61,13 @@ func main() {
 	r := mux.NewRouter()
 
 	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:8884/mqtt").SetClientID("gotrivial2")
-	//opts.SetKeepAlive(2 * time.Second)
+	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:11883/").SetClientID("wf-mqtt")
+	//opts.SetKeepAlive(2 * time.Second)	
 	opts.SetDefaultPublishHandler(f)
-	opts.SetUsername("x")
-	opts.SetPassword("x")
 	//opts.SetPingTimeout(1 * time.Second)
 	c := mqtt.NewClient(opts)
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
-	}
-	if token := c.Subscribe("test/topic", 0, nil); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
-		os.Exit(1)
 	}
 	//mqtt client end
 	for x1, v1 := range langpool {
@@ -86,9 +79,8 @@ func main() {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
 		datasources.LoadApidata(v, x)
-		for x1, v1 := range langpool {
-			fmt.Println("x1:", x1)
-			fmt.Println("v1:", v1)
+		fmt.Println("LoadApidata:", v)
+		for _, v1 := range langpool {
 			parser.ParseSorties(x, v, c, v1)
 			parser.ParseNews(x, v, c, v1)
 			parser.ParseAlerts(x, v, c, v1)
@@ -106,7 +98,7 @@ func main() {
 
 		}
 		PrintMemUsage()
-
+	}
 		c1 := cron.New()
 		c1.AddFunc("@every 1m1s", func() {
 
@@ -154,7 +146,7 @@ func main() {
 			panic(err)
 		}
 
-	}
+
 }
 
 // PrintMemUsage - only for debug
