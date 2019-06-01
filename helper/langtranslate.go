@@ -43,7 +43,7 @@ func Langtranslate1(src string, lang string) (ret string) {
 			key := s[len(s)-1]
 			re := regexp.MustCompile(`[A-Z]?[^A-Z]*`)
 			split := re.FindAllString(key, -1)
-			x1 = strings.Join(split, "  ")
+			x1 = strings.Join(split, " ")
 		}
 	}
 	ret = x1
