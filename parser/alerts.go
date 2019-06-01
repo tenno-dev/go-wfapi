@@ -39,7 +39,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	var alerts []Alerts
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
 	fmt.Println(erralert)
-	if erralert != nil  {
+	if erralert != nil {
 		topicf := "wf/" + lang + "/" + platform + "/alerts"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
@@ -56,16 +56,16 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 		missionfaction, _ := jsonparser.GetString(value, "MissionInfo", "faction")
 		missionfaction = helper.Factionstranslate(missionfaction, lang)
 
-		missionlocation, _ := jsonparser.GetString(value, "MissionInfo", "node")
+		missionlocation, _ := jsonparser.GetString(value, "MissionInfo", "location")
 		missionlocation1 := helper.Sortietranslate(missionlocation, "sortieloc", lang)
 		missionlocation = missionlocation1[1]
 		minEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "minEnemyLevel")
 		maxEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "maxEnemyLevel")
 		enemywaves, _ := jsonparser.GetInt(value, "MissionInfo", "maxWaveNum")
-		rewardcredits, _ := jsonparser.GetInt(value, "MissionInfo", "reward", "credits")
-		rewarditemsmany, _ := jsonparser.GetString(value, "MissionInfo", "reward", "countedItems", "[0]", "type")
-		rewarditemsmanycount, _ := jsonparser.GetInt(value, "MissionInfo", "reward", "countedItems", "[0]", "count")
-		rewarditem, _ := jsonparser.GetString(value, "MissionInfo", "reward", "items", "[0]")
+		rewardcredits, _ := jsonparser.GetInt(value, "MissionInfo", "missionReward", "credits")
+		rewarditemsmany, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "countedItems", "[0]", "type")
+		rewarditemsmanycount, _ := jsonparser.GetInt(value, "MissionInfo", "missionReward", "countedItems", "[0]", "count")
+		rewarditem, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "items", "[0]")
 
 		w := Alerts{id, started,
 			ended, missiontype,
