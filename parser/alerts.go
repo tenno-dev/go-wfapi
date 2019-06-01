@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -38,7 +39,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	var alerts []Alerts
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
 	fmt.Println(erralert)
-	if erralert != nil || erralert == nil { // disable  parsing until api returns data
+	if erralert != nil  {
 		topicf := "wf/" + lang + "/" + platform + "/alerts"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
@@ -47,19 +48,24 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	}
 	fmt.Println("alert reached")
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		id, _ := jsonparser.GetString(value, "id")
-		started, _ := jsonparser.GetString(value, "activation")
-		ended, _ := jsonparser.GetString(value, "expiry")
-		missiontype, _ := jsonparser.GetString(value, "mission", "type")
-		missionfaction, _ := jsonparser.GetString(value, "mission", "faction")
-		missionlocation, _ := jsonparser.GetString(value, "mission", "node")
-		minEnemyLevel, _ := jsonparser.GetInt(value, "mission", "minEnemyLevel")
-		maxEnemyLevel, _ := jsonparser.GetInt(value, "mission", "maxEnemyLevel")
-		enemywaves, _ := jsonparser.GetInt(value, "mission", "maxWaveNum")
-		rewardcredits, _ := jsonparser.GetInt(value, "mission", "reward", "credits")
-		rewarditemsmany, _ := jsonparser.GetString(value, "mission", "reward", "countedItems", "[0]", "type")
-		rewarditemsmanycount, _ := jsonparser.GetInt(value, "mission", "reward", "countedItems", "[0]", "count")
-		rewarditem, _ := jsonparser.GetString(value, "mission", "reward", "items", "[0]")
+		id, _ := jsonparser.GetString(value, "_id", "$oid")
+		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
+		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
+		missiontype, _ := jsonparser.GetString(value, "MissionInfo", "missionType")
+		missiontype = helper.Missiontranslate(missiontype, lang)
+		missionfaction, _ := jsonparser.GetString(value, "MissionInfo", "faction")
+		missionfaction = helper.Factionstranslate(missionfaction, lang)
+
+		missionlocation, _ := jsonparser.GetString(value, "MissionInfo", "node")
+		missionlocation1 := helper.Sortietranslate(missionlocation, "sortieloc", lang)
+		missionlocation = missionlocation1[1]
+		minEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "minEnemyLevel")
+		maxEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "maxEnemyLevel")
+		enemywaves, _ := jsonparser.GetInt(value, "MissionInfo", "maxWaveNum")
+		rewardcredits, _ := jsonparser.GetInt(value, "MissionInfo", "reward", "credits")
+		rewarditemsmany, _ := jsonparser.GetString(value, "MissionInfo", "reward", "countedItems", "[0]", "type")
+		rewarditemsmanycount, _ := jsonparser.GetInt(value, "MissionInfo", "reward", "countedItems", "[0]", "count")
+		rewarditem, _ := jsonparser.GetString(value, "MissionInfo", "reward", "items", "[0]")
 
 		w := Alerts{id, started,
 			ended, missiontype,
