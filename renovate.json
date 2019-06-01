@@ -13,7 +13,6 @@
     "schedule:nonOfficeHours",
     "group:allNonMajor"
   ],
-"requiredStatusChecks": null, 
   "automergeType": "pr",
   "automergeComment": "Automerge by [bot]",
   "baseBranch": "master",
