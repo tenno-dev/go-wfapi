@@ -65,6 +65,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 		rewarditemsmany, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "countedItems", "[0]", "type")
 		rewarditemsmanycount, _ := jsonparser.GetInt(value, "MissionInfo", "missionReward", "countedItems", "[0]", "count")
 		rewarditem, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "items", "[0]")
+		rewarditem = helper.Langtranslate1(rewarditem, lang)
 
 		w := Alerts{id, started,
 			ended, missiontype,
