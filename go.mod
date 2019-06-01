@@ -23,7 +23,7 @@ require (
 	github.com/robfig/cron v1.1.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
-	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f // indirect
+	golang.org/x/crypto v0.0.0-20190601152940-20be4c3c3ed5 // indirect
 	golang.org/x/net v0.0.0-20190522155817-f3200d17e092 // indirect
 	golang.org/x/sys v0.0.0-20190530223933-ad28b68e88f1 // indirect
 	golang.org/x/text v0.3.2 // indirect
