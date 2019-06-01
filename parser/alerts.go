@@ -55,10 +55,9 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 		missiontype = helper.Missiontranslate(missiontype, lang)
 		missionfaction, _ := jsonparser.GetString(value, "MissionInfo", "faction")
 		missionfaction = helper.Factionstranslate(missionfaction, lang)
-
 		missionlocation, _ := jsonparser.GetString(value, "MissionInfo", "location")
 		missionlocation1 := helper.Sortietranslate(missionlocation, "sortieloc", lang)
-		missionlocation = missionlocation1[1]
+		missionlocation = missionlocation1[0]
 		minEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "minEnemyLevel")
 		maxEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "maxEnemyLevel")
 		enemywaves, _ := jsonparser.GetInt(value, "MissionInfo", "maxWaveNum")
