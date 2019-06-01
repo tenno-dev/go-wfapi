@@ -1,4 +1,25 @@
 {
+  "extends": [
+    "config:base",
+    ":rebaseStalePrs",
+    ":assignAndReview(Bitti09)",
+    ":automergeMinor",
+    ":automergeDigest",
+    ":automergeBranchPush",
+    ":pinSkipCi",
+    ":gitSignOff",
+    ":unpublishSafe",
+    ":prConcurrentLimit10",
+    "schedule:nonOfficeHours",
+    "group:allNonMajor"
+  ],
+  "automergeType": "pr-comment",
+  "automergeComment": "Automerge by [bot]",
   "baseBranch": "master",
-  "extends": "github>kamontat/full-renovate-config"
+  "labels": [
+    "Bot: Renovate",
+    "Status: In Review",
+    "Type: Dependency",
+    "Priority: Low"
+  ]
 }
