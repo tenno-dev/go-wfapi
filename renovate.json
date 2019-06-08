@@ -10,12 +10,12 @@
     ":gitSignOff",
     ":unpublishSafe",
     ":prConcurrentLimit10",
-    "schedule": "every weekend"
     "group:allNonMajor"
   ],
   "automergeType": "branch-push"
   "automerge": true,
   "baseBranch": "master",
+  "schedule": "every weekend"
   "labels": [
     "Bot: Renovate",
     "Status: In Review",
