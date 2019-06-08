@@ -12,7 +12,7 @@
     ":prConcurrentLimit10",
     "group:allNonMajor"
   ],
-  "automergeType": "branch-push"
+  "automergeType": "branch-push",
   "automerge": true,
   "baseBranch": "master",
   "schedule": "every weekend"
