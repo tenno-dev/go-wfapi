@@ -10,11 +10,11 @@
     ":gitSignOff",
     ":unpublishSafe",
     ":prConcurrentLimit10",
-    "schedule:nonOfficeHours",
+    "schedule": "every weekend"
     "group:allNonMajor"
   ],
-  "automergeType": "pr",
-  "automergeComment": "Automerge by [bot]",
+  "automergeType": "branch-push"
+  "automerge": true,
   "baseBranch": "master",
   "labels": [
     "Bot: Renovate",
