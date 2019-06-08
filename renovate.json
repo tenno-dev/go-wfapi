@@ -15,7 +15,7 @@
   "automergeType": "branch-push",
   "automerge": true,
   "baseBranch": "master",
-  "schedule": "every weekend"
+  "schedule": "every weekend",
   "labels": [
     "Bot: Renovate",
     "Status: In Review",
