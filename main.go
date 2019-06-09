@@ -62,7 +62,7 @@ func main() {
 
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:11883/").SetClientID("wf-mqtt")
-	//opts.SetKeepAlive(2 * time.Second)	
+	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
 	c := mqtt.NewClient(opts)
@@ -75,10 +75,12 @@ func main() {
 		fmt.Println("v1:", v1)
 		datasources.Loadlangdata(v1, x1)
 	}
+	datasources.LoadTime()
 	for x, v := range platforms {
 		fmt.Println("x:", x)
 		fmt.Println("v:", v)
 		datasources.LoadApidata(v, x)
+
 		fmt.Println("LoadApidata:", v)
 		for _, v1 := range langpool {
 			parser.ParseSorties(x, v, c, v1)
@@ -90,6 +92,9 @@ func main() {
 			parser.ParseDarvoDeal(x, v, c, v1)
 			parser.ParseNightwave(x, v, c, v1)
 			parser.ParseVoidTrader(x, v, c, v1)
+			parser.ParseProgress1(x, v, c, v1)
+			parser.ParseTime(x, v, c, v1)
+
 			/*
 				parseCycles(x, v, c)
 				parseEvents(x, v, c)
@@ -99,53 +104,56 @@ func main() {
 		}
 		PrintMemUsage()
 	}
-		c1 := cron.New()
-		c1.AddFunc("@every 1m1s", func() {
+	c1 := cron.New()
+	c1.AddFunc("@every 1m1s", func() {
+		datasources.LoadTime()
 
-			fmt.Println("Tick")
-			for x, v := range platforms {
-				fmt.Println("x:", x)
-				fmt.Println("v:", v)
-				datasources.LoadApidata(v, x)
-				for x1, v1 := range langpool {
-					fmt.Println("x1:", x1)
-					fmt.Println("v1:", v1)
-					parser.ParseSorties(x, v, c, v1)
-					parser.ParseNews(x, v, c, v1)
-					parser.ParseAlerts(x, v, c, v1)
-					parser.ParseFissures(x, v, c, v1)
-					parser.ParseSyndicateMissions(x, v, c, v1)
-					parser.ParseInvasions(x, v, c, v1)
-					parser.ParseDarvoDeal(x, v, c, v1)
-					parser.ParseNightwave(x, v, c, v1)
-					parser.ParseVoidTrader(x, v, c, v1)
-				}
-				/*
-					parseCycles(x, v, c)
-					parseEvents(x, v, c)
-				*/
-				PrintMemUsage()
+		fmt.Println("Tick")
+		for x, v := range platforms {
+			fmt.Println("x:", x)
+			fmt.Println("v:", v)
+			datasources.LoadApidata(v, x)
+			for x1, v1 := range langpool {
+				fmt.Println("x1:", x1)
+				fmt.Println("v1:", v1)
+				parser.ParseSorties(x, v, c, v1)
+				parser.ParseNews(x, v, c, v1)
+				parser.ParseAlerts(x, v, c, v1)
+				parser.ParseFissures(x, v, c, v1)
+				parser.ParseSyndicateMissions(x, v, c, v1)
+				parser.ParseInvasions(x, v, c, v1)
+				parser.ParseDarvoDeal(x, v, c, v1)
+				parser.ParseNightwave(x, v, c, v1)
+				parser.ParseVoidTrader(x, v, c, v1)
+				parser.ParseProgress1(x, v, c, v1)
+				parser.ParseTime(x, v, c, v1)
+
 			}
-		})
-		c1.Start()
-		PrintMemUsage()
-
-		r.HandleFunc("/", outputs.IndexHandler)
-
-		// routes for multilang http output
-		r.HandleFunc("/{platform}", outputs.ProfileHandler)
-		r.HandleFunc("/{platform}/darvo/", outputs.ProfileHandler2)
-		r.HandleFunc("/{platform}/news/", outputs.ProfileHandler3)
-		r.HandleFunc("/{platform}/alerts/", outputs.ProfileHandler4)
-		r.HandleFunc("/{platform}/fissures/", outputs.ProfileHandler5)
-		r.HandleFunc("/{platform}/nightwave/", outputs.ProfileHandler6)
-
-		fmt.Println("Server started at http://localhost:9090")
-
-		if err := http.ListenAndServe("127.0.0.1:9090", r); err != nil {
-			panic(err)
+			/*
+				parseCycles(x, v, c)
+				parseEvents(x, v, c)
+			*/
+			PrintMemUsage()
 		}
+	})
+	c1.Start()
+	PrintMemUsage()
 
+	r.HandleFunc("/", outputs.IndexHandler)
+
+	// routes for multilang http output
+	r.HandleFunc("/{platform}", outputs.ProfileHandler)
+	r.HandleFunc("/{platform}/darvo/", outputs.ProfileHandler2)
+	r.HandleFunc("/{platform}/news/", outputs.ProfileHandler3)
+	r.HandleFunc("/{platform}/alerts/", outputs.ProfileHandler4)
+	r.HandleFunc("/{platform}/fissures/", outputs.ProfileHandler5)
+	r.HandleFunc("/{platform}/nightwave/", outputs.ProfileHandler6)
+
+	fmt.Println("Server started at http://localhost:9090")
+
+	if err := http.ListenAndServe("127.0.0.1:9090", r); err != nil {
+		panic(err)
+	}
 
 }
 
