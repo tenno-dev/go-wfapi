@@ -9,7 +9,7 @@ require (
 	github.com/gliderlabs/ssh v0.1.4 // indirect
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/gorilla/mux v1.7.2
-	github.com/gregjones/httpcache v0.0.0-20190212212710-3befbb6ad0cc
+	github.com/gregjones/httpcache v0.0.0-20190615000008-901d90724c79
 	github.com/json-iterator/go v1.1.6
 	github.com/kataras/muxie v1.0.7
 	github.com/kr/pty v1.1.4 // indirect
