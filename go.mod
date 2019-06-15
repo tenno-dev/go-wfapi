@@ -12,7 +12,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190615000008-901d90724c79
 	github.com/json-iterator/go v1.1.6
 	github.com/kataras/muxie v1.0.7
-	github.com/kr/pty v1.1.4 // indirect
+	github.com/kr/pty v1.1.5 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
