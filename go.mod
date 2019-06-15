@@ -24,7 +24,7 @@ require (
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20190615013718-5c40567a22f8 // indirect
-	golang.org/x/net v0.0.0-20190607223832-461777fb6f67 // indirect
+	golang.org/x/net v0.0.0-20190615025505-d28f0bde5980 // indirect
 	golang.org/x/sys v0.0.0-20190609083714-301114b31cce // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190608024740-eacb66d2a7c3 // indirect
