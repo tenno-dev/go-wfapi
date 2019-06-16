@@ -20,7 +20,7 @@ require (
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pkg/profile v1.3.0
-	github.com/robfig/cron v1.1.0
+	github.com/robfig/cron v1.2.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20190615013718-5c40567a22f8 // indirect
