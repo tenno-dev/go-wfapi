@@ -27,7 +27,7 @@ require (
 	golang.org/x/net v0.0.0-20190622014157-3b0461eec859 // indirect
 	golang.org/x/sys v0.0.0-20190622022634-d432491b9138 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190615043526-5aca471b1d59 // indirect
+	golang.org/x/tools v0.0.0-20190622035326-6e04913cbbac // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.0 // indirect
 	gopkg.in/src-d/go-git-fixtures.v3 v3.5.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.11.0
