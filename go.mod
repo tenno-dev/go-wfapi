@@ -20,7 +20,7 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20190622004715-cc06ce4a13d4 // indirect
-	golang.org/x/net v0.0.0-20190622014157-3b0461eec859 // indirect
+	golang.org/x/net v0.0.0-20190629003620-da137c7871d7 // indirect
 	golang.org/x/sys v0.0.0-20190622022634-d432491b9138 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190622035326-6e04913cbbac // indirect
