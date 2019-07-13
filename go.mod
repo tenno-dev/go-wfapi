@@ -17,7 +17,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
 	github.com/pkg/profile v1.3.0
-	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3 v3.0.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20190706003810-4def268fd1a4 // indirect
 	golang.org/x/net v0.0.0-20190629003620-da137c7871d7 // indirect
