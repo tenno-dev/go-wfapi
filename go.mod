@@ -23,6 +23,6 @@ require (
 	golang.org/x/net v0.0.0-20190727055925-ca1201d0de80 // indirect
 	golang.org/x/sys v0.0.0-20190727065050-fc99dfbffb4e // indirect
 	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20190720003607-e377ae9d6386 // indirect
+	golang.org/x/tools v0.0.0-20190727075616-1bd56024c620 // indirect
 	gopkg.in/src-d/go-git.v4 v4.12.0
 )
