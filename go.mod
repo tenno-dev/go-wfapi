@@ -6,7 +6,7 @@ require (
 	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/gliderlabs/ssh v0.2.2 // indirect
-	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gregjones/httpcache v0.0.0-20190615000008-901d90724c79
 	github.com/json-iterator/go v1.1.7
