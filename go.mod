@@ -3,7 +3,7 @@ module github.com/bitti09/go-wfapi
 go 1.12
 
 require (
-	github.com/buger/jsonparser v0.0.0-20181115193947-bf1c66bbce23
+	github.com/buger/jsonparser ee4c978eae7e
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/gliderlabs/ssh v0.2.2 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
