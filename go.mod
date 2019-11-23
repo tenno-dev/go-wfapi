@@ -16,7 +16,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
-	github.com/pkg/profile v1.3.0
+	github.com/pkg/profile v1.4.0
 	github.com/robfig/cron/v3 v3.0.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	golang.org/x/crypto 9756ffdc2472 // indirect
