@@ -16,7 +16,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
 	github.com/pkg/profile v1.4.0 // indirect
-	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3/v3 v3.0.1
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876 // indirect
