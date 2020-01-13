@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -28,18 +27,18 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 		Variants []Sortievariant
 		Active   bool
 	}
-	fmt.Println("reached sortie start")
+	// fmt.Println("reached sortie start")
 	data := datasources.Apidata[platformno]
 	_, _, _, sortieerr := jsonparser.Get(data, "Sorties")
 	if sortieerr != nil {
 		topicf := "wf/" + lang + "/" + platform + "/sorties"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("reached sortie error")
+		// fmt.Println("reached sortie error")
 
 		return
 	}
-	fmt.Println("reached sortie start")
+	// fmt.Println("reached sortie start")
 
 	var sortie []Sortie
 	id, _ := jsonparser.GetString(data, "Sorties", "[0]", "_id", "$oid")

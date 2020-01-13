@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -26,11 +25,11 @@ func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string)
 		topicf := "wf/" + lang + "/" + platform + "/progress"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("reached progress error")
+		// fmt.Println("reached progress error")
 
 		return
 	}
-	fmt.Println("reached progress start")
+	// fmt.Println("reached progress start")
 
 	p1, _ := jsonparser.GetFloat(data, "ProjectPct", "[0]")
 	p2, _ := jsonparser.GetFloat(data, "ProjectPct", "[1]")

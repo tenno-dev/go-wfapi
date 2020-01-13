@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strconv"
 	"time"
@@ -74,17 +73,16 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 	var dchallenge []DailyChallenges
 	var wchallenge []WeeklyChallenges
 	var welitechallenge []WeeklyEliteChallenges
-	fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "SeasonInfo")
 	if errfissures != "" {
 		topicf := "wf/" + lang + "/" + platform + "/nightwave"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("error Nightwave reached")
+		// fmt.Println("error Nightwave reached")
 		return
 	}
 	timenow := time.Now().Unix()
-	fmt.Println("nightwave reached")
+	// fmt.Println("nightwave reached")
 	id := "1"
 	ended, _ := jsonparser.GetString(data, "SeasonInfo", "Expiry", "$date", "$numberLong")
 	activation, _ := jsonparser.GetString(data, "SeasonInfo", "Activation", "$date", "$numberLong")
@@ -97,6 +95,8 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string)
 		endedc, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		endedc1, _ := strconv.ParseInt(endedc, 10, 64)
 		endedc2 := endedc1 / 1000
+		// fmt.Println(idc)
+		// fmt.Println(endedc2)
 		activationc, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 		activationc1, _ := strconv.ParseInt(activationc, 10, 64)
 		activationc2 := activationc1 / 1000

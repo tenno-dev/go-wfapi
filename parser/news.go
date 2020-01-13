@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -31,7 +30,7 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 	data := datasources.Apidata[platformno]
 	_, _, _, ernews := jsonparser.Get(data, "Events")
 	if ernews != nil {
-		fmt.Println("error ernews reached")
+		// fmt.Println("error ernews reached")
 		return
 	}
 	var errnews2 bool

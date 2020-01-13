@@ -1,8 +1,6 @@
 package helper
 
 import (
-	"fmt"
-
 	"github.com/bitti09/go-wfapi/datasources"
 )
 
@@ -65,7 +63,7 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 // Sortietranslate2 - Sortie Rewards "translate "
 func Sortietranslate2(src string, lang string) (ret []byte) {
 	result := datasources.SortieRewards
-	fmt.Println(result)
+	// fmt.Println(result)
 	ret = result
 
 	return ret

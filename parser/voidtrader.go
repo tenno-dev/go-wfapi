@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -37,11 +36,11 @@ func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string
 		topicf := "wf/" + lang + "/" + platform + "/voidtrader"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("reached void error")
+		// fmt.Println("reached void error")
 
 		return
 	}
-	fmt.Println("reached sortie start")
+	// fmt.Println("reached void start")
 
 	id, _ := jsonparser.GetString(data, "VoidTraders", "[0]", "_id", "$oid")
 	started, _ := jsonparser.GetString(data, "VoidTraders", "[0]", "Activation", "$date", "$numberLong")

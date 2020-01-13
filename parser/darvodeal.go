@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -34,16 +33,16 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 	}
 	data := datasources.Apidata[platformno]
 	var deals []DarvoDeals
-	fmt.Println("Darvo  reached")
+	// fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "DailyDeals")
 	if errfissures != "" {
 		topicf := "wf/" + lang + "/" + platform + "/darvodeals"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("error Darvo reached")
+		// fmt.Println("error Darvo reached")
 		return
 	}
-	fmt.Println("Darvo2 reached")
+	// fmt.Println("Darvo2 reached")
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		//id, _ := jsonparser.GetString(value, "id")
 		id := "1"

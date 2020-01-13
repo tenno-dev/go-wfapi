@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -38,15 +37,15 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	data := datasources.Apidata[platformno]
 	var alerts []Alerts
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
-	fmt.Println(erralert)
+	// fmt.Println(erralert)
 	if erralert != nil {
 		topicf := "wf/" + lang + "/" + platform + "/alerts"
 		token := c.Publish(topicf, 0, true, []byte("{}"))
 		token.Wait()
-		fmt.Println("error alert reached")
+		// fmt.Println("error alert reached")
 		return
 	}
-	fmt.Println("alert reached")
+	// fmt.Println("alert reached")
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		id, _ := jsonparser.GetString(value, "_id", "$oid")
 		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
