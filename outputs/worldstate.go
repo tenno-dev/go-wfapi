@@ -18,8 +18,8 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "This is the <strong>%s</strong>", "index page")
 }
 
-// ProfileHandler test 2
-func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+// Everything test 2
+func Everything(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	value, _ := intMap[platform]
@@ -27,8 +27,8 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(datasources.Apidata[value])
 }
 
-// ProfileHandler2 DarvoDeals
-func ProfileHandler2(w http.ResponseWriter, r *http.Request) {
+// DarvoDeals DarvoDeals
+func DarvoDeals(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
 	platform := vars["platform"]
@@ -40,8 +40,8 @@ func ProfileHandler2(w http.ResponseWriter, r *http.Request) {
 	w.Write(messageJSON)
 }
 
-// ProfileHandler3 Newsdata
-func ProfileHandler3(w http.ResponseWriter, r *http.Request) {
+// News Newsdata
+func News(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")
@@ -53,8 +53,8 @@ func ProfileHandler3(w http.ResponseWriter, r *http.Request) {
 	w.Write(messageJSON)
 }
 
-// ProfileHandler4 Alertsdata
-func ProfileHandler4(w http.ResponseWriter, r *http.Request) {
+// Alerts Alertsdata
+func Alerts(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")
@@ -66,8 +66,8 @@ func ProfileHandler4(w http.ResponseWriter, r *http.Request) {
 	w.Write(messageJSON)
 }
 
-// ProfileHandler5 Fissuresdata
-func ProfileHandler5(w http.ResponseWriter, r *http.Request) {
+// Fissures Fissuresdata
+func Fissures(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")
@@ -78,8 +78,9 @@ func ProfileHandler5(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(messageJSON)
 }
-// ProfileHandler6 Fissuresdata
-func ProfileHandler6(w http.ResponseWriter, r *http.Request) {
+
+// Nightwave Fissuresdata
+func Nightwave(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	platform := vars["platform"]
 	token := r.Header.Get("Accept-Language")

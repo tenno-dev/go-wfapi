@@ -62,6 +62,7 @@ func main() {
 
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:11883/").SetClientID("wf-mqtt")
+	opts := mqtt.NewClientOptions().AddBroker("ws://88.99.36.215:1888/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
@@ -138,16 +139,15 @@ func main() {
 	})
 	c1.Start()
 	PrintMemUsage()
-
 	r.HandleFunc("/", outputs.IndexHandler)
 
 	// routes for multilang http output
-	r.HandleFunc("/{platform}", outputs.ProfileHandler)
-	r.HandleFunc("/{platform}/darvo/", outputs.ProfileHandler2)
-	r.HandleFunc("/{platform}/news/", outputs.ProfileHandler3)
-	r.HandleFunc("/{platform}/alerts/", outputs.ProfileHandler4)
-	r.HandleFunc("/{platform}/fissures/", outputs.ProfileHandler5)
-	r.HandleFunc("/{platform}/nightwave/", outputs.ProfileHandler6)
+	r.HandleFunc("/{platform}", outputs.Everything)
+	r.HandleFunc("/{platform}/darvo/", outputs.DarvoDeals)
+	r.HandleFunc("/{platform}/news/", outputs.News)
+	r.HandleFunc("/{platform}/alerts/", outputs.Alerts)
+	r.HandleFunc("/{platform}/fissures/", outputs.Fissures)
+	r.HandleFunc("/{platform}/nightwave/", outputs.Nightwave)
 
 	fmt.Println("Server started at http://localhost:9090")
 
