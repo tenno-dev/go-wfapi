@@ -1,0 +1,139 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the  simple REST Version of Mybitti's Warframe API.",
+        "title": "Mybitti Warframe API",
+        "contact": {},
+        "license": {},
+        "version": "1.0"
+    },
+    "host": "localhost:9090",
+    "basePath": "/",
+    "paths": {
+        "/{platform}/darvo/": {
+            "get": {
+                "description": "get platform  Darvo Deal by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DarvoDeals"
+                ],
+                "summary": "Show active Darvo Deal",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Platform",
+                        "name": "platform",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/parser.DarvoDeals"
+                        }
+                    }
+                }
+            }
+        },
+        "/{platform}/news/": {
+            "get": {
+                "description": "get platform  News",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Newsdata"
+                ],
+                "summary": "Show curent News",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Platform",
+                        "name": "platform",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "language",
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/parser.News"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "parser.DarvoDeals": {
+            "type": "object",
+            "properties": {
+                "dealPrice": {
+                    "type": "integer"
+                },
+                "discountPercent": {
+                    "type": "integer"
+                },
+                "ends": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "item": {
+                    "type": "string"
+                },
+                "itemtest": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "sold": {
+                    "type": "integer"
+                },
+                "start": {
+                    "type": "string"
+                },
+                "stock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "parser.News": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "boolean"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

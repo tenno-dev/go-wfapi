@@ -8,12 +8,14 @@ import (
 	"strconv"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	_ "github.com/bitti09/go-wfapi/docs"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
+	"github.com/swaggo/http-swagger" // http-swagger middleware
 )
 
 //current supported lang
@@ -103,6 +105,7 @@ func main() {
 			parser.ParseVoidTrader(x, v, c, v1)
 			parser.ParseProgress1(x, v, c, v1)
 			parser.ParseTime(x, v, c, v1)
+			parser.ParsePenemy(x, v, c, v1)
 
 			/*
 				parseCycles(x, v, c)
@@ -134,6 +137,7 @@ func main() {
 				parser.ParseVoidTrader(x, v, c, v1)
 				parser.ParseProgress1(x, v, c, v1)
 				parser.ParseTime(x, v, c, v1)
+				parser.ParsePenemy(x, v, c, v1)
 
 			}
 			/*
@@ -146,7 +150,14 @@ func main() {
 	c1.Start()
 	PrintMemUsage()
 	r.HandleFunc("/", outputs.IndexHandler)
+	r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
 
+	// @title Mybitti Warframe API
+	// @version 1.0
+	// @description This is the  simple REST Version of Mybitti's Warframe API.
+
+	// @host localhost:9090
+	// @BasePath /
 	// routes for multilang http output
 	r.HandleFunc("/{platform}", outputs.Everything)
 	r.HandleFunc("/{platform}/darvo/", outputs.DarvoDeals)

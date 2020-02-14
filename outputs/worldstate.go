@@ -27,6 +27,15 @@ func Everything(w http.ResponseWriter, r *http.Request) {
 	w.Write(datasources.Apidata[value])
 }
 
+// DarvoDeals godoc
+// @Summary Show active Darvo Deal
+// @Description get platform  Darvo Deal by ID
+// @Tags DarvoDeals
+// @Produce  json
+// @Param platform path string true "Platform"
+// @Param Accept-Language header string true "language"
+// @Success 200 {object} parser.DarvoDeals
+// @Router /{platform}/darvo/ [get]
 // DarvoDeals DarvoDeals
 func DarvoDeals(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -40,6 +49,15 @@ func DarvoDeals(w http.ResponseWriter, r *http.Request) {
 	w.Write(messageJSON)
 }
 
+// Newsdata godoc
+// @Summary Show curent News
+// @Description get platform  News
+// @Tags Newsdata
+// @Produce  json
+// @Param platform path string true "Platform"
+// @Param Accept-Language header string true "language"
+// @Success 200 {object} parser.News
+// @Router /{platform}/news/ [get]
 // News Newsdata
 func News(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

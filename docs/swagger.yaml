@@ -1,0 +1,92 @@
+basePath: /
+definitions:
+  parser.DarvoDeals:
+    properties:
+      dealPrice:
+        type: integer
+      discountPercent:
+        type: integer
+      ends:
+        type: string
+      id:
+        type: string
+      item:
+        type: string
+      itemtest:
+        type: string
+      price:
+        type: integer
+      sold:
+        type: integer
+      start:
+        type: string
+      stock:
+        type: integer
+    type: object
+  parser.News:
+    properties:
+      date:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      message:
+        type: string
+      priority:
+        type: boolean
+      url:
+        type: string
+    type: object
+host: localhost:9090
+info:
+  contact: {}
+  description: This is the  simple REST Version of Mybitti's Warframe API.
+  license: {}
+  title: Mybitti Warframe API
+  version: "1.0"
+paths:
+  /{platform}/darvo/:
+    get:
+      description: get platform  Darvo Deal by ID
+      parameters:
+      - description: Platform
+        in: path
+        name: platform
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/parser.DarvoDeals'
+      summary: Show active Darvo Deal
+      tags:
+      - DarvoDeals
+  /{platform}/news/:
+    get:
+      description: get platform  News
+      parameters:
+      - description: Platform
+        in: path
+        name: platform
+        required: true
+        type: string
+      - description: language
+        in: header
+        name: Accept-Language
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/parser.News'
+      summary: Show curent News
+      tags:
+      - Newsdata
+swagger: "2.0"
