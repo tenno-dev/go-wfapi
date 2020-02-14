@@ -77,6 +77,8 @@ func main() {
 		fmt.Println("v1:", v1)
 		datasources.Loadlangdata(v1, x1)
 		datasources.LoadRegiondata(v1, x1)
+		datasources.LoadResourcedata(v1, x1)
+		datasources.LoadUpgradesdata(v1, x1)
 
 	}
 	test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
