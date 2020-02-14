@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"fmt"
+
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/tidwall/gjson"
 )
 
 // Sortietranslate translate sortie data
@@ -39,23 +42,30 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 		ret = x1
 
 	}
+	return ret
+}
+func Regiontranslate(src string, lang string) (ret [3]string) {
 
-	if langtype == "sortieloc" {
-		var x1 [2]string
+	var x1 [3]string
+	nodesearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".name"
+	planetsearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".systemName"
 
-		x1[0] = src
-		x1[1] = src
-		result, ok := datasources.Sortieloc[lang][src].(map[string]interface{})
+	Nodename := gjson.Get(string(datasources.Regiondata[lang]), nodesearch).String()
+	Planetname := gjson.Get(string(datasources.Regiondata[lang]), planetsearch).String()
 
-		if ok != false {
-			x1[0] = result["value"].(string)
-			x1[1] = result["enemy"].(string)
+	fmt.Println("test2:", Nodename)
+	//	fmt.Println("test21:", string(datasources.Regiondata["en"]))
 
-		}
-		/**/
-		ret = x1
+	x1[2] = src
+	result, ok := datasources.Sortieloc[lang][src].(map[string]interface{})
+	if ok != false {
+		x1[0] = Nodename
+		x1[1] = Planetname
+		x1[2] = result["enemy"].(string)
 
 	}
+	/**/
+	ret = x1
 	/**/
 	return ret
 }

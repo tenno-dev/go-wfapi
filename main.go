@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/helper"
 	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -75,7 +76,12 @@ func main() {
 		fmt.Println("x1:", x1)
 		fmt.Println("v1:", v1)
 		datasources.Loadlangdata(v1, x1)
+		datasources.LoadRegiondata(v1, x1)
+
 	}
+	test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
+	fmt.Println(test1)
+
 	datasources.LoadTime()
 	for x, v := range platforms {
 		fmt.Println("x:", x)
@@ -100,8 +106,6 @@ func main() {
 				parseCycles(x, v, c)
 				parseEvents(x, v, c)
 			*/
-			PrintMemUsage()
-
 		}
 		PrintMemUsage()
 	}

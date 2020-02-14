@@ -49,7 +49,7 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 		active := true
 		location1, _ := jsonparser.GetString(value, "Node")
-		location := helper.Sortietranslate(location1, "sortieloc", lang)
+		location := helper.Regiontranslate(location1, lang)
 		missiontype1, _ := jsonparser.GetString(value, "MissionType")
 		missiontype := helper.Missiontranslate(missiontype1, lang)
 		tier1, _ := jsonparser.GetString(value, "Modifier")

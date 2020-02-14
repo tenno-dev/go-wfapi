@@ -12,11 +12,11 @@ import (
 // ParseInvasions parse active Invasions
 func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
 	type Invasion struct {
-		ID          string
-		Location    string
-		MissionType string
-		Completed   bool
-		Started     string
+		ID                  string
+		Location            string
+		MissionType         string
+		Completed           bool
+		Started             string
 		AttackerRewardItem  string `json:",omitempty"`
 		AttackerRewardCount int64  `json:",omitempty"`
 		AttackerMissionInfo string `json:",omitempty"`
@@ -45,7 +45,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			id, _ := jsonparser.GetString(value, "_id", "$oid")
 			started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 			location1, _ := jsonparser.GetString(value, "Node")
-			location := helper.Sortietranslate(location1, "sortieloc", lang)
+			location := helper.Regiontranslate(location1, lang)
 			missiontype, _ := jsonparser.GetString(value, "LocTag")
 			missiontype = helper.Langtranslate1(missiontype, lang)
 			completed, _ := jsonparser.GetBoolean(value, "Completed")

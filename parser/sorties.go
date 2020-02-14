@@ -57,13 +57,13 @@ func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
 		mmod1, _ := jsonparser.GetString(value, "modifierType")
 		mmod := helper.Sortietranslate(mmod1, "sortiemod", lang)
 		mloc1, _ := jsonparser.GetString(value, "node")
-		mloc := helper.Sortietranslate(mloc1, "sortieloc", lang)
-
+		mloc2 := helper.Regiontranslate(mloc1, lang)
+		mloc := mloc2[0] + " (" + mloc2[1] + ")"
 		variants = append(variants, Sortievariant{
 			MissionType:     mtype,
 			MissionMod:      mmod[0],
 			MissionModDesc:  mmod[1],
-			MissionLocation: mloc[0],
+			MissionLocation: mloc,
 		})
 	}, "Sorties", "[0]", "Variants")
 	active := true

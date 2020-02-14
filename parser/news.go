@@ -73,11 +73,11 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
 			priority, _ := jsonparser.GetBoolean(value, "priority")
 			w := News{ID: id, Message: message, URL: url, Date: date, Image: image, priority: priority}
 			news = append(news, w)
-			topicf := "wf/" + lang + "/" + platform + "/news"
-			Newsdata[platformno][lang] = news
-			messageJSON, _ := json.Marshal(news)
-			token := c.Publish(topicf, 0, true, messageJSON)
-			token.Wait()
 		}
 	}, "Events")
+	topicf := "wf/" + lang + "/" + platform + "/news"
+	Newsdata[platformno][lang] = news
+	messageJSON, _ := json.Marshal(news)
+	token := c.Publish(topicf, 0, true, messageJSON)
+	token.Wait()
 }
