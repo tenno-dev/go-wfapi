@@ -18,7 +18,7 @@ require (
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kataras/muxie v1.0.8 // indirect
-	github.com/labstack/echo v3.3.10+incompatible
+	github.com/labstack/echo/v4 v4.1.14
 	github.com/labstack/echo/v4 v4.1.14
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
