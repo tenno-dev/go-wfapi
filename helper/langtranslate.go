@@ -31,13 +31,13 @@ func Langtranslate1(src string, lang string) (ret string) {
 	x1 = src
 	src12 := strings.Replace(src, "StoreItems/", "", -1)
 	ressearch := "ExportResources.#(uniqueName==" + "\"" + src12 + "\"" + ")" + ".name"
-	resname := gjson.Get(string(datasources.Resourcedata[lang]), ressearch)
+	resname := gjson.GetBytes(datasources.Resourcedata[lang], ressearch)
 
 	if resname.Exists() {
 		x1 = strings.Title(strings.ToLower(resname.String()))
 	} else {
 		upgradesearch := "ExportUpgrades.#(uniqueName==" + "\"" + src12 + "\"" + ")" + ".name"
-		upgradename := gjson.Get(string(datasources.Upgradesdata[lang]), upgradesearch)
+		upgradename := gjson.GetBytes(datasources.Upgradesdata[lang], upgradesearch)
 
 		if upgradename.Exists() {
 			x1 = strings.Title(strings.ToLower(upgradename.String()))

@@ -7,6 +7,7 @@ require (
 	github.com/buger/jsonparser v0.0.0-20191204142016-1a29609e0929
 	github.com/creack/pty v1.1.9 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.2.0
+	github.com/fatih/color v1.9.0 // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-openapi/spec v0.19.6 // indirect
@@ -14,6 +15,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
+	github.com/google/pprof v0.0.0-20200212024743-f11f1df84d12 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/json-iterator/go v1.1.9 // indirect
@@ -26,6 +28,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
 	github.com/pkg/profile v1.4.0 // indirect
+	github.com/rakyll/govalidate v0.0.0-20200214024726-5767ab4ad60a // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect

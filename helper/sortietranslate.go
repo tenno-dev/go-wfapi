@@ -50,8 +50,8 @@ func Regiontranslate(src string, lang string) (ret [3]string) {
 	nodesearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".name"
 	planetsearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".systemName"
 
-	Nodename := gjson.Get(string(datasources.Regiondata[lang]), nodesearch).String()
-	Planetname := gjson.Get(string(datasources.Regiondata[lang]), planetsearch).String()
+	Nodename := gjson.GetBytes(datasources.Regiondata[lang], nodesearch).String()
+	Planetname := gjson.GetBytes(datasources.Regiondata[lang], planetsearch).String()
 
 	fmt.Println("test2:", Nodename)
 	//	fmt.Println("test21:", string(datasources.Regiondata["en"]))

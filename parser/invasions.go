@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -57,12 +58,14 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 			}
 			attackerfaction, _ := jsonparser.GetString(value, "AttackerMissionInfo", "faction")
 			attackerfaction = helper.Factionstranslate(attackerfaction, lang)
-			_, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "type")
+			test, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "ItemType")
+			fmt.Println(string(test))
 			if ierror2 == nil {
 				defenderitem, _ = jsonparser.GetString(value, "DefenderReward", "countedItems", "[0]", "ItemType")
 				defenderitem = helper.Langtranslate1(defenderitem, lang)
 				defenderitemcount, _ = jsonparser.GetInt(value, "DefenderReward", "countedItems", "[0]", "ItemCount")
 			}
+
 			defenderfaction, _ := jsonparser.GetString(value, "DefenderMissionInfo", "faction")
 			defenderfaction = helper.Factionstranslate(defenderfaction, lang)
 			completion1, _ := jsonparser.GetInt(value, "Count")

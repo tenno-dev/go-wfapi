@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/http/pprof"
 	_ "net/http/pprof"
 	"runtime"
 	"strconv"
@@ -64,8 +65,7 @@ func main() {
 	r := mux.NewRouter()
 
 	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:11883/").SetClientID("wf-mqtt")
-	opts := mqtt.NewClientOptions().AddBroker("ws://88.99.36.215:1888/mqtt").SetClientID("wf-mqtt")
+	opts := mqtt.NewClientOptions().AddBroker("wss://api.mybitti.de:8083/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
@@ -165,7 +165,16 @@ func main() {
 	r.HandleFunc("/{platform}/alerts/", outputs.Alerts)
 	r.HandleFunc("/{platform}/fissures/", outputs.Fissures)
 	r.HandleFunc("/{platform}/nightwave/", outputs.Nightwave)
+	r.HandleFunc("/debug/pprof/", pprof.Index)
+	r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	r.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 
+	// Manually add support for paths linked to by index page at /debug/pprof/
+	r.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
+	r.Handle("/debug/pprof/heap", pprof.Handler("heap"))
+	r.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
+	r.Handle("/debug/pprof/block", pprof.Handler("block"))
 	fmt.Println("Server started at http://localhost:9090")
 
 	if err := http.ListenAndServe("127.0.0.1:9090", r); err != nil {

@@ -8,3 +8,4 @@ filename
 langsource/
 download\.json
 go-wfapi
+heap.out
