@@ -14,7 +14,6 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gofiber/fiber"
 	"github.com/robfig/cron"
-	// http-swagger middleware
 )
 
 //current supported lang
@@ -32,9 +31,7 @@ var langtest = "en"
 // LangMap start
 type LangMap map[string]interface{}
 
-// LangMap2 d
-
-// todo
+// Data  vars
 var arcanesData map[string]interface{}
 var conclaveData map[string]interface{}
 var eventsData map[string]interface{}
@@ -118,12 +115,8 @@ func main() {
 
 		fmt.Println("Tick")
 		for x, v := range platforms {
-			fmt.Println("x:", x)
-			fmt.Println("v:", v)
 			datasources.LoadApidata(v, x)
-			for x1, v1 := range langpool {
-				fmt.Println("x1:", x1)
-				fmt.Println("v1:", v1)
+			for _, v1 := range langpool {
 				parser.ParseSorties(x, v, c, v1)
 				parser.ParseNews(x, v, c, v1)
 				parser.ParseAlerts(x, v, c, v1)
@@ -156,18 +149,9 @@ func main() {
 	app.Get("/:platform/fissures/", outputs.Fissures)
 	app.Get("/:platform/nightwave/", outputs.Nightwave)
 	app.Get("/:platform/penemy/", outputs.Penemy) // temp naming
+	app.Get("/:platform/fissures/", outputs.Fissures)
+	app.Get("/:platform/nightwave/", outputs.Nightwave)
 
-	// @title Mybitti Warframe API
-	// @version 1.0
-	// @description This is the  simple REST Version of Mybitti's Warframe API.
-
-	// @host localhost:9090
-	// @BasePath /
-	// routes for multilang http output
-	/*
-		r.HandleFunc("/{platform}/fissures/", outputs.Fissures)
-		r.HandleFunc("/{platform}/nightwave/", outputs.Nightwave)
-		fmt.Println("Server started at http://localhost:9090")*/
 	app.Listen(8080)
 
 }

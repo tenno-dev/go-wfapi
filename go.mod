@@ -24,7 +24,7 @@ require (
 	github.com/klauspost/cpuid v1.2.3 // indirect
 	github.com/labstack/echo/v4 v4.1.14
 	github.com/leodido/go-urn v1.2.0 // indirect
-	github.com/mailru/easyjson v0.7.0 // indirect
+	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
@@ -39,8 +39,8 @@ require (
 	github.com/tidwall/pretty v1.0.1 // indirect
 	golang.org/x/crypto v0.0.0-20200214034016-1d94cc7ab1c6 // indirect
 	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
-	golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4 // indirect
-	golang.org/x/tools v0.0.0-20200214201135-548b770e2dfa // indirect
+	golang.org/x/sys v0.0.0-20200217220822-9197077df867 // indirect
+	golang.org/x/tools v0.0.0-20200216192241-b320d3a0f5a2 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1
 	gopkg.in/yaml.v2 v2.2.8 // indirect
