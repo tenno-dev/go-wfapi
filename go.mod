@@ -30,7 +30,7 @@ require (
 	github.com/peterbourgon/diskv/v3 v3.0.0 // indirect
 	github.com/pkg/profile v1.4.0 // indirect
 	github.com/rakyll/govalidate v0.0.0-20200214024726-5767ab4ad60a // indirect
-	github.com/robfig/cron v1.2.0
+	github.com/robfig/cron/v3/v3 v3.0.1
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/swaggo/http-swagger v0.0.0-20200103000832-0e9263c4b516
