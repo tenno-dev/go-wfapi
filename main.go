@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/pprof"
 	_ "net/http/pprof"
 	"runtime"
 	"strconv"
@@ -14,9 +12,9 @@ import (
 	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gorilla/mux"
+	"github.com/gofiber/fiber"
 	"github.com/robfig/cron"
-	"github.com/swaggo/http-swagger" // http-swagger middleware
+	// http-swagger middleware
 )
 
 //current supported lang
@@ -62,10 +60,10 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 func main() {
 
 	datasources.InitLangDir()
-	r := mux.NewRouter()
+	app := fiber.New()
 
 	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("wss://api.mybitti.de:8083/mqtt").SetClientID("wf-mqtt")
+	opts := mqtt.NewClientOptions().AddBroker("wss://api.mybitti.de:8084/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
@@ -149,8 +147,15 @@ func main() {
 	})
 	c1.Start()
 	PrintMemUsage()
-	r.HandleFunc("/", outputs.IndexHandler)
-	r.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
+
+	app.Get("/", outputs.IndexHandler)
+	app.Get("/:platform", outputs.Everything)
+	app.Get("/:platform/darvo/", outputs.DarvoDeals)
+	app.Get("/:platform/news/", outputs.News)
+	app.Get("/:platform/alerts/", outputs.Alerts)
+	app.Get("/:platform/fissures/", outputs.Fissures)
+	app.Get("/:platform/nightwave/", outputs.Nightwave)
+	app.Get("/:platform/penemy/", outputs.Penemy) // temp naming
 
 	// @title Mybitti Warframe API
 	// @version 1.0
@@ -159,27 +164,11 @@ func main() {
 	// @host localhost:9090
 	// @BasePath /
 	// routes for multilang http output
-	r.HandleFunc("/{platform}", outputs.Everything)
-	r.HandleFunc("/{platform}/darvo/", outputs.DarvoDeals)
-	r.HandleFunc("/{platform}/news/", outputs.News)
-	r.HandleFunc("/{platform}/alerts/", outputs.Alerts)
-	r.HandleFunc("/{platform}/fissures/", outputs.Fissures)
-	r.HandleFunc("/{platform}/nightwave/", outputs.Nightwave)
-	r.HandleFunc("/debug/pprof/", pprof.Index)
-	r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-	r.HandleFunc("/debug/pprof/profile", pprof.Profile)
-	r.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-
-	// Manually add support for paths linked to by index page at /debug/pprof/
-	r.Handle("/debug/pprof/goroutine", pprof.Handler("goroutine"))
-	r.Handle("/debug/pprof/heap", pprof.Handler("heap"))
-	r.Handle("/debug/pprof/threadcreate", pprof.Handler("threadcreate"))
-	r.Handle("/debug/pprof/block", pprof.Handler("block"))
-	fmt.Println("Server started at http://localhost:9090")
-
-	if err := http.ListenAndServe("127.0.0.1:9090", r); err != nil {
-		panic(err)
-	}
+	/*
+		r.HandleFunc("/{platform}/fissures/", outputs.Fissures)
+		r.HandleFunc("/{platform}/nightwave/", outputs.Nightwave)
+		fmt.Println("Server started at http://localhost:9090")*/
+	app.Listen(8080)
 
 }
 

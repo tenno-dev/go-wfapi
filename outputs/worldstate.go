@@ -2,29 +2,27 @@ package outputs
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/parser"
-	"github.com/gorilla/mux"
+	"github.com/gofiber/fiber"
 )
 
 var intMap = map[string]int{"pc": 0, "ps4": 1, "xb1": 2, "swi": 3}
 
 // IndexHandler test
-func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html;charset=utf8")
-	fmt.Fprintf(w, "This is the <strong>%s</strong>", "index page")
+func IndexHandler(c *fiber.Ctx) {
+	token := c.Get("Accept-Language")
+	token = token[0:2]
+	c.Send(token)
 }
 
 // Everything test 2
-func Everything(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	platform := vars["platform"]
+func Everything(c *fiber.Ctx) {
+	platform := c.Params("platform")
 	value, _ := intMap[platform]
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(datasources.Apidata[value])
+	c.Type("json")
+	c.Send(datasources.Apidata[value])
 }
 
 // DarvoDeals godoc
@@ -37,16 +35,16 @@ func Everything(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} parser.DarvoDeals
 // @Router /{platform}/darvo/ [get]
 // DarvoDeals DarvoDeals
-func DarvoDeals(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	w.Header().Set("Content-Type", "application/json")
-	platform := vars["platform"]
-	token := r.Header.Get("Accept-Language")
-	token = token[0:2]
+func DarvoDeals(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
+	token1 := token[0:2]
+	token2 := token[0:5]
 	value, _ := intMap[platform]
-	messageJSON, _ := json.Marshal(parser.Darvodata[value][token])
-
-	w.Write(messageJSON)
+	messageJSON, _ := json.Marshal(parser.Darvodata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
 }
 
 // Newsdata godoc
@@ -59,53 +57,66 @@ func DarvoDeals(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} parser.News
 // @Router /{platform}/news/ [get]
 // News Newsdata
-func News(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	platform := vars["platform"]
-	token := r.Header.Get("Accept-Language")
+func News(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
 	value, _ := intMap[platform]
-	token = token[0:2]
-	w.Header().Set("Content-Type", "application/json")
-	messageJSON, _ := json.Marshal(parser.Newsdata[value][token])
-
-	w.Write(messageJSON)
+	token1 := token[0:2]
+	token2 := token[0:5]
+	messageJSON, _ := json.Marshal(parser.Newsdata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
 }
 
 // Alerts Alertsdata
-func Alerts(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	platform := vars["platform"]
-	token := r.Header.Get("Accept-Language")
+func Alerts(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
 	value, _ := intMap[platform]
-	token = token[0:2]
-	w.Header().Set("Content-Type", "application/json")
-	messageJSON, _ := json.Marshal(parser.Alertsdata[value][token])
-
-	w.Write(messageJSON)
+	token1 := token[0:2]
+	token2 := token[0:5]
+	messageJSON, _ := json.Marshal(parser.Alertsdata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
 }
 
 // Fissures Fissuresdata
-func Fissures(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	platform := vars["platform"]
-	token := r.Header.Get("Accept-Language")
+func Fissures(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
 	value, _ := intMap[platform]
-	token = token[0:2]
-	w.Header().Set("Content-Type", "application/json")
-	messageJSON, _ := json.Marshal(parser.Fissuresdata[value][token])
-
-	w.Write(messageJSON)
+	token1 := token[0:2]
+	token2 := token[0:5]
+	messageJSON, _ := json.Marshal(parser.Fissuresdata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
 }
 
-// Nightwave Fissuresdata
-func Nightwave(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	platform := vars["platform"]
-	token := r.Header.Get("Accept-Language")
+// Nightwave data
+func Nightwave(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
 	value, _ := intMap[platform]
-	token = token[0:2]
-	w.Header().Set("Content-Type", "application/json")
-	messageJSON, _ := json.Marshal(parser.Nightwavedata[value][token])
+	token1 := token[0:2]
+	token2 := token[0:5]
+	messageJSON, _ := json.Marshal(parser.Nightwavedata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
+}
 
-	w.Write(messageJSON)
+// Penemy sdata
+func Penemy(c *fiber.Ctx) {
+	platform := c.Params("platform")
+	token := c.Get("Accept-Language")
+	value, _ := intMap[platform]
+	token1 := token[0:2]
+	token2 := token[0:5]
+	messageJSON, _ := json.Marshal(parser.Penemydata[value][token1])
+	c.Type("json")
+	c.Set("Content-Language", token2)
+	c.Send(messageJSON)
 }

@@ -13,14 +13,15 @@ require (
 	github.com/go-openapi/spec v0.19.6 // indirect
 	github.com/go-openapi/swag v0.19.7 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/gofiber/fiber v1.6.1
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/google/pprof v0.0.0-20200212024743-f11f1df84d12 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
-	github.com/json-iterator/go v1.1.9 // indirect
 	github.com/kataras/muxie v1.0.8 // indirect
-	github.com/labstack/echo/v4 v4.1.14
+	github.com/klauspost/compress v1.10.0 // indirect
+	github.com/klauspost/cpuid v1.2.3 // indirect
 	github.com/labstack/echo/v4 v4.1.14
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
