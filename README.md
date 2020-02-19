@@ -4,19 +4,19 @@
 
 WIP  Warframe API Parser with  MQTT publisher
 
-## Current Status:
+## Current Status
 
-### Parser:
- - [x] News
- - [x] Sorties
- - [x] Void Fissures
- - [ ] Alerts (waiting for api response)
- - [x] Darvo's Deals ( untranslated )
- - [x] Nightwave
- - [x] Syndicate Missions ( untranslated )
- - [x] Invasions  ( half translated )
- - [x] Void Trader 
- - [ ] World Events
+### Parser
+  - [x] News
+  - [x] Sorties
+  - [x] Void Fissures
+  - [ ] Alerts (waiting for api response)
+  - [x] Darvo's Deals ( untranslated )
+  - [x] Nightwave
+  - [x] Syndicate Missions ( untranslated )
+  - [x] Invasions  ( half translated )
+  - [x] Void Trader 
+  - [ ] World Events
 
 
 ### General

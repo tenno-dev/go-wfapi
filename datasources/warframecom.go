@@ -21,7 +21,6 @@ var Upgradesdata = make(map[string][]byte)
 
 // LoadApidata loads data from Warframe.com api
 func LoadApidata(id1 string, id2 int) (ret []byte) {
-	// WF API Source
 	client := &http.Client{}
 
 	url := "http://content.warframe.com/dynamic/worldState.php"
@@ -69,7 +68,7 @@ func LoadRegiondata(id1 string, id2 int) (ret []byte) {
 	return
 }
 
-// LoadItemdata loads data from Warframe.com api
+// LoadResourcedata loads data from Warframe.com api
 func LoadResourcedata(id1 string, id2 int) (ret []byte) {
 	// WF API Source
 	client := &http.Client{}
@@ -94,7 +93,7 @@ func LoadResourcedata(id1 string, id2 int) (ret []byte) {
 	return
 }
 
-// LoadItemdata loads data from Warframe.com api
+// LoadUpgradesdata loads data from Warframe.com api
 func LoadUpgradesdata(id1 string, id2 int) (ret []byte) {
 	// WF API Source
 	client := &http.Client{}
