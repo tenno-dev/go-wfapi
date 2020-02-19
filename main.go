@@ -58,7 +58,7 @@ func main() {
 
 	datasources.InitLangDir()
 	app := fiber.New()
-
+	app.Prefork = true // Prefork enabled
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("ws://127.0.0.1:8083/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
@@ -141,7 +141,7 @@ func main() {
 	c1.Start()
 	PrintMemUsage()
 
-	app.Get("/", outputs.IndexHandler)
+	 // app.Get("/", outputs.IndexHandler)
 	app.Get("/:platform", outputs.Everything)
 	app.Get("/:platform/darvo/", outputs.DarvoDeals)
 	app.Get("/:platform/news/", outputs.News)
