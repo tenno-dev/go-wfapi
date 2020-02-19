@@ -25,15 +25,6 @@ func Everything(c *fiber.Ctx) {
 	c.Send(datasources.Apidata[value])
 }
 
-// DarvoDeals godoc
-// @Summary Show active Darvo Deal
-// @Description get platform  Darvo Deal by ID
-// @Tags DarvoDeals
-// @Produce  json
-// @Param platform path string true "Platform"
-// @Param Accept-Language header string true "language"
-// @Success 200 {object} parser.DarvoDeals
-// @Router /{platform}/darvo/ [get]
 // DarvoDeals DarvoDeals
 func DarvoDeals(c *fiber.Ctx) {
 	platform := c.Params("platform")
@@ -47,16 +38,7 @@ func DarvoDeals(c *fiber.Ctx) {
 	c.Send(messageJSON)
 }
 
-// Newsdata godoc
-// @Summary Show curent News
-// @Description get platform  News
-// @Tags Newsdata
-// @Produce  json
-// @Param platform path string true "Platform"
-// @Param Accept-Language header string true "language"
-// @Success 200 {object} parser.News
-// @Router /{platform}/news/ [get]
-// News Newsdata
+// News godoc
 func News(c *fiber.Ctx) {
 	platform := c.Params("platform")
 	token := c.Get("Accept-Language")

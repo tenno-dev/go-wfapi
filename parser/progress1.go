@@ -8,14 +8,14 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-//Progress1 - Progress1
+// Progress1 - Progress1
 type Progress1 struct {
 	P1 float64
 	P2 float64
 	P3 float64
 }
 
-// ParseVoidTrader Parse Void trader
+// ParseProgress1 Parse Void trader
 func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string) {
 	data := datasources.Apidata[platformno]
 	var progress1 []Progress1

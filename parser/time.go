@@ -8,14 +8,14 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-//Time1 - Time Base
+// Time1 - Time Base
 type Time1 struct {
 	Cetus  []Time2
 	Vallis []Time2
 	Earth  []Time2
 }
 
-//Time2- Time Details
+// Time2 - Time Details
 type Time2 struct {
 	Start string `json:",omitempty"`
 	End   string

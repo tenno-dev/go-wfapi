@@ -44,6 +44,8 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 	}
 	return ret
 }
+
+// Regiontranslate - Region "translate "
 func Regiontranslate(src string, lang string) (ret [3]string) {
 
 	var x1 [3]string
