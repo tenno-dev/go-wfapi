@@ -60,7 +60,7 @@ func main() {
 	app := fiber.New()
 
 	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("wss://api.mybitti.de:8084/mqtt").SetClientID("wf-mqtt")
+	opts := mqtt.NewClientOptions().AddBroker("ws://127.0.0.1:8083/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
