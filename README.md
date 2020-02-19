@@ -8,10 +8,10 @@ WIP  Warframe API Parser with  MQTT publisher
 
 ### Parser
 
-- [x] This is a complete item
-- [x] News
-- [x] Sorties
-- [x] Void Fissures
+-  [x] This is a complete item
+-  [x] News
+-  [x] Sorties
+-  [x] Void Fissures
 - [ ] Alerts (waiting for api response)
 - [x] Darvo's Deals ( untranslated )
 - [x] Nightwave
