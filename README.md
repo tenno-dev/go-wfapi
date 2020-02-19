@@ -7,17 +7,18 @@ WIP  Warframe API Parser with  MQTT publisher
 ## Current Status
 
 ### Parser
-  - [x] News
-  - [x] Sorties
-  - [x] Void Fissures
-  - [ ] Alerts (waiting for api response)
-  - [x] Darvo's Deals ( untranslated )
-  - [x] Nightwave
-  - [x] Syndicate Missions ( untranslated )
-  - [x] Invasions  ( half translated )
-  - [x] Void Trader 
-  - [ ] World Events
 
+- [x] This is a complete item
+- [x] News
+- [x] Sorties
+- [x] Void Fissures
+- [ ] Alerts (waiting for api response)
+- [x] Darvo's Deals ( untranslated )
+- [x] Nightwave
+- [x] Syndicate Missions ( untranslated )
+- [x] Invasions  ( half translated )
+- [x] Void Trader
+- [ ] World Events
 
 ### General
 
@@ -25,10 +26,9 @@ WIP  Warframe API Parser with  MQTT publisher
 - [ ] **Code Spliting ( in progress )**
 - [ ] Rewrite of the  current "hacky" ways for json parsing
 
-
 ## Demo
 
-- Web: https://api.mybitti.de
+- Web: [https://api.mybitti.de](https://api.mybitti.de)
   - Ping:   /
   - Worldstate(unparsed) /:platform
   - Darvos Deal: /:platform/platform/  (Accept-Language required)
@@ -39,7 +39,6 @@ WIP  Warframe API Parser with  MQTT publisher
 
   only first two chars  of  (Accept-Language) is used.
 
-
 - MQTT Client:  (sometimes offline when i'm testing new updates)
   - Host: mybitti(.)de
   - Port: 1884
@@ -48,4 +47,3 @@ WIP  Warframe API Parser with  MQTT publisher
   - Lang: {"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
   - Platform: {"pc", "ps4", "xb1", "swi"}
   - Tested Client: [MQTT Explorer](https://mqtt-explorer.com/)
-
