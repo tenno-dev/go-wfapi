@@ -7,7 +7,7 @@ WIP  Warframe API Parser with  MQTT publisher
  - [x] News
  - [x] Sorties
  - [x] Void Fissures
- - [ ] Alerts (waiting for api response)
+ - [-] Alerts (waiting for api response)
  - [x] Darvo's Deals ( untranslated )
  - [x] Nightwave
  - [x] Syndicate Missions ( untranslated )
