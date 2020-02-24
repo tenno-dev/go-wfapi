@@ -55,6 +55,7 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
+	datasources.LoadKuvadata()
 
 	datasources.InitLangDir()
 	app := fiber.New()
@@ -141,7 +142,7 @@ func main() {
 	c1.Start()
 	PrintMemUsage()
 
-	 // app.Get("/", outputs.IndexHandler)
+	// app.Get("/", outputs.IndexHandler)
 	app.Get("/:platform", outputs.Everything)
 	app.Get("/:platform/darvo/", outputs.DarvoDeals)
 	app.Get("/:platform/news/", outputs.News)
