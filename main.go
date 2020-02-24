@@ -111,6 +111,11 @@ func main() {
 		}
 		PrintMemUsage()
 	}
+	c0 := cron.New()
+	c0.AddFunc("@every 5m1s", func() {
+		datasources.LoadKuvadata()
+	}
+
 	c1 := cron.New()
 	c1.AddFunc("@every 1m1s", func() {
 		datasources.LoadTime()
@@ -142,6 +147,7 @@ func main() {
 		}
 	})
 	c1.Start()
+	c0.Start()
 	PrintMemUsage()
 
 	// app.Get("/", outputs.IndexHandler)
