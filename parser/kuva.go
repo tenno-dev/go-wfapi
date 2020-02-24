@@ -101,7 +101,7 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 
 	})
 
-	topica := "wf/" + lang + "/" + platform + "/arbitation"
+	topica := "wf/" + lang + "/" + platform + "/arbitration"
 	messageJSONa, _ := json.Marshal(arbi)
 	ArbitrationMission[platformno][lang] = arbi
 	tokena := c.Publish(topica, 0, true, messageJSONa)
