@@ -7,8 +7,10 @@ import (
 	"net/http"
 )
 
+// Kuvadata Kuvadata result
 var Kuvadata []byte
 
+// LoadKuvadata  Load Kuvadata from https://10o.io/kuvalog.json
 func LoadKuvadata() (ret []byte) {
 	client := &http.Client{}
 

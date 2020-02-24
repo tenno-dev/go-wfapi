@@ -10,7 +10,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-// KuvaMission struct
+// KuvaData struct
 type KuvaData struct {
 	ID          string
 	Start       string
@@ -23,7 +23,7 @@ type KuvaData struct {
 	Sharkwing   bool
 }
 
-// ArbitrationMission struct
+// ArbitrationData struct
 type ArbitrationData struct {
 	ID          string
 	Start       string
@@ -44,7 +44,7 @@ var KuvaMission = make(map[int]map[string][]KuvaData)
 // ArbitrationMission for http export
 var ArbitrationMission = make(map[int]map[string][]ArbitrationData)
 
-// ParseDarvoDeal Parse current Darvo Deal
+// ParseKuva Parse current Darvo Deal
 func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 	if _, ok := KuvaMission[platformno]; !ok {
 		KuvaMission[platformno] = make(map[string][]KuvaData)
