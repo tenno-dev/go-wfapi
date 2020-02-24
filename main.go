@@ -114,7 +114,7 @@ func main() {
 	c0 := cron.New()
 	c0.AddFunc("@every 5m1s", func() {
 		datasources.LoadKuvadata()
-	}
+	})
 
 	c1 := cron.New()
 	c1.AddFunc("@every 1m1s", func() {
