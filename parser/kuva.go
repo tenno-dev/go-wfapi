@@ -36,7 +36,7 @@ type ArbitrationData struct {
 	Sharkwing   bool
 }
 
-const timeFormat = "2006-01-02T15:04:05.999Z"
+const timeFormat = "2006-01-02T15:04:05.000Z"
 
 // KuvaMission for http export
 var KuvaMission = make(map[int]map[string][]KuvaData)
@@ -49,7 +49,10 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 	if _, ok := KuvaMission[platformno]; !ok {
 		KuvaMission[platformno] = make(map[string][]KuvaData)
 	}
-	data := datasources.Kuvadata
+	if _, ok := ArbitrationMission[platformno]; !ok {
+		ArbitrationMission[platformno] = make(map[string][]ArbitrationData)
+	}
+	data := datasources.Kuvadata[:]
 	var kuva []KuvaData
 	var arbi []ArbitrationData
 
@@ -66,16 +69,16 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		//id, _ := jsonparser.GetString(value, "id")
 		id := "1"
+		now := time.Now().UTC()
 		started, _ := jsonparser.GetString(value, "start")
 		ended, _ := jsonparser.GetString(value, "end")
 		start, _ := time.Parse(timeFormat, started)
 		end, _ := time.Parse(timeFormat, ended)
-		now := time.Now()
-
-		if start.After(now) && end.Before(now) {
+		if start.Before(now) && end.After(now) {
 			sdate := started
 			edate := ended
 			mtyperaw, _ := jsonparser.GetString(value, "missiontype")
+
 			mloc1, _ := jsonparser.GetString(value, "solnode")
 			mloc2 := helper.Regiontranslate(mloc1, lang)
 			mtype := mloc2[3]
@@ -96,7 +99,7 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 			}
 		}
 
-	}, "")
+	})
 
 	topica := "wf/" + lang + "/" + platform + "/arbitation"
 	messageJSONa, _ := json.Marshal(arbi)
