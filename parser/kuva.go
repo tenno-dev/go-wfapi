@@ -16,6 +16,7 @@ type KuvaData struct {
 	Start       string
 	Ends        string
 	Node        string
+	Node2       string
 	Planet      string
 	Missiontype string
 	Enemy       string
@@ -29,6 +30,7 @@ type ArbitrationData struct {
 	Start       string
 	Ends        string
 	Node        string
+	Node2       string
 	Planet      string
 	Missiontype string
 	Enemy       string
@@ -84,16 +86,17 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 			mtype := mloc2[3]
 			node := mloc2[0]
 			planet := mloc2[1]
+			node2 := mloc2[4]
 			enemy := mloc2[2]
 			arch, _ := jsonparser.GetBoolean(value, "archwing")
 			shark, _ := jsonparser.GetBoolean(value, "sharkwing")
 
 			if mtyperaw == "EliteAlertMission" {
-				a := ArbitrationData{id, sdate, edate, node, planet, mtype, enemy,
+				a := ArbitrationData{id, sdate, edate, node, node2, planet, mtype, enemy,
 					arch, shark}
 				arbi = append(arbi, a)
 			} else {
-				k := KuvaData{id, sdate, edate, node, planet, mtype, enemy,
+				k := KuvaData{id, sdate, edate, node, node2, planet, mtype, enemy,
 					arch, shark}
 				kuva = append(kuva, k)
 			}

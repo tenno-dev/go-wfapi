@@ -46,9 +46,9 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 }
 
 // Regiontranslate - Region "translate "
-func Regiontranslate(src string, lang string) (ret [4]string) {
+func Regiontranslate(src string, lang string) (ret [5]string) {
 
-	var x1 [4]string
+	var x1 [5]string
 	nodesearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".name"
 	planetsearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".systemName"
 
@@ -65,6 +65,7 @@ func Regiontranslate(src string, lang string) (ret [4]string) {
 		x1[1] = Planetname
 		x1[2] = result["enemy"].(string)
 		x1[3] = result["type"].(string)
+		x1[4] = result["value"].(string)
 
 	}
 	/**/
