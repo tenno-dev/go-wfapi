@@ -17,7 +17,7 @@ WIP  Warframe API Parser with  MQTT publisher
 -   [x] Syndicate Missions ( untranslated )
 -   [x] Invasions  ( half translated )
 -   [x] Void Trader
--   [-] World Events (partly)
+-   [x] World Events (partly)
 -   [x] Kuva Missions (***new***)
 -   [x] Arbitration (***new***)
 
