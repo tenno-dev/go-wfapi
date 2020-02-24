@@ -8,7 +8,6 @@ WIP  Warframe API Parser with  MQTT publisher
 
 ### Parser
 
--   [x] This is a complete item
 -   [x] News
 -   [x] Sorties
 -   [x] Void Fissures
@@ -18,13 +17,9 @@ WIP  Warframe API Parser with  MQTT publisher
 -   [x] Syndicate Missions ( untranslated )
 -   [x] Invasions  ( half translated )
 -   [x] Void Trader
--   [ ] World Events
-
-### General
-
--   [ ] **Code Rewrite  ( in progress )**
--   [ ] **Code Spliting ( in progress )**
--   [ ] Rewrite of the  current "hacky" ways for json parsing
+-   [-] World Events (partly)
+-   [x] Kuva Missions (***new***)
+-   [x] Arbitration (***new***)
 
 ## Demo
 
@@ -40,11 +35,11 @@ WIP  Warframe API Parser with  MQTT publisher
 
     only first two chars  of  (Accept-Language) is used.
 
--   MQTT Client:  (sometimes offline when i'm testing new updates)
-    -   Host: mybitti(.)de
-    -   Port: 1884
+-   MQTT Client:
+    -   Host: api-wf(.)mybitti(.)de
+    -   Port: 8084
     -   Protocol: wss
-    -   Data path: /wf/{lang}/{platform}/
+    -   Data path: wf/{lang}/{platform}/
     -   Lang: {"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
     -   Platform: {"pc", "ps4", "xb1", "swi"}
     -   Tested Client: [MQTT Explorer](https://mqtt-explorer.com/)
