@@ -90,6 +90,7 @@ func main() {
 
 		fmt.Println("LoadApidata:", v)
 		for _, v1 := range langpool {
+			parser.ParseKuva(x, v, c, v1)
 			parser.ParseSorties(x, v, c, v1)
 			parser.ParseNews(x, v, c, v1)
 			parser.ParseAlerts(x, v, c, v1)
@@ -118,6 +119,7 @@ func main() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
+				parser.ParseKuva(x, v, c, v1)
 				parser.ParseSorties(x, v, c, v1)
 				parser.ParseNews(x, v, c, v1)
 				parser.ParseAlerts(x, v, c, v1)
