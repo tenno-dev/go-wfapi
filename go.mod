@@ -22,7 +22,7 @@ require (
 	github.com/klauspost/compress v1.10.1 // indirect
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
-	github.com/robfig/cron/v3/v3 v3.0.1
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/swaggo/swag v1.6.5
 	github.com/tidwall/gjson v1.5.0

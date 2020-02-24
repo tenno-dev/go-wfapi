@@ -13,7 +13,7 @@ import (
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gofiber/fiber"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 )
 
 //current supported lang
@@ -59,7 +59,7 @@ func main() {
 
 	datasources.InitLangDir()
 	app := fiber.New()
-	app.Prefork = true // Prefork enabled
+	app.Settings.Prefork = true // Prefork enabled
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("ws://127.0.0.1:8083/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
