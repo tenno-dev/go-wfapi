@@ -62,6 +62,7 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 		enemywaves, _ := jsonparser.GetInt(value, "MissionInfo", "maxWaveNum")
 		rewardcredits, _ := jsonparser.GetInt(value, "MissionInfo", "missionReward", "credits")
 		rewarditemsmany, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "countedItems", "[0]", "ItemType")
+		rewarditemsmany = helper.Langtranslate1(rewarditemsmany, lang)
 		rewarditemsmanycount, _ := jsonparser.GetInt(value, "MissionInfo", "missionReward", "countedItems", "[0]", "ItemCount")
 		rewarditem, _ := jsonparser.GetString(value, "MissionInfo", "missionReward", "items", "[0]")
 		rewarditem = helper.Langtranslate1(rewarditem, lang)
