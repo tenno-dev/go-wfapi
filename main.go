@@ -56,7 +56,7 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 
 func main() {
 	datasources.LoadKuvadata()
-
+	datasources.LoadAnomalydata()
 	datasources.InitLangDir()
 	app := fiber.New()
 	app.Settings.Prefork = true // Prefork enabled
@@ -90,6 +90,7 @@ func main() {
 
 		fmt.Println("LoadApidata:", v)
 		for _, v1 := range langpool {
+			parser.ParseAnomaly(x, v, c, v1)
 			parser.ParseKuva(x, v, c, v1)
 			parser.ParseSorties(x, v, c, v1)
 			parser.ParseNews(x, v, c, v1)
@@ -114,6 +115,7 @@ func main() {
 	c0 := cron.New()
 	c0.AddFunc("@every 5m1s", func() {
 		datasources.LoadKuvadata()
+		datasources.LoadAnomalydata()
 	})
 
 	c1 := cron.New()
@@ -124,6 +126,7 @@ func main() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
+				parser.ParseAnomaly(x, v, c, v1)
 				parser.ParseKuva(x, v, c, v1)
 				parser.ParseSorties(x, v, c, v1)
 				parser.ParseNews(x, v, c, v1)
