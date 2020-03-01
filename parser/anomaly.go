@@ -13,11 +13,11 @@ import (
 // AnomalyData struct
 type AnomalyData struct {
 	ID               string
+	Node             string
 	Start            string // int to string
 	Startstring      string // int to utc string
 	Ends             string // int to string
 	EndString        string // int to utc string
-	Node             string
 	Projection       string // int to string
 	Projectionstring string // int to utc string
 }
@@ -49,7 +49,7 @@ func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string) {
 	projection1 := strconv.FormatInt(projection, 10)
 	projectionstring := time.Unix(projection, 0).String()
 
-	a := AnomalyData{id, started1, startedstring, ended1, endedstring, node, projection1, projectionstring}
+	a := AnomalyData{id, node, started1, startedstring, ended1, endedstring, projection1, projectionstring}
 	anoma = append(anoma, a)
 
 	topica := "wf/" + lang + "/" + platform + "/anomaly"
