@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -11,11 +12,14 @@ import (
 
 // AnomalyData struct
 type AnomalyData struct {
-	ID         string
-	Start      string
-	Ends       string
-	Node       string
-	projection string
+	ID               string
+	Start            string // int to string
+	Startstring      string // int to utc string
+	Ends             string // int to string
+	EndString        string // int to utc string
+	Node             string
+	Projection       string // int to string
+	Projectionstring string // int to utc string
 }
 
 // KuvaMission for http export
@@ -33,15 +37,19 @@ func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string) {
 	id := "1"
 	started, _ := jsonparser.GetInt(value, "start")
 	started1 := strconv.FormatInt(started, 10)
+	startedstring := time.Unix(started, 0).String()
+
 	ended, _ := jsonparser.GetInt(value, "end")
+	endedstring := time.Unix(ended, 0).String()
 	ended1 := strconv.FormatInt(ended, 10)
 	//start, _ := time.Parse(timeFormat, started)
 	// end, _ := time.Parse(timeFormat, ended)
 	node, _ := jsonparser.GetString(value, "name")
 	projection, _ := jsonparser.GetInt(value, "projection")
 	projection1 := strconv.FormatInt(projection, 10)
+	projectionstring := time.Unix(projection, 0).String()
 
-	a := AnomalyData{id, started1, ended1, node, projection1}
+	a := AnomalyData{id, started1, startedstring, ended1, endedstring, node, projection1, projectionstring}
 	anoma = append(anoma, a)
 
 	topica := "wf/" + lang + "/" + platform + "/anomaly"
