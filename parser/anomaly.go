@@ -25,22 +25,20 @@ func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string) {
 	if _, ok := AnomalyDataSet[platformno]; !ok {
 		AnomalyDataSet[platformno] = make(map[string][]AnomalyData)
 	}
-	data := datasources.Anomalydata[:]
+	value := datasources.Anomalydata[:]
 	var anoma []AnomalyData
 
-	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
-		//id, _ := jsonparser.GetString(value, "id")
-		id := "1"
-		started, _ := jsonparser.GetString(value, "start")
-		ended, _ := jsonparser.GetString(value, "end")
-		//start, _ := time.Parse(timeFormat, started)
-		// end, _ := time.Parse(timeFormat, ended)
-		node, _ := jsonparser.GetString(value, "name")
-		projection, _ := jsonparser.GetString(value, "projection")
+	//id, _ := jsonparser.GetString(value, "id")
+	id := "1"
+	started, _ := jsonparser.GetString(value, "start")
+	ended, _ := jsonparser.GetString(value, "end")
+	//start, _ := time.Parse(timeFormat, started)
+	// end, _ := time.Parse(timeFormat, ended)
+	node, _ := jsonparser.GetString(value, "name")
+	projection, _ := jsonparser.GetString(value, "projection")
 
-		a := AnomalyData{id, started, ended, node, projection}
-		anoma = append(anoma, a)
-	})
+	a := AnomalyData{id, started, ended, node, projection}
+	anoma = append(anoma, a)
 
 	topica := "wf/" + lang + "/" + platform + "/anomaly"
 	messageJSONa, _ := json.Marshal(anoma)
