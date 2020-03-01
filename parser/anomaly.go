@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -30,14 +31,17 @@ func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string) {
 
 	//id, _ := jsonparser.GetString(value, "id")
 	id := "1"
-	started, _ := jsonparser.GetString(value, "start")
-	ended, _ := jsonparser.GetString(value, "end")
+	started, _ := jsonparser.GetInt(value, "start")
+	started1 := strconv.FormatInt(started, 10)
+	ended, _ := jsonparser.GetInt(value, "end")
+	ended1 := strconv.FormatInt(ended, 10)
 	//start, _ := time.Parse(timeFormat, started)
 	// end, _ := time.Parse(timeFormat, ended)
 	node, _ := jsonparser.GetString(value, "name")
-	projection, _ := jsonparser.GetString(value, "projection")
+	projection, _ := jsonparser.GetInt(value, "projection")
+	projection1 := strconv.FormatInt(projection, 10)
 
-	a := AnomalyData{id, started, ended, node, projection}
+	a := AnomalyData{id, started1, ended1, node, projection1}
 	anoma = append(anoma, a)
 
 	topica := "wf/" + lang + "/" + platform + "/anomaly"
