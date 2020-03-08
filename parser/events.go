@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/bitti09/go-wfapi/datasources"
+	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -69,6 +70,8 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 		goal, _ := jsonparser.GetInt(value, "Goal")
 		goal1 := strconv.FormatInt(goal, 10)
 		reward, _ := jsonparser.GetString(value, "Reward", "items", "[0]")
+		rewards1 := helper.Langtranslate1(reward, lang)
+
 		rewardcredits, _ := jsonparser.GetInt(value, "Reward", "credits")
 		rewardcredits1 := strconv.FormatInt(rewardcredits, 10)
 		rewardxp, _ := jsonparser.GetInt(value, "Reward", "xp")
@@ -77,16 +80,18 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 		var interim []InterimReward
 		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
 			item, _ := jsonparser.GetString(value1, "countedItems", "[0]", "ItemType")
+			item1 := helper.Langtranslate1(item, lang)
 
 			if item == "" {
 				item, _ = jsonparser.GetString(value1, "items", "[0]")
+				item1 := helper.Langtranslate1(item, lang)
 
 			}
 			xp, _ := jsonparser.GetInt(value1, "xp")
 			xp1 := strconv.FormatInt(xp, 10)
 			credits, _ := jsonparser.GetInt(value1, "credits")
 			credits1 := strconv.FormatInt(credits, 10)
-			wt := InterimReward{item, credits1, xp1}
+			wt := InterimReward{item1, credits1, xp1}
 			interim = append(interim, wt)
 		}, "InterimRewards")
 		var interimsteps []string
@@ -95,7 +100,7 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 			interimsteps = append(interimsteps, string(value1))
 		}, "InterimGoals")
 
-		w := EventsData{Debug: debug, ID: id, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health1, Goal: goal1, Mainreward: reward, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim}
+		w := EventsData{Debug: debug, ID: id, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health1, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim}
 		event = append(event, w)
 	}, "Goals")
 	topicf := "wf/" + lang + "/" + platform + "/goals"
