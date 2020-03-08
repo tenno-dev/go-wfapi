@@ -84,7 +84,7 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 
 			if item == "" {
 				item, _ = jsonparser.GetString(value1, "items", "[0]")
-				item1 := helper.Langtranslate1(item, lang)
+				item1 = helper.Langtranslate1(item, lang)
 
 			}
 			xp, _ := jsonparser.GetInt(value1, "xp")
