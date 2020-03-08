@@ -127,6 +127,7 @@ func main() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
+				parser.ParseGoals(x, v, c, v1)
 				parser.ParseAnomaly(x, v, c, v1)
 				parser.ParseKuva(x, v, c, v1)
 				parser.ParseSorties(x, v, c, v1)
