@@ -90,6 +90,7 @@ func main() {
 
 		fmt.Println("LoadApidata:", v)
 		for _, v1 := range langpool {
+			parser.ParseGoals(x, v, c, v1)
 			parser.ParseAnomaly(x, v, c, v1)
 			parser.ParseKuva(x, v, c, v1)
 			parser.ParseSorties(x, v, c, v1)

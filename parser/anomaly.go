@@ -22,7 +22,7 @@ type AnomalyData struct {
 	Projectionstring string // int to utc string
 }
 
-// KuvaMission for http export
+// AnomalyDataSet for http export
 var AnomalyDataSet = make(map[int]map[string][]AnomalyData)
 
 // ParseKuva Parse current Darvo Deal
