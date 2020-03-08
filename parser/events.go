@@ -21,6 +21,7 @@ type InterimReward struct {
 type EventsData struct {
 	Debug             string
 	ID                string
+	Name              string
 	Start             string          // int to string
 	Ends              string          // int to string
 	Location          string          `json:",omitempty"`
@@ -57,6 +58,9 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		// id
 		id, _ := jsonparser.GetString(value, "_id", "$oid")
+		name, _ := jsonparser.GetString(value, "Desc")
+		name1 := helper.Langtranslate1(name, lang)
+
 		started, _ := jsonparser.GetString(value, "Activation", "$date", "$numberLong")
 		ended, _ := jsonparser.GetString(value, "Expiry", "$date", "$numberLong")
 
@@ -100,7 +104,7 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 			interimsteps = append(interimsteps, string(value1))
 		}, "InterimGoals")
 
-		w := EventsData{Debug: debug, ID: id, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health1, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim}
+		w := EventsData{Debug: debug, ID: id, Name: name1, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health1, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim}
 		event = append(event, w)
 	}, "Goals")
 	topicf := "wf/" + lang + "/" + platform + "/goals"
