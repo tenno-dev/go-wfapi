@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -63,8 +64,8 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 		//scorev, _ := jsonparser.GetString(value, "ScoreVar")
 		count1, _ := jsonparser.GetInt(value, "Count")
 		count2 := strconv.FormatInt(count1, 10)
-		health, _ := jsonparser.GetInt(value, "HealthPct")
-		health1 := strconv.FormatInt(health, 10)
+		health, _ := jsonparser.GetFloat(value, "HealthPct")
+		health1 := fmt.Sprintf("%.2f", health)
 		goal, _ := jsonparser.GetInt(value, "Goal")
 		goal1 := strconv.FormatInt(goal, 10)
 		reward, _ := jsonparser.GetString(value, "Reward", "items", "[0]")
