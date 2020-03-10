@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -14,6 +15,15 @@ type InterimReward struct {
 	Item    string
 	Credits string
 	XP      string
+}
+
+type EventJobs struct {
+	Type        string
+	ItemRewards []string
+	MRreq       int64
+	Minenemylvl int64
+	Maxenemylvl int64
+	XPreward    []string
 }
 
 // EventsData struct
@@ -32,6 +42,7 @@ type EventsData struct {
 	Mainrewardxp      string          `json:",omitempty"`
 	InterimGoalsteps  []string        `json:",omitempty"`
 	InterimRewards    []InterimReward `json:",omitempty"`
+	Jobs              []EventJobs     `json:",omitempty"`
 }
 
 // Eventdata - Event data
@@ -102,8 +113,24 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
 			interimsteps = append(interimsteps, string(value1))
 		}, "InterimGoals")
+		var job1 []EventJobs
+		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
+			type1, _ := jsonparser.GetString(value1, "jobType", "[0]", "ItemType")
+			rewards0, _ := jsonparser.GetString(value1, "rewards")
+			rewards1 := helper.Langtranslate1(rewards0, lang)
+			rewards := strings.Split(rewards1, ",")
+			minEnemyLevel, _ := jsonparser.GetInt(value1, "minEnemyLevel")
+			maxEnemyLevel, _ := jsonparser.GetInt(value1, "maxEnemyLevel")
+			mr1, _ := jsonparser.GetInt(value1, "masteryReq")
+			standing := make([]string, 0)
+			jsonparser.ArrayEach(value1, func(xpam []byte, dataType jsonparser.ValueType, offset int, err error) {
+				standing = append(standing, string(xpam))
 
-		w := EventsData{Debug: debug, ID: id, Name: name1, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health1, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim}
+			}, "xpAmounts")
+			jobs := EventJobs{type1, rewards, mr1, minEnemyLevel, maxEnemyLevel, standing}
+			job1 = append(job1, jobs)
+		}, "Jobs")
+		w := EventsData{Debug: debug, ID: id, Name: name1, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim, Jobs: job1}
 		event = append(event, w)
 	}, "Goals")
 	topicf := "wf/" + lang + "/" + platform + "/goals"
