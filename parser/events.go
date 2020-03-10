@@ -115,7 +115,8 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 		}, "InterimGoals")
 		var job1 []EventJobs
 		jsonparser.ArrayEach(value, func(value1 []byte, dataType jsonparser.ValueType, offset int, err error) {
-			type1, _ := jsonparser.GetString(value1, "jobType", "[0]", "ItemType")
+			type1, _ := jsonparser.GetString(value1, "jobType")
+			jobtype := helper.Langtranslate1(type1, lang)
 			rewards0, _ := jsonparser.GetString(value1, "rewards")
 			rewards1 := helper.Langtranslate1(rewards0, lang)
 			rewards := strings.Split(rewards1, ",")
@@ -127,7 +128,7 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 				standing = append(standing, string(xpam))
 
 			}, "xpAmounts")
-			jobs := EventJobs{type1, rewards, mr1, minEnemyLevel, maxEnemyLevel, standing}
+			jobs := EventJobs{jobtype, rewards, mr1, minEnemyLevel, maxEnemyLevel, standing}
 			job1 = append(job1, jobs)
 		}, "Jobs")
 		w := EventsData{Debug: debug, ID: id, Name: name1, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim, Jobs: job1}
