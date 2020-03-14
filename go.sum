@@ -74,6 +74,8 @@ github.com/go-openapi/swag v0.19.8 h1:vfK6jLhs7OI4tAXkvkooviaE1JEPcw3mutyegLHHjm
 github.com/go-openapi/swag v0.19.8/go.mod h1:ao+8BpOPyKdpQz3AOJfbeEVpLmWAvlT1IfTe5McPyhY=
 github.com/gofiber/fiber v1.8.2 h1:WwN5FKoEgqPuUAJLbBbpfk9imr+LojwcWZJDz13PGt4=
 github.com/gofiber/fiber v1.8.2/go.mod h1:JD9ZZgxqitISS6yDcKP26BKR6Ul+z6UrZX7WlalC1sE=
+github.com/gofiber/fiber v1.8.31 h1:ztkn4jsM6sUK7f0af0MxCDj4/GSF8cT0dIaESFLEZRU=
+github.com/gofiber/fiber v1.8.31/go.mod h1:JD9ZZgxqitISS6yDcKP26BKR6Ul+z6UrZX7WlalC1sE=
 github.com/gofiber/template v1.0.0 h1:Vf4Fby9zUWVQyY2y69KKyRHsEYlIE+Pxb25M+jiaEL0=
 github.com/gofiber/template v1.0.0/go.mod h1:+bij+R0NI6urTg2jtQvPj5wb2uWMxW9eYGsAN3QhnP0=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
