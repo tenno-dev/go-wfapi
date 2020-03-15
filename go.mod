@@ -8,7 +8,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
-	github.com/gofiber/fiber v1.8.31
+	github.com/gofiber/fiber v1.8.32
 	github.com/google/btree v1.0.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
