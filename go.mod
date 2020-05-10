@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/buger/jsonparser v0.0.0-20200507200006-c912c6b9a0a4
+	github.com/buger/jsonparser v0.0.0-20200510021239-5754b3eaeae7
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
