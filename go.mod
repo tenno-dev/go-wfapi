@@ -17,7 +17,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/savsgio/gotils v0.0.0-20200308224205-e330c862e34f // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/swaggo/swag v1.6.5
+	github.com/swaggo/swag v1.6.6
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
