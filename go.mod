@@ -8,7 +8,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-openapi/spec v0.19.7 // indirect
 	github.com/go-openapi/swag v0.19.8 // indirect
-	github.com/gofiber/fiber v1.14.2
+	github.com/gofiber/fiber v1.14.4
 	github.com/google/btree v1.0.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
@@ -18,8 +18,7 @@ require (
 	github.com/savsgio/gotils v0.0.0-20200308224205-e330c862e34f // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/swaggo/swag v1.6.7
-	github.com/tidwall/gjson v1.6.0
-	github.com/tidwall/pretty v1.0.1 // indirect
+	github.com/tidwall/gjson v1.6.1
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
 	golang.org/x/tools v0.0.0-20200309202150-20ab64c0d93f // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1
