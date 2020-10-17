@@ -6,7 +6,6 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/buger/jsonparser v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.2.0
-	github.com/go-openapi/spec v0.19.9 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/gofiber/fiber v1.14.6
 	github.com/google/btree v1.0.0 // indirect
@@ -18,7 +17,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/sergi/go-diff v1.1.0 // indirect
-	github.com/swaggo/swag v1.6.7
+	github.com/swaggo/swag v1.6.8
 	github.com/tidwall/gjson v1.6.1
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
