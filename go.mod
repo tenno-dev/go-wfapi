@@ -7,7 +7,7 @@ require (
 	github.com/buger/jsonparser v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/go-openapi/swag v0.19.9 // indirect
-	github.com/gofiber/fiber v1.14.6
+	github.com/gofiber/fiber/v2/v2 v2.1.0
 	github.com/google/btree v1.0.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
