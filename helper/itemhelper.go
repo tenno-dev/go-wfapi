@@ -16,14 +16,14 @@ func Getitemdetails(src string) (ret string) {
 	src = strings.ToLower(src)
 	src = url.PathEscape(src)
 	url := "http://localhost:8000/warframe/v1/items/" + src
-	fmt.Println("url:", url)
+	// fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 
 	if err != nil {
 		fmt.Println("Errored when sending request to the server")
 		ret = "error: not found"
-				fmt.Println(err)
+		fmt.Println(err)
 
 		return ret
 	}

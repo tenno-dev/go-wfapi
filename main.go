@@ -120,7 +120,7 @@ func main() {
 	})
 
 	c1 := cron.New()
-	c1.AddFunc("@every 1m1s", func() {
+	c1.AddFunc("@every 1m10s", func() {
 		datasources.LoadTime()
 
 		fmt.Println("Tick")

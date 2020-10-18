@@ -1,7 +1,6 @@
 package helper
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -48,7 +47,7 @@ func Langtranslate1(src string, lang string) (ret string) {
 				x1 = result["value"].(string)
 			} else {
 				src1 := strings.Replace(src, "storeItems/", "", -1)
-				fmt.Println("translate error2", src1)
+				// fmt.Println("translate error2", src1)
 				result, ok := datasources.Languages[lang][src1].(map[string]interface{})
 				if ok != false {
 					x1 = result["value"].(string)

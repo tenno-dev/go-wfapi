@@ -1,8 +1,6 @@
 package helper
 
 import (
-	"fmt"
-
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/tidwall/gjson"
 )
@@ -55,7 +53,7 @@ func Regiontranslate(src string, lang string) (ret [5]string) {
 	Nodename := gjson.GetBytes(datasources.Regiondata[lang], nodesearch).String()
 	Planetname := gjson.GetBytes(datasources.Regiondata[lang], planetsearch).String()
 
-	fmt.Println("test2:", Nodename)
+	// fmt.Println("test2:", Nodename)
 	//	fmt.Println("test21:", string(datasources.Regiondata["en"]))
 
 	x1[3] = src
