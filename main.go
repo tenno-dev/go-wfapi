@@ -12,7 +12,7 @@ import (
 	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/robfig/cron/v3"
 )
 
@@ -56,8 +56,9 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 
 func main() {
 	datasources.InitLangDir()
-	app := fiber.New()
-	app.Settings.Prefork = true // Prefork enabled
+	app := fiber.New(fiber.Config{
+		Prefork: true,
+	})
 	// mqtt client start
 	opts := mqtt.NewClientOptions().AddBroker("ws://127.0.0.1:8083/mqtt").SetClientID("wf-mqtt")
 	//opts.SetKeepAlive(2 * time.Second)
@@ -164,7 +165,7 @@ func main() {
 	app.Get("/:platform/fissures/", outputs.Fissures)
 	app.Get("/:platform/nightwave/", outputs.Nightwave)
 
-	app.Listen(8080)
+	app.Listen(":8080")
 
 }
 
