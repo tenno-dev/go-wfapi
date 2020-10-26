@@ -55,8 +55,6 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
-	datasources.LoadKuvadata()
-	datasources.LoadAnomalydata()
 	datasources.InitLangDir()
 	app := fiber.New()
 	app.Settings.Prefork = true // Prefork enabled
