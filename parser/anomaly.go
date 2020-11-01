@@ -25,7 +25,7 @@ type AnomalyData struct {
 // AnomalyDataSet for http export
 var AnomalyDataSet = make(map[int]map[string][]AnomalyData)
 
-// ParseKuva Parse current Darvo Deal
+// ParseAnomaly Parse current Darvo Deal
 func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string) {
 	if _, ok := AnomalyDataSet[platformno]; !ok {
 		AnomalyDataSet[platformno] = make(map[string][]AnomalyData)

@@ -11,12 +11,14 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// InterimReward struct
 type InterimReward struct {
 	Item    string
 	Credits string
 	XP      string
 }
 
+// EventJobs struct
 type EventJobs struct {
 	Type        string
 	ItemRewards []string

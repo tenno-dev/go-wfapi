@@ -7,10 +7,10 @@ import (
 	"net/http"
 )
 
-// Kuvadata Kuvadata result
+// Anomalydata Kuvadata result
 var Anomalydata []byte
 
-// LoadKuvadata  Load Kuvadata from https://semlar.com/anomaly.json
+// LoadAnomalydata  Load Kuvadata from https://semlar.com/anomaly.json
 func LoadAnomalydata() (ret []byte) {
 	client := &http.Client{}
 
