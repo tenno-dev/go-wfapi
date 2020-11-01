@@ -1,6 +1,7 @@
 # go-wfapi
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6cd589b3d93c4185af48815346a99d44)](https://app.codacy.com/manual/Bitti09/go-wfapi?utm_source=github.com&utm_medium=referral&utm_content=Bitti09/go-wfapi&utm_campaign=Badge_Grade_Settings)
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/tenno-dev/go-wfapi)
 
 WIP  Warframe API Parser with  MQTT publisher
 
