@@ -12,7 +12,6 @@ require (
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/gofiber/fiber/v2 v2.19.0
-	github.com/gofrs/uuid v3.3.0+incompatible // indirect
 	github.com/goiiot/libmqtt v0.9.6 // indirect
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.2 // indirect
@@ -26,7 +25,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14 // indirect
 	github.com/swaggo/gin-swagger v1.2.0 // indirect
-	github.com/swaggo/swag v1.7.1
+	github.com/swaggo/swag v1.7.3
 	github.com/tidwall/gjson v1.9.1
 	github.com/valyala/fasthttp v1.30.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
