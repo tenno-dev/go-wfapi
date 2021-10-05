@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -30,7 +31,9 @@ type Alerts struct {
 var Alertsdata = make(map[int]map[string][]Alerts)
 
 // ParseAlerts parsing Alerts data
-func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Alertsdata[platformno]; !ok {
 		Alertsdata[platformno] = make(map[string][]Alerts)
 	}
@@ -81,4 +84,5 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string) {
 	messageJSON, _ := json.Marshal(alerts)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
+
 }

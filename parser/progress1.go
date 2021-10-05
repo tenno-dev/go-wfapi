@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -16,7 +17,9 @@ type Progress1 struct {
 }
 
 // ParseProgress1 Parse Void trader
-func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	data := datasources.Apidata[platformno]
 	var progress1 []Progress1
 

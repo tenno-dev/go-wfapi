@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -27,7 +28,9 @@ type DarvoDeals struct {
 var Darvodata = make(map[int]map[string][]DarvoDeals)
 
 // ParseDarvoDeal Parse current Darvo Deal
-func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Darvodata[platformno]; !ok {
 		Darvodata[platformno] = make(map[string][]DarvoDeals)
 	}
@@ -70,4 +73,5 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string)
 	Darvodata[platformno][lang] = deals
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
+
 }

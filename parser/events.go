@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -53,7 +54,9 @@ var interim []InterimReward
 var interimsteps []string
 
 // ParseGoals parsing Events data (Called Goals in warframe api)
-func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseGoals(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Eventdata[platformno]; !ok {
 		Eventdata[platformno] = make(map[string][]EventsData)
 	}
@@ -69,6 +72,7 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		// id
+
 		id, _ := jsonparser.GetString(value, "_id", "$oid")
 		name, _ := jsonparser.GetString(value, "Desc")
 		name1 := helper.Langtranslate1(name, lang)
@@ -141,4 +145,5 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string) {
 	messageJSON, _ := json.Marshal(event)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
+
 }

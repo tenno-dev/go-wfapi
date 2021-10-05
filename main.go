@@ -5,14 +5,13 @@ import (
 	_ "net/http/pprof"
 	"runtime"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	_ "github.com/bitti09/go-wfapi/docs"
-	"github.com/bitti09/go-wfapi/helper"
-	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gofiber/fiber/v2"
 	"github.com/robfig/cron/v3"
 )
 
@@ -55,63 +54,35 @@ var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	var wg2 sync.WaitGroup
+
 	datasources.InitLangDir()
-	app := fiber.New(fiber.Config{
-		Prefork: true,
-	})
+
 	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("ws://127.0.0.1:8083/mqtt").SetClientID("wf-mqtt")
-	//opts.SetKeepAlive(2 * time.Second)
+	opts := mqtt.NewClientOptions().AddBroker("wss://api2.tenno.dev:8084/mqtt").SetClientID("wf-mqtt")
+	opts.SetKeepAlive(2 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	//opts.SetPingTimeout(1 * time.Second)
 	c := mqtt.NewClient(opts)
+	//mqtt client end
+	for x1, v1 := range langpool {
+		//fmt.Println("x1:", x1)
+		//fmt.Println("v1:", v1)
+		wg2.Add(4)
+		go datasources.Loadlangdata(v1, x1, &wg2)
+		go datasources.LoadRegiondata(v1, x1, &wg2)
+		go datasources.LoadResourcedata(v1, x1, &wg2)
+		go datasources.LoadUpgradesdata(v1, x1, &wg2)
+		wg2.Wait()
+		fmt.Println("langpool goroutine exit")
+
+	}
 	if token := c.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
-	//mqtt client end
-	for x1, v1 := range langpool {
-		fmt.Println("x1:", x1)
-		fmt.Println("v1:", v1)
-		datasources.Loadlangdata(v1, x1)
-		datasources.LoadRegiondata(v1, x1)
-		datasources.LoadResourcedata(v1, x1)
-		datasources.LoadUpgradesdata(v1, x1)
-
-	}
-	test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
-	fmt.Println(test1)
-
-	datasources.LoadTime()
-	for x, v := range platforms {
-		fmt.Println("x:", x)
-		fmt.Println("v:", v)
-		datasources.LoadApidata(v, x)
-
-		fmt.Println("LoadApidata:", v)
-		for _, v1 := range langpool {
-			parser.ParseGoals(x, v, c, v1)
-			parser.ParseAnomaly(x, v, c, v1)
-			parser.ParseKuva(x, v, c, v1)
-			parser.ParseSorties(x, v, c, v1)
-			parser.ParseNews(x, v, c, v1)
-			parser.ParseAlerts(x, v, c, v1)
-			parser.ParseFissures(x, v, c, v1)
-			parser.ParseSyndicateMissions(x, v, c, v1)
-			parser.ParseInvasions(x, v, c, v1)
-			parser.ParseDarvoDeal(x, v, c, v1)
-			parser.ParseNightwave(x, v, c, v1)
-			parser.ParseVoidTrader(x, v, c, v1)
-			parser.ParseProgress1(x, v, c, v1)
-			parser.ParseTime(x, v, c, v1)
-			parser.ParsePenemy(x, v, c, v1)
-
-			/*
-				parseCycles(x, v, c)
-				parseEvents(x, v, c)
-			*/
-		}
-		PrintMemUsage()
-	}
+	//test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
+	//fmt.Println(test1)
 	c0 := cron.New()
 	c0.AddFunc("@every 5m1s", func() {
 		datasources.LoadKuvadata()
@@ -119,53 +90,44 @@ func main() {
 	})
 
 	c1 := cron.New()
-	c1.AddFunc("@every 1m10s", func() {
+	c1.AddFunc("@every 1m1s", func() {
 		datasources.LoadTime()
 
-		fmt.Println("Tick")
+		fmt.Println("Tick1s")
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
-				parser.ParseGoals(x, v, c, v1)
-				parser.ParseAnomaly(x, v, c, v1)
-				parser.ParseKuva(x, v, c, v1)
-				parser.ParseSorties(x, v, c, v1)
-				parser.ParseNews(x, v, c, v1)
-				parser.ParseAlerts(x, v, c, v1)
-				parser.ParseFissures(x, v, c, v1)
-				parser.ParseSyndicateMissions(x, v, c, v1)
-				parser.ParseInvasions(x, v, c, v1)
-				parser.ParseDarvoDeal(x, v, c, v1)
-				parser.ParseNightwave(x, v, c, v1)
-				parser.ParseVoidTrader(x, v, c, v1)
-				parser.ParseProgress1(x, v, c, v1)
-				parser.ParseTime(x, v, c, v1)
-				parser.ParsePenemy(x, v, c, v1)
+				wg.Add(15)
+				go parser.ParseGoals(x, v, c, v1, &wg)
+				go parser.ParseAnomaly(x, v, c, v1, &wg)
+				go parser.ParseKuva(x, v, c, v1, &wg)
+				go parser.ParseSorties(x, v, c, v1, &wg)
+				go parser.ParseNews(x, v, c, v1, &wg)
+				go parser.ParseAlerts(x, v, c, v1, &wg)
+				go parser.ParseFissures(x, v, c, v1, &wg)
+				go parser.ParseSyndicateMissions(x, v, c, v1, &wg)
+				go parser.ParseInvasions(x, v, c, v1, &wg)
+				go parser.ParseDarvoDeal(x, v, c, v1, &wg)
+				go parser.ParseNightwave(x, v, c, v1, &wg)
+				go parser.ParseVoidTrader(x, v, c, v1, &wg)
+				go parser.ParseProgress1(x, v, c, v1, &wg)
+				go parser.ParseTime(x, v, c, v1, &wg)
+				go parser.ParsePenemy(x, v, c, v1, &wg)
+				wg.Wait()
+				fmt.Println("parsepool v=" + v + " goroutine exit")
 
 			}
 			/*
 				parseCycles(x, v, c)
 				parseEvents(x, v, c)
 			*/
-			PrintMemUsage()
 		}
 	})
+	c1.Run()
 	c1.Start()
+	c0.Run()
 	c0.Start()
 	PrintMemUsage()
-
-	// app.Get("/", outputs.IndexHandler)
-	app.Get("/:platform", outputs.Everything)
-	app.Get("/:platform/darvo/", outputs.DarvoDeals)
-	app.Get("/:platform/news/", outputs.News)
-	app.Get("/:platform/alerts/", outputs.Alerts)
-	app.Get("/:platform/fissures/", outputs.Fissures)
-	app.Get("/:platform/nightwave/", outputs.Nightwave)
-	app.Get("/:platform/penemy/", outputs.Penemy) // temp naming
-	app.Get("/:platform/fissures/", outputs.Fissures)
-	app.Get("/:platform/nightwave/", outputs.Nightwave)
-
-	app.Listen(":8080")
 
 }
 

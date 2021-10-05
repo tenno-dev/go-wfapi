@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"strings"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -11,7 +12,9 @@ import (
 )
 
 // ParseSyndicateMissions Parse Ostrons & Solaris United Missions
-func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	type SyndicateJobs struct {
 		Jobtype        string
 		Rewards        []string

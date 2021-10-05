@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
 // Apidata Result of LoadApidata
@@ -27,7 +28,7 @@ func LoadApidata(id1 string, id2 int) (ret []byte) {
 	if id1 != "pc" {
 		url = "http://content." + id1 + ".warframe.com/dynamic/worldState.php"
 	}
-	fmt.Println("url:", url)
+	//fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 
@@ -44,15 +45,17 @@ func LoadApidata(id1 string, id2 int) (ret []byte) {
 }
 
 // LoadRegiondata loads data from Warframe.com api
-func LoadRegiondata(id1 string, id2 int) (ret []byte) {
+func LoadRegiondata(id1 string, id2 int, wg *sync.WaitGroup) (ret []byte) {
 	// WF API Source
+	defer wg.Done()
+
 	client := &http.Client{}
 
 	url := "http://content.warframe.com/MobileExport/Manifest/ExportRegions.json"
 	if id1 != "en" {
 		url = "http://content.warframe.com/MobileExport/Manifest/ExportRegions_" + id1 + ".json"
 	}
-	fmt.Println("url:", url)
+	//fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 
@@ -69,15 +72,17 @@ func LoadRegiondata(id1 string, id2 int) (ret []byte) {
 }
 
 // LoadResourcedata loads data from Warframe.com api
-func LoadResourcedata(id1 string, id2 int) (ret []byte) {
+func LoadResourcedata(id1 string, id2 int, wg *sync.WaitGroup) (ret []byte) {
 	// WF API Source
+	defer wg.Done()
+
 	client := &http.Client{}
 
 	url := "http://content.warframe.com/MobileExport/Manifest/ExportResources.json"
 	if id1 != "en" {
 		url = "http://content.warframe.com/MobileExport/Manifest/ExportResources_" + id1 + ".json"
 	}
-	fmt.Println("url:", url)
+	//fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 
@@ -94,15 +99,17 @@ func LoadResourcedata(id1 string, id2 int) (ret []byte) {
 }
 
 // LoadUpgradesdata loads data from Warframe.com api
-func LoadUpgradesdata(id1 string, id2 int) (ret []byte) {
+func LoadUpgradesdata(id1 string, id2 int, wg *sync.WaitGroup) (ret []byte) {
 	// WF API Source
+	defer wg.Done()
+
 	client := &http.Client{}
 
 	url := "http://content.warframe.com/MobileExport/Manifest/ExportResources.json"
 	if id1 != "en" {
 		url = "http://content.warframe.com/MobileExport/Manifest/ExportResources_" + id1 + ".json"
 	}
-	fmt.Println("url:", url)
+	//fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 

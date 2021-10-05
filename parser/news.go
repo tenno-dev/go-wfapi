@@ -3,6 +3,7 @@ package parser
 import (
 	"encoding/json"
 	"strings"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -23,7 +24,9 @@ type News struct {
 var Newsdata = make(map[int]map[string][]News)
 
 // ParseNews parsing news data (Called Events in warframe api)
-func ParseNews(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseNews(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Newsdata[platformno]; !ok {
 		Newsdata[platformno] = make(map[string][]News)
 	}

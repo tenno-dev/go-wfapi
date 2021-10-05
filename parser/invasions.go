@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -10,7 +11,9 @@ import (
 )
 
 // ParseInvasions parse active Invasions
-func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	type Invasion struct {
 		ID                  string
 		Location            string
@@ -80,6 +83,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string)
 	messageJSON, _ := json.Marshal(invasions)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
+
 }
 func calcCompletion(count int64, goal int64, attacker string) (complete float32) {
 	y := float32((1 + float32(count)/float32(goal)))

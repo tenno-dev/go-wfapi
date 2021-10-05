@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
@@ -23,7 +24,9 @@ type Time2 struct {
 }
 
 // ParseTime Parse Void trader
-func ParseTime(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseTime(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	data1 := datasources.Cetustime
 	data2 := datasources.Valistime
 	data3 := datasources.Earthtime

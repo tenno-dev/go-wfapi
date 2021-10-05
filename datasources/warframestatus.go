@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sync"
 
 	git "gopkg.in/src-d/go-git.v4"
 )
@@ -76,8 +77,8 @@ func InitLangDir() {
 }
 
 // Loadlangdata load lang string from warframestat.us repo
-func Loadlangdata(id1 string, id2 int) {
-
+func Loadlangdata(id1 string, id2 int, wg *sync.WaitGroup) {
+	defer wg.Done()
 	/*
 		// arcanesData
 

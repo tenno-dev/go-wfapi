@@ -15,7 +15,7 @@ func LoadKuvadata() (ret []byte) {
 	client := &http.Client{}
 
 	url := "https://10o.io/kuvalog.json"
-	fmt.Println("url:", url)
+	//fmt.Println("url:", url)
 	req, _ := http.NewRequest("GET", url, nil)
 	res, err := client.Do(req)
 

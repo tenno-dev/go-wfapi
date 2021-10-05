@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -10,7 +11,9 @@ import (
 )
 
 // ParseSorties parsing Sorties data
-func ParseSorties(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseSorties(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	type Sortievariant struct {
 		MissionType     string
 		MissionMod      string

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -64,7 +65,9 @@ type Nightwave struct {
 var Nightwavedata = make(map[int]map[string][]Nightwave)
 
 // ParseNightwave Parse Nightwave Season Info
-func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Nightwavedata[platformno]; !ok {
 		Nightwavedata[platformno] = make(map[string][]Nightwave)
 	}

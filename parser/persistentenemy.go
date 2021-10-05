@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -27,7 +28,9 @@ type Penemy struct {
 var Penemydata = make(map[int]map[string][]Penemy)
 
 // ParsePenemy parsing  persistent enemy data
-func ParsePenemy(platformno int, platform string, c mqtt.Client, lang string) {
+func ParsePenemy(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Penemydata[platformno]; !ok {
 		Penemydata[platformno] = make(map[string][]Penemy)
 	}

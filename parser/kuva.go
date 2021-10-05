@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -47,7 +48,9 @@ var KuvaMission = make(map[int]map[string][]KuvaData)
 var ArbitrationMission = make(map[int]map[string][]ArbitrationData)
 
 // ParseKuva Parse current Darvo Deal
-func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseKuva(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := KuvaMission[platformno]; !ok {
 		KuvaMission[platformno] = make(map[string][]KuvaData)
 	}
@@ -110,8 +113,10 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string) {
 	tokena := c.Publish(topica, 0, true, messageJSONa)
 	topick := "wf/" + lang + "/" + platform + "/kuva"
 	tokena.Wait()
+
 	messageJSONk, _ := json.Marshal(kuva)
 	KuvaMission[platformno][lang] = kuva
 	tokenk := c.Publish(topick, 0, true, messageJSONk)
 	tokenk.Wait()
+
 }

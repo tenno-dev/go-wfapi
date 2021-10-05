@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -27,7 +28,9 @@ type Fissures struct {
 var Fissuresdata = make(map[int]map[string][]Fissures)
 
 // ParseFissures  parse Fissure data
-func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseFissures(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if _, ok := Fissuresdata[platformno]; !ok {
 		Fissuresdata[platformno] = make(map[string][]Fissures)
 	}
@@ -67,4 +70,5 @@ func ParseFissures(platformno int, platform string, c mqtt.Client, lang string) 
 	messageJSON, _ := json.Marshal(fissures)
 	token := c.Publish(topicf, 0, true, messageJSON)
 	token.Wait()
+
 }

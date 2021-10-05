@@ -2,6 +2,7 @@ package parser
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
@@ -27,7 +28,9 @@ type VoidtraderOffers struct {
 }
 
 // ParseVoidTrader Parse Void trader
-func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string) {
+func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	data := datasources.Apidata[platformno]
 	var voidtrader []Voidtrader
 
