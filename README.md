@@ -9,35 +9,24 @@ WIP  Warframe API Parser with  MQTT publisher
 
 ### Parser
 
--   [x] News
--   [x] Sorties
--   [x] Void Fissures
--   [ ] Alerts (waiting for api response)
--   [x] Darvo's Deals ( untranslated )
--   [x] Nightwave 
--   [x] Syndicate Missions ( untranslated )
--   [x] Invasions  ( half translated )
--   [x] Void Trader
--   [x] World Events (partly)
--   [x] Kuva Missions (***new***)
--   [x] Arbitration (***new***)
+-   [] News
+-   [] Sorties
+-   [] Void Fissures
+-   [] Alerts (waiting for api response)
+-   [] Darvo's Deals ( untranslated )
+-   [] Nightwave 
+-   [] Syndicate Missions ( untranslated )
+-   [] Invasions  ( half translated )
+-   [] Void Trader
+-   [] World Events (partly)
+-   [] Kuva Missions (***new***)
+-   [] Arbitration (***new***)
 
 ## Demo
 
--   Web: <https://api.mybitti.de>
-
-    -   Ping:   /
-    -   Worldstate(unparsed) /:platform
-    -   Darvos Deal: /:platform/platform/  (Accept-Language required)
-    -   News /:platform/news/ (Accept-Language required)
-    -   Alerts /:platform/alerts/ (Accept-Language required)
-    -   Fissures /:platform/fissures/ (Accept-Language required)
-    -   Nightwave /:platform/nightwave/ (Accept-Language required)
-
-    only first two chars  of  (Accept-Language) is used.
-
+** Currently not online **
 -   MQTT Client:
-    -   Host: api-wf(.)mybitti(.)de
+    -   Host: api-wf(.)tenno(.)dev
     -   Port: 8084
     -   Protocol: wss
     -   Data path: wf/{lang}/{platform}/
