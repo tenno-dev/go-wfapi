@@ -22,29 +22,12 @@ var platforms = [4]string{"pc", "ps4", "xb1", "swi"}
 
 // platforms end
 // var translationtype = [10]string{"en", "de", "es", "fr","it","ko","pl","pt","ru","zh"}
-var bempty = "[{}]"
-var langtest = "en"
 
 // LangMap start
 type LangMap map[string]interface{}
 
-// Data  vars
-var arcanesData map[string]interface{}
-var conclaveData map[string]interface{}
-var eventsData map[string]interface{}
-var languages = map[string]string{}
-var operationTypes = map[string]string{}
-var persistentEnemyData map[string]interface{}
-
-var syndicatesData = map[string]string{}
-var synthTargets map[string]interface{}
-var upgradeTypes map[string]interface{}
-var warframes map[string]interface{} //
-var weapons map[string]interface{}
-
 // Apidata downloaded api data
 var Apidata [][]byte
-var sortierewards = ""
 
 func main() {
 	var wg sync.WaitGroup
