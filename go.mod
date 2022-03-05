@@ -4,8 +4,10 @@ go 1.13
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20220113124808-70ae35bab23f // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/buger/jsonparser v1.1.1
+	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/gofiber/fiber/v2 v2.27.0
 	github.com/google/btree v1.0.1 // indirect
@@ -23,5 +25,4 @@ require (
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/tools v0.1.9 // indirect
-	gopkg.in/src-d/go-git.v4 v4.13.1
 )
