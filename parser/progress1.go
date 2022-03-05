@@ -14,6 +14,7 @@ type Progress1 struct {
 	P3 float64
 }
 
+// Progress1data export Progress1
 var Progress1data = make(map[int]map[string][]Progress1)
 
 // ParseProgress1 Parse Void trader

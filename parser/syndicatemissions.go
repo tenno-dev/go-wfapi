@@ -18,7 +18,7 @@ type SyndicateJobs struct {
 	StandingReward []string
 }
 
-// SyndicateJobs struct
+// SyndicateMissions struct
 type SyndicateMissions struct {
 	ID        string
 	Started   string
