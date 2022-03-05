@@ -21,6 +21,7 @@ type Time2 struct {
 	State string
 }
 
+// Time1sdata export Time1
 var Time1sdata = make(map[int]map[string][]Time1)
 
 // ParseTime Parse Void trader

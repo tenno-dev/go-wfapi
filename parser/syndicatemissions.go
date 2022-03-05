@@ -9,6 +9,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// SyndicateJobs struct
 type SyndicateJobs struct {
 	Jobtype        string
 	Rewards        []string
@@ -16,6 +17,8 @@ type SyndicateJobs struct {
 	MaxEnemyLevel  int64
 	StandingReward []string
 }
+
+// SyndicateJobs struct
 type SyndicateMissions struct {
 	ID        string
 	Started   string
@@ -24,6 +27,7 @@ type SyndicateMissions struct {
 	Jobs      []SyndicateJobs
 }
 
+// SyndicateMissionsdata export SyndicateMissions
 var SyndicateMissionsdata = make(map[int]map[string][]SyndicateMissions)
 
 // ParseSyndicateMissions Parse Ostrons & Solaris United Missions

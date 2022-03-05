@@ -8,6 +8,7 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// Invasion struct
 type Invasion struct {
 	ID                  string
 	Location            string

@@ -25,6 +25,7 @@ type VoidtraderOffers struct {
 	Credits int64  `json:",omitempty"`
 }
 
+// Voidtraderdata export Voidtrader
 var Voidtraderdata = make(map[int]map[string][]Voidtrader)
 
 // ParseVoidTrader Parse Void trader

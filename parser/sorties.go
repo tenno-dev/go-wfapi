@@ -8,12 +8,15 @@ import (
 	"github.com/buger/jsonparser"
 )
 
+// Sortievariant struct
 type Sortievariant struct {
 	MissionType     string
 	MissionMod      string
 	MissionModDesc  string
 	MissionLocation string
 }
+
+// Sortie struct
 type Sortie struct {
 	ID       string
 	Started  string
@@ -25,6 +28,7 @@ type Sortie struct {
 	Active   bool
 }
 
+// Sortiedata export Sortiedata
 var Sortiedata = make(map[int]map[string][]Sortie)
 
 // ParseSorties parsing Sorties data
