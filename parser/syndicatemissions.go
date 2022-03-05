@@ -1,33 +1,36 @@
 package parser
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
-// ParseSyndicateMissions Parse Ostrons & Solaris United Missions
-func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
-	defer wg.Done()
+type SyndicateJobs struct {
+	Jobtype        string
+	Rewards        []string
+	MinEnemyLevel  int64
+	MaxEnemyLevel  int64
+	StandingReward []string
+}
+type SyndicateMissions struct {
+	ID        string
+	Started   string
+	End       string
+	Syndicate string
+	Jobs      []SyndicateJobs
+}
 
-	type SyndicateJobs struct {
-		Jobtype        string
-		Rewards        []string
-		MinEnemyLevel  int64
-		MaxEnemyLevel  int64
-		StandingReward []string
-	}
-	type SyndicateMissions struct {
-		ID        string
-		Started   string
-		End       string
-		Syndicate string
-		Jobs      []SyndicateJobs
+var SyndicateMissionsdata = make(map[int]map[string][]SyndicateMissions)
+
+// ParseSyndicateMissions Parse Ostrons & Solaris United Missions
+func ParseSyndicateMissions(platformno int, platform string, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if _, ok := SyndicateMissionsdata[platformno]; !ok {
+		SyndicateMissionsdata[platformno] = make(map[string][]SyndicateMissions)
 	}
 	data := datasources.Apidata[platformno]
 	var syndicates []SyndicateMissions
@@ -70,9 +73,6 @@ func ParseSyndicateMissions(platformno int, platform string, c mqtt.Client, lang
 			syndicates = append(syndicates, w)
 		}
 	}, "SyndicateMissions")
+	SyndicateMissionsdata[platformno][lang] = syndicates
 
-	topicf := "wf/" + lang + "/" + platform + "/syndicates"
-	messageJSON, _ := json.Marshal(syndicates)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 }

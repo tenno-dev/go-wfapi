@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"encoding/json"
 	"regexp"
 	"strconv"
 	"sync"
@@ -10,7 +9,6 @@ import (
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // DailyChallenges - DailyChallenges
@@ -65,7 +63,7 @@ type Nightwave struct {
 var Nightwavedata = make(map[int]map[string][]Nightwave)
 
 // ParseNightwave Parse Nightwave Season Info
-func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseNightwave(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Nightwavedata[platformno]; !ok {
@@ -78,10 +76,6 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string,
 	var welitechallenge []WeeklyEliteChallenges
 	errfissures, _ := jsonparser.GetString(data, "SeasonInfo")
 	if errfissures != "" {
-		topicf := "wf/" + lang + "/" + platform + "/nightwave"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("error Nightwave reached")
 		return
 	}
 	timenow := time.Now().Unix()
@@ -113,15 +107,15 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string,
 		}
 		daily, _ := jsonparser.GetBoolean(value, "Daily")
 		elite, _ := regexp.MatchString(`WeeklyHard.*`, mission)
-		if daily == true {
+		if daily {
 			dailyc := DailyChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			dchallenge = append(dchallenge, dailyc)
 		}
-		if daily == false && elite == false {
+		if !daily && !elite {
 			weekc := WeeklyChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			wchallenge = append(wchallenge, weekc)
 		}
-		if daily == false && elite == true {
+		if !daily && elite {
 			weekelitec := WeeklyEliteChallenges{idc, endedc2, activationc2, active, reputation, cdesc[1], cdesc[0]}
 			welitechallenge = append(welitechallenge, weekelitec)
 		}
@@ -129,9 +123,5 @@ func ParseNightwave(platformno int, platform string, c mqtt.Client, lang string,
 	w := Nightwave{id, ended, activation, season + 1, tag1,
 		phase, "", "", dchallenge, wchallenge, welitechallenge}
 	nightwave = append(nightwave, w)
-	topicf := "wf/" + lang + "/" + platform + "/nightwave"
 	Nightwavedata[platformno][lang] = nightwave
-	messageJSON, _ := json.Marshal(nightwave)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 }

@@ -13,11 +13,11 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 		x1[1] = src
 
 		result, ok := datasources.Sortiemodtypes[lang][src]
-		if ok != false {
+		if ok {
 			x1[0] = result.(string)
 		}
 		result2, ok := datasources.Sortiemoddesc[lang][src]
-		if ok != false {
+		if ok {
 			x1[1] = result2.(string)
 		}
 
@@ -31,7 +31,7 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 		x1[1] = src
 
 		result, ok := datasources.Sortiemodbosses[lang][src].(map[string]interface{})
-		if ok != false {
+		if ok {
 			x1[0] = result["faction"].(string)
 			x1[1] = result["name"].(string)
 
@@ -58,7 +58,7 @@ func Regiontranslate(src string, lang string) (ret [5]string) {
 
 	x1[3] = src
 	result, ok := datasources.Sortieloc[lang][src].(map[string]interface{})
-	if ok != false {
+	if ok {
 		x1[0] = Nodename
 		x1[1] = Planetname
 		x1[2] = result["enemy"].(string)

@@ -1,13 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 //Voidtrader - Voidtrader
@@ -27,20 +25,19 @@ type VoidtraderOffers struct {
 	Credits int64  `json:",omitempty"`
 }
 
-// ParseVoidTrader Parse Void trader
-func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
-	defer wg.Done()
+var Voidtraderdata = make(map[int]map[string][]Voidtrader)
 
+// ParseVoidTrader Parse Void trader
+func ParseVoidTrader(platformno int, platform string, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if _, ok := Voidtraderdata[platformno]; !ok {
+		Voidtraderdata[platformno] = make(map[string][]Voidtrader)
+	}
 	data := datasources.Apidata[platformno]
 	var voidtrader []Voidtrader
 
 	_, _, _, voiderr := jsonparser.Get(data, "VoidTraders")
 	if voiderr != nil {
-		topicf := "wf/" + lang + "/" + platform + "/voidtrader"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("reached void error")
-
 		return
 	}
 	// fmt.Println("reached void start")
@@ -67,9 +64,5 @@ func ParseVoidTrader(platformno int, platform string, c mqtt.Client, lang string
 	w := Voidtrader{ID: id, Started: started,
 		Ends: ended, NPC: npc, Node: location[0], Offers: voidoffers}
 	voidtrader = append(voidtrader, w)
-
-	topicf := "wf/" + lang + "/" + platform + "/voidtrader"
-	messageJSON, _ := json.Marshal(voidtrader)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
+	Voidtraderdata[platformno][lang] = voidtrader
 }

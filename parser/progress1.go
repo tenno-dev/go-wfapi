@@ -1,12 +1,10 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Progress1 - Progress1
@@ -16,20 +14,19 @@ type Progress1 struct {
 	P3 float64
 }
 
-// ParseProgress1 Parse Void trader
-func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
-	defer wg.Done()
+var Progress1data = make(map[int]map[string][]Progress1)
 
+// ParseProgress1 Parse Void trader
+func ParseProgress1(platformno int, platform string, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if _, ok := Progress1data[platformno]; !ok {
+		Progress1data[platformno] = make(map[string][]Progress1)
+	}
 	data := datasources.Apidata[platformno]
 	var progress1 []Progress1
 
 	_, _, _, pro1err := jsonparser.Get(data, "ProjectPct")
 	if pro1err != nil {
-		topicf := "wf/" + lang + "/" + platform + "/progress"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("reached progress error")
-
 		return
 	}
 	// fmt.Println("reached progress start")
@@ -41,10 +38,6 @@ func ParseProgress1(platformno int, platform string, c mqtt.Client, lang string,
 	w := Progress1{P1: p1, P2: p2,
 		P3: p3}
 	progress1 = append(progress1, w)
-
-	topicf := "wf/" + lang + "/" + platform + "/progress"
-	messageJSON, _ := json.Marshal(progress1)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
+	Progress1data[platformno][lang] = progress1
 
 }

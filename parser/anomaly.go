@@ -1,14 +1,12 @@
 package parser
 
 import (
-	"encoding/json"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // AnomalyData struct
@@ -27,7 +25,7 @@ type AnomalyData struct {
 var AnomalyDataSet = make(map[int]map[string][]AnomalyData)
 
 // ParseAnomaly Parse current Darvo Deal
-func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseAnomaly(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := AnomalyDataSet[platformno]; !ok {
@@ -54,11 +52,5 @@ func ParseAnomaly(platformno int, platform string, c mqtt.Client, lang string, w
 
 	a := AnomalyData{id, node, started1, startedstring, ended1, endedstring, projection1, projectionstring}
 	anoma = append(anoma, a)
-
-	topica := "wf/" + lang + "/" + platform + "/anomaly"
-	messageJSONa, _ := json.Marshal(anoma)
 	AnomalyDataSet[platformno][lang] = anoma
-	tokena := c.Publish(topica, 0, true, messageJSONa)
-	tokena.Wait()
-
 }

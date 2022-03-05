@@ -1,13 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Penemy struct
@@ -18,6 +16,8 @@ type Penemy struct {
 	Rank            int64
 	Region          int64
 	MissionLocation string
+	MissionType     string
+	MissionFaction  string
 	Lasttime        string
 	Enemy           string
 	Discovered      bool
@@ -28,7 +28,7 @@ type Penemy struct {
 var Penemydata = make(map[int]map[string][]Penemy)
 
 // ParsePenemy parsing  persistent enemy data
-func ParsePenemy(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParsePenemy(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Penemydata[platformno]; !ok {
@@ -39,10 +39,6 @@ func ParsePenemy(platformno int, platform string, c mqtt.Client, lang string, wg
 	_, _, _, erralert := jsonparser.Get(data, "PersistentEnemies")
 	// fmt.Println(erralert)
 	if erralert != nil {
-		topicf := "wf/" + lang + "/" + platform + "/penemy"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("error alert reached")
 		return
 	}
 	// fmt.Println("alert reached")
@@ -67,15 +63,10 @@ func ParsePenemy(platformno int, platform string, c mqtt.Client, lang string, wg
 		ticketing, _ := jsonparser.GetBoolean(value, "UseTicketing")
 		w := Penemy{id, health,
 			fleedamage, rank,
-			region, lastlocation, lasttime,
+			region, lastlocation, missiontype, missionfaction, lasttime,
 			enemy, discovered, ticketing}
 		penemy = append(penemy, w)
 
 	}, "PersistentEnemies")
-
-	topicf := "wf/" + lang + "/" + platform + "/penemy"
 	Penemydata[platformno][lang] = penemy
-	messageJSON, _ := json.Marshal(penemy)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 }

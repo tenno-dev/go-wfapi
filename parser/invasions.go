@@ -1,46 +1,48 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+type Invasion struct {
+	ID                  string
+	Location            string
+	MissionType         string
+	Completed           bool
+	Started             string
+	AttackerRewardItem  string `json:",omitempty"`
+	AttackerRewardCount int64  `json:",omitempty"`
+	AttackerMissionInfo string `json:",omitempty"`
+	DefenderRewardItem  string `json:",omitempty"`
+	DefenderRewardCount int64  `json:",omitempty"`
+	DefenderMissionInfo string `json:",omitempty"`
+	Completion          float32
+}
+
+// Invasiondata export Invasiondata
+var Invasiondata = make(map[int]map[string][]Invasion)
+
 // ParseInvasions parse active Invasions
-func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseInvasions(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	type Invasion struct {
-		ID                  string
-		Location            string
-		MissionType         string
-		Completed           bool
-		Started             string
-		AttackerRewardItem  string `json:",omitempty"`
-		AttackerRewardCount int64  `json:",omitempty"`
-		AttackerMissionInfo string `json:",omitempty"`
-		DefenderRewardItem  string `json:",omitempty"`
-		DefenderRewardCount int64  `json:",omitempty"`
-		DefenderMissionInfo string `json:",omitempty"`
-		Completion          float32
+	if _, ok := Invasiondata[platformno]; !ok {
+		Invasiondata[platformno] = make(map[string][]Invasion)
 	}
 
 	data := datasources.Apidata[platformno]
 	invasioncheck, _, _, _ := jsonparser.Get(data, "Invasions")
 	if len(invasioncheck) == 0 {
-		topicf := "wf/" + lang + "/" + platform + "/invasions"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
 		return
 	}
 	var invasions []Invasion
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		iscomplete, _ := jsonparser.GetBoolean(value, "Completed")
-		if iscomplete != true {
+		if !iscomplete {
 			attackeritem := ""
 			attackeritemcount := int64(0)
 			defenderitem := ""
@@ -61,7 +63,6 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string,
 			attackerfaction, _ := jsonparser.GetString(value, "AttackerMissionInfo", "faction")
 			attackerfaction = helper.Factionstranslate(attackerfaction, lang)
 			_, _, _, ierror2 := jsonparser.Get(value, "DefenderReward", "countedItems", "[0]", "ItemType")
-			// fmt.Println(string(test))
 			if ierror2 == nil {
 				defenderitem, _ = jsonparser.GetString(value, "DefenderReward", "countedItems", "[0]", "ItemType")
 				defenderitem = helper.Langtranslate1(defenderitem, lang)
@@ -79,11 +80,7 @@ func ParseInvasions(platformno int, platform string, c mqtt.Client, lang string,
 			invasions = append(invasions, w)
 		}
 	}, "Invasions")
-	topicf := "wf/" + lang + "/" + platform + "/invasions"
-	messageJSON, _ := json.Marshal(invasions)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
+	Invasiondata[platformno][lang] = invasions
 }
 func calcCompletion(count int64, goal int64, attacker string) (complete float32) {
 	y := float32((1 + float32(count)/float32(goal)))

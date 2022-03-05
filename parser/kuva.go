@@ -1,14 +1,12 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // KuvaData struct
@@ -48,7 +46,7 @@ var KuvaMission = make(map[int]map[string][]KuvaData)
 var ArbitrationMission = make(map[int]map[string][]ArbitrationData)
 
 // ParseKuva Parse current Darvo Deal
-func ParseKuva(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseKuva(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := KuvaMission[platformno]; !ok {
@@ -61,16 +59,6 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string, wg *
 	var kuva []KuvaData
 	var arbi []ArbitrationData
 
-	// fmt.Println("Darvo  reached")
-	/*errfissures, _ := jsonparser.GetString(data, "DailyDeals")
-	if errfissures != "" {
-		topicf := "wf/" + lang + "/" + platform + "/darvodeals"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("error Darvo reached")
-		return
-	}*/
-	// fmt.Println("Darvo2 reached")
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
 		//id, _ := jsonparser.GetString(value, "id")
 		id := "1"
@@ -106,17 +94,6 @@ func ParseKuva(platformno int, platform string, c mqtt.Client, lang string, wg *
 		}
 
 	})
-
-	topica := "wf/" + lang + "/" + platform + "/arbitration"
-	messageJSONa, _ := json.Marshal(arbi)
 	ArbitrationMission[platformno][lang] = arbi
-	tokena := c.Publish(topica, 0, true, messageJSONa)
-	topick := "wf/" + lang + "/" + platform + "/kuva"
-	tokena.Wait()
-
-	messageJSONk, _ := json.Marshal(kuva)
 	KuvaMission[platformno][lang] = kuva
-	tokenk := c.Publish(topick, 0, true, messageJSONk)
-	tokenk.Wait()
-
 }

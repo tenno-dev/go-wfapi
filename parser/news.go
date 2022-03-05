@@ -1,13 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // News struct
@@ -24,7 +22,7 @@ type News struct {
 var Newsdata = make(map[int]map[string][]News)
 
 // ParseNews parsing news data (Called Events in warframe api)
-func ParseNews(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseNews(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Newsdata[platformno]; !ok {
@@ -33,7 +31,6 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string, wg *
 	data := datasources.Apidata[platformno]
 	_, _, _, ernews := jsonparser.Get(data, "Events")
 	if ernews != nil {
-		// fmt.Println("error ernews reached")
 		return
 	}
 	var errnews2 bool
@@ -58,7 +55,7 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string, wg *
 			errnews2 = true
 		}
 
-		if errnews2 == false {
+		if !errnews2 {
 			image := "http://n9e5v4d8.ssl.hwcdn.net/uploads/e0b4d18d3330bb0e62dcdcb364d5f004.png"
 			id, _ := jsonparser.GetString(value, "_id", "$oid")
 
@@ -78,9 +75,5 @@ func ParseNews(platformno int, platform string, c mqtt.Client, lang string, wg *
 			news = append(news, w)
 		}
 	}, "Events")
-	topicf := "wf/" + lang + "/" + platform + "/news"
 	Newsdata[platformno][lang] = news
-	messageJSON, _ := json.Marshal(news)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 }

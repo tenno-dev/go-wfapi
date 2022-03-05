@@ -15,10 +15,9 @@ func Langtranslate2(src string, lang string) (ret [2]string) {
 	x1[1] = src
 	src = strings.ToLower(src)
 	result, ok := datasources.Languages[lang][src].(map[string]interface{})
-	if ok != false {
+	if ok {
 		x1[0] = result["value"].(string)
 		x1[1] = result["desc"].(string)
-
 	}
 	ret = x1
 	return ret
@@ -43,13 +42,13 @@ func Langtranslate1(src string, lang string) (ret string) {
 		} else {
 			src = strings.ToLower(src)
 			result, ok := datasources.Languages[lang][src].(map[string]interface{})
-			if ok != false {
+			if ok {
 				x1 = result["value"].(string)
 			} else {
 				src1 := strings.Replace(src, "storeItems/", "", -1)
 				// fmt.Println("translate error2", src1)
 				result, ok := datasources.Languages[lang][src1].(map[string]interface{})
-				if ok != false {
+				if ok {
 					x1 = result["value"].(string)
 				} else {
 					s := strings.Split(x1, "/")

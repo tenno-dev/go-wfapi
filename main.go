@@ -6,12 +6,10 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	_ "github.com/bitti09/go-wfapi/docs"
 	"github.com/bitti09/go-wfapi/parser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/robfig/cron/v3"
 )
 
@@ -48,24 +46,12 @@ var weapons map[string]interface{}
 var Apidata [][]byte
 var sortierewards = ""
 
-var f mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("TOPIC: %s\n", msg.Topic())
-	fmt.Printf("MSG: %s\n", msg.Payload())
-}
-
 func main() {
 	var wg sync.WaitGroup
 	var wg2 sync.WaitGroup
 
 	datasources.InitLangDir()
 
-	// mqtt client start
-	opts := mqtt.NewClientOptions().AddBroker("wss://api2.tenno.dev:8084/mqtt").SetClientID("wf-mqtt")
-	opts.SetKeepAlive(2 * time.Second)
-	opts.SetDefaultPublishHandler(f)
-	//opts.SetPingTimeout(1 * time.Second)
-	c := mqtt.NewClient(opts)
-	//mqtt client end
 	for x1, v1 := range langpool {
 		//fmt.Println("x1:", x1)
 		//fmt.Println("v1:", v1)
@@ -77,9 +63,6 @@ func main() {
 		wg2.Wait()
 		fmt.Println("langpool goroutine exit")
 
-	}
-	if token := c.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
 	}
 	//test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
 	//fmt.Println(test1)
@@ -98,21 +81,21 @@ func main() {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
 				wg.Add(15)
-				go parser.ParseGoals(x, v, c, v1, &wg)
-				go parser.ParseAnomaly(x, v, c, v1, &wg)
-				go parser.ParseKuva(x, v, c, v1, &wg)
-				go parser.ParseSorties(x, v, c, v1, &wg)
-				go parser.ParseNews(x, v, c, v1, &wg)
-				go parser.ParseAlerts(x, v, c, v1, &wg)
-				go parser.ParseFissures(x, v, c, v1, &wg)
-				go parser.ParseSyndicateMissions(x, v, c, v1, &wg)
-				go parser.ParseInvasions(x, v, c, v1, &wg)
-				go parser.ParseDarvoDeal(x, v, c, v1, &wg)
-				go parser.ParseNightwave(x, v, c, v1, &wg)
-				go parser.ParseVoidTrader(x, v, c, v1, &wg)
-				go parser.ParseProgress1(x, v, c, v1, &wg)
-				go parser.ParseTime(x, v, c, v1, &wg)
-				go parser.ParsePenemy(x, v, c, v1, &wg)
+				go parser.ParseGoals(x, v, v1, &wg)
+				go parser.ParseAnomaly(x, v, v1, &wg)
+				go parser.ParseKuva(x, v, v1, &wg)
+				go parser.ParseSorties(x, v, v1, &wg)
+				go parser.ParseNews(x, v, v1, &wg)
+				go parser.ParseAlerts(x, v, v1, &wg)
+				go parser.ParseFissures(x, v, v1, &wg)
+				go parser.ParseSyndicateMissions(x, v, v1, &wg)
+				go parser.ParseInvasions(x, v, v1, &wg)
+				go parser.ParseDarvoDeal(x, v, v1, &wg)
+				go parser.ParseNightwave(x, v, v1, &wg)
+				go parser.ParseVoidTrader(x, v, v1, &wg)
+				go parser.ParseProgress1(x, v, v1, &wg)
+				go parser.ParseTime(x, v, v1, &wg)
+				go parser.ParsePenemy(x, v, v1, &wg)
 				wg.Wait()
 				fmt.Println("parsepool v=" + v + " goroutine exit")
 

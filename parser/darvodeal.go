@@ -1,13 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // DarvoDeals struct
@@ -28,7 +26,7 @@ type DarvoDeals struct {
 var Darvodata = make(map[int]map[string][]DarvoDeals)
 
 // ParseDarvoDeal Parse current Darvo Deal
-func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseDarvoDeal(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Darvodata[platformno]; !ok {
@@ -39,9 +37,6 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string,
 	// fmt.Println("Darvo  reached")
 	errfissures, _ := jsonparser.GetString(data, "DailyDeals")
 	if errfissures != "" {
-		topicf := "wf/" + lang + "/" + platform + "/darvodeals"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
 		// fmt.Println("error Darvo reached")
 		return
 	}
@@ -67,11 +62,6 @@ func ParseDarvoDeal(platformno int, platform string, c mqtt.Client, lang string,
 			discount, stock, sold}
 		deals = append(deals, w)
 	}, "DailyDeals")
-
-	topicf := "wf/" + lang + "/" + platform + "/darvodeals"
-	messageJSON, _ := json.Marshal(deals)
 	Darvodata[platformno][lang] = deals
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
 
 }

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
@@ -9,7 +8,6 @@ import (
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // InterimReward struct
@@ -54,7 +52,7 @@ var interim []InterimReward
 var interimsteps []string
 
 // ParseGoals parsing Events data (Called Goals in warframe api)
-func ParseGoals(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseGoals(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Eventdata[platformno]; !ok {
@@ -140,10 +138,5 @@ func ParseGoals(platformno int, platform string, c mqtt.Client, lang string, wg 
 		w := EventsData{Debug: debug, ID: id, Name: name1, Start: started, Ends: ended, Location: node, Count: count2, HealthPct: health, Goal: goal1, Mainreward: rewards1, Mainrewardxp: rewardxp1, Mainrewardcredits: rewardcredits1, InterimGoalsteps: interimsteps, InterimRewards: interim, Jobs: job1}
 		event = append(event, w)
 	}, "Goals")
-	topicf := "wf/" + lang + "/" + platform + "/goals"
 	Eventdata[platformno][lang] = event
-	messageJSON, _ := json.Marshal(event)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
 }

@@ -1,12 +1,10 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Time1 - Time Base
@@ -23,10 +21,14 @@ type Time2 struct {
 	State string
 }
 
-// ParseTime Parse Void trader
-func ParseTime(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
-	defer wg.Done()
+var Time1sdata = make(map[int]map[string][]Time1)
 
+// ParseTime Parse Void trader
+func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if _, ok := Time1sdata[platformno]; !ok {
+		Time1sdata[platformno] = make(map[string][]Time1)
+	}
 	data1 := datasources.Cetustime
 	data2 := datasources.Valistime
 	data3 := datasources.Earthtime
@@ -66,10 +68,5 @@ func ParseTime(platformno int, platform string, c mqtt.Client, lang string, wg *
 	w := Time1{Cetus: cetus, Vallis: valis,
 		Earth: earth}
 	time1 = append(time1, w)
-
-	topicf := "wf/" + lang + "/" + platform + "/time"
-	messageJSON, _ := json.Marshal(time1)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
+	Time1sdata[platformno][lang] = time1
 }

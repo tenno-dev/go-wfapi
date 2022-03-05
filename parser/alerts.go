@@ -1,13 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 // Alerts struct
@@ -31,7 +29,7 @@ type Alerts struct {
 var Alertsdata = make(map[int]map[string][]Alerts)
 
 // ParseAlerts parsing Alerts data
-func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string, wg *sync.WaitGroup) {
+func ParseAlerts(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	if _, ok := Alertsdata[platformno]; !ok {
@@ -42,10 +40,6 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string, wg
 	_, _, _, erralert := jsonparser.Get(data, "Alerts")
 	// fmt.Println(erralert)
 	if erralert != nil {
-		topicf := "wf/" + lang + "/" + platform + "/alerts"
-		token := c.Publish(topicf, 0, true, []byte("{}"))
-		token.Wait()
-		// fmt.Println("error alert reached")
 		return
 	}
 	// fmt.Println("alert reached")
@@ -78,11 +72,5 @@ func ParseAlerts(platformno int, platform string, c mqtt.Client, lang string, wg
 		alerts = append(alerts, w)
 
 	}, "Alerts")
-
-	topicf := "wf/" + lang + "/" + platform + "/alerts"
 	Alertsdata[platformno][lang] = alerts
-	messageJSON, _ := json.Marshal(alerts)
-	token := c.Publish(topicf, 0, true, messageJSON)
-	token.Wait()
-
 }
