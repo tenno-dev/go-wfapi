@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
@@ -30,16 +31,19 @@ func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup)
 	if _, ok := Time1sdata[platformno]; !ok {
 		Time1sdata[platformno] = make(map[string][]Time1)
 	}
+	data := datasources.Apidata[platformno]
+
 	data1 := datasources.Cetustime
 	data2 := datasources.Valistime
 	data3 := datasources.Earthtime
+	fmt.Println(data1)
 
 	var time1 []Time1
 	var cetus []Time2
 	var valis []Time2
 	var earth []Time2
 
-	cetusbegin, _ := jsonparser.GetString(data1, "activation")
+	cetusbegin, _ := jsonparser.GetString(data, "Cetustime", "activation")
 	cetusend, _ := jsonparser.GetString(data1, "expiry")
 	cetusstate, _ := jsonparser.GetString(data1, "state")
 	cetus = append(cetus, Time2{
@@ -65,7 +69,6 @@ func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup)
 		End:   earthend,
 		State: earthstate,
 	})
-
 	w := Time1{Cetus: cetus, Vallis: valis,
 		Earth: earth}
 	time1 = append(time1, w)

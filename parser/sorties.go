@@ -23,13 +23,20 @@ type Sortie struct {
 	Ends     string
 	Boss     string
 	Faction  string
-	Reward   string
+	Reward   []SortieRewards1
 	Variants []Sortievariant
 	Active   bool
 }
 
 // Sortiedata export Sortiedata
 var Sortiedata = make(map[int]map[string][]Sortie)
+
+type SortieRewards1 struct {
+	Id       string
+	ItemName string
+	Rarity   string
+	Chance   float64
+}
 
 // ParseSorties parsing Sorties data
 func ParseSorties(platformno int, platform string, lang string, wg *sync.WaitGroup) {
@@ -39,6 +46,8 @@ func ParseSorties(platformno int, platform string, lang string, wg *sync.WaitGro
 	}
 	// fmt.Println("reached sortie start")
 	data := datasources.Apidata[platformno]
+	data2 := datasources.SortieRewards[lang]
+
 	_, _, _, sortieerr := jsonparser.Get(data, "Sorties")
 	if sortieerr != nil {
 		return
@@ -51,9 +60,23 @@ func ParseSorties(platformno int, platform string, lang string, wg *sync.WaitGro
 	ended, _ := jsonparser.GetString(data, "Sorties", "[0]", "Expiry", "$date", "$numberLong")
 	boss1, _ := jsonparser.GetString(data, "Sorties", "[0]", "Boss")
 	boss := helper.Sortietranslate(boss1, "sortiemodboss", lang)
-	reward, _ := jsonparser.GetString(data, "Sorties", "[0]", "Reward")
-	reward1 := helper.Sortietranslate2(reward, lang)
-	reward = string(reward1[:]) // temp
+	//reward, _ := jsonparser.GetString(data, "Sorties", "[0]", "Reward")
+	//reward, _ := jsonparser.GetString(data2)
+	//fmt.Println(jsonparser.GetString(data2))
+	var rewards []SortieRewards1
+	jsonparser.ArrayEach(data2, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
+		id, _ := jsonparser.GetString(value, "_id")
+		itemName, _ := jsonparser.GetString(value, "itemName")
+		rarity, _ := jsonparser.GetString(value, "rarity")
+		chance, _ := jsonparser.GetFloat(value, "chance")
+		rewards = append(rewards, SortieRewards1{
+			Id:       id,
+			ItemName: itemName,
+			Rarity:   rarity,
+			Chance:   chance,
+		})
+	}, "sortieRewards")
+
 	var variants []Sortievariant
 
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -73,7 +96,7 @@ func ParseSorties(platformno int, platform string, lang string, wg *sync.WaitGro
 	}, "Sorties", "[0]", "Variants")
 	active := true
 	w := Sortie{ID: id, Started: started,
-		Ends: ended, Boss: boss[1], Faction: boss[0], Reward: reward, Variants: variants,
+		Ends: ended, Boss: boss[1], Faction: boss[0], Reward: rewards, Variants: variants,
 		Active: active}
 	sortie = append(sortie, w)
 	Sortiedata[platformno][lang] = sortie

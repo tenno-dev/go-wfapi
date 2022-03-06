@@ -93,7 +93,9 @@ func main() {
 			"message": "pong",
 		})
 	})
-	r.GET("/:platform", outputs.Everything)                            // looks ok
+	r.GET("/:platform", outputs.Everything)  // looks ok
+	r.GET("/:platform/", outputs.Everything) // looks ok
+
 	r.GET("/:platform/darvo", outputs.DarvoDeals)                      // looks ok
 	r.GET("/:platform/news", outputs.News)                             // looks ok
 	r.GET("/:platform/alerts", outputs.Alerts)                         // null response
@@ -102,14 +104,14 @@ func main() {
 	r.GET("/:platform/penemy", outputs.Penemy)                         // null response
 	r.GET("/:platform/invasion", outputs.Invasion)                     // empty location
 	r.GET("/:platform/time", outputs.Time)                             // empty response
-	r.GET("/:platform/sortie", outputs.Sortie)                         // Reward & MissionLocation empty
-	r.GET("/:platform/voidtrader", outputs.Voidtrader)                 // Node empty
-	r.GET("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards"
+	r.GET("/:platform/sortie", outputs.Sortie)                         // looks ok
+	r.GET("/:platform/voidtrader", outputs.Voidtrader)                 // looks ok
+	r.GET("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards" - needs  more work  in reward parser
 	r.GET("/:platform/anomaly", outputs.AnomalyData)                   // needs work
 	r.GET("/:platform/progress", outputs.Progress1)                    // looks ok
 	r.GET("/:platform/event", outputs.Event)                           // looks ok
-	r.GET("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response
-	r.GET("/:platform/kuvamission", outputs.KuvaMission)               // null response
+	r.GET("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
+	r.GET("/:platform/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
 
 	s.StartAsync()
 

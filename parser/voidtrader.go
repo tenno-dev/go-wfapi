@@ -48,7 +48,10 @@ func ParseVoidTrader(platformno int, platform string, lang string, wg *sync.Wait
 	ended, _ := jsonparser.GetString(data, "VoidTraders", "[0]", "Expiry", "$date", "$numberLong")
 	npc, _ := jsonparser.GetString(data, "VoidTraders", "[0]", "Character")
 	location1, _ := jsonparser.GetString(data, "VoidTraders", "[0]", "Node")
-	location := helper.Sortietranslate(location1, "sortieloc", lang)
+
+	location := helper.Regiontranslate(location1, lang)
+	//fmt.Println(location)
+
 	var voidoffers []VoidtraderOffers
 
 	jsonparser.ArrayEach(data, func(value []byte, dataType jsonparser.ValueType, offset int, err error) {
@@ -63,7 +66,7 @@ func ParseVoidTrader(platformno int, platform string, lang string, wg *sync.Wait
 		})
 	}, "VoidTraders", "[0]", "Manifest")
 	w := Voidtrader{ID: id, Started: started,
-		Ends: ended, NPC: npc, Node: location[0], Offers: voidoffers}
+		Ends: ended, NPC: npc, Node: location[2], Offers: voidoffers}
 	voidtrader = append(voidtrader, w)
 	Voidtraderdata[platformno][lang] = voidtrader
 }

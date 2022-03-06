@@ -3,7 +3,9 @@ package datasources
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"sync"
 
@@ -47,7 +49,7 @@ var MissionTypes = make(map[string]map[string]interface{})
 var Languages = make(map[string]map[string]interface{})
 
 // SortieRewards General Lang strings
-var SortieRewards []byte
+var SortieRewards = make(map[string][]byte)
 
 // Dirpath path to lang  git dir
 var Dirpath = "./langsource/"
@@ -79,6 +81,7 @@ func InitLangDir() {
 // Loadlangdata load lang string from warframestat.us repo
 func Loadlangdata(id1 string, id2 int, wg *sync.WaitGroup) {
 	defer wg.Done()
+	client := &http.Client{}
 	/*
 		// arcanesData
 
@@ -260,22 +263,22 @@ func Loadlangdata(id1 string, id2 int, wg *sync.WaitGroup) {
 	FactionsData[id1] = result
 
 	// sortieRewards
-	url = Dirpath + "data/" + id1 + "/sortieRewards.json"
-	if id1 != "en" {
-		// url = "https://drops.warframestat.us/data/sortieRewards.json"
-		return
+	url = "https://drops.warframestat.us/data/sortieRewards.json"
+	if id1 == "en" {
+		url = "https://drops.warframestat.us/data/sortieRewards.json"
 	}
 	// fmt.Println("url:", url)
-	req, err = os.Open(url)
+	req1, _ := http.NewRequest("GET", url, nil)
+	res1, err := client.Do(req1)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Errored when sending request to the server")
+		return
 	}
-	defer req.Close()
-	body, _ = ioutil.ReadAll(req)
-	var result2 string
+	defer res1.Body.Close()
+	body1, _ := ioutil.ReadAll(res1.Body)
 
-	json.Unmarshal([]byte(body), &result2)
-	SortieRewards = body
+	SortieRewards[id1] = body1[:]
+	_, _ = io.Copy(ioutil.Discard, res1.Body)
 
 	/*
 		// syndicatesData
