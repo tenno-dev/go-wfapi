@@ -6,11 +6,14 @@ import (
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
 	_ "github.com/bitti09/go-wfapi/docs"
+	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
-	"github.com/robfig/cron/v3"
+	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 )
 
 //current supported lang
@@ -30,6 +33,9 @@ type LangMap map[string]interface{}
 var Apidata [][]byte
 
 func main() {
+	r := gin.Default()
+	s := gocron.NewScheduler(time.UTC)
+
 	var wg sync.WaitGroup
 	var wg2 sync.WaitGroup
 
@@ -47,19 +53,7 @@ func main() {
 		fmt.Println("langpool goroutine exit")
 
 	}
-	//test1 := helper.Sortietranslate("SolNode30", "sortieloc", "de")
-	//fmt.Println(test1)
-	c0 := cron.New()
-	c0.AddFunc("@every 5m1s", func() {
-		datasources.LoadKuvadata()
-		datasources.LoadAnomalydata()
-	})
-
-	c1 := cron.New()
-	c1.AddFunc("@every 1m1s", func() {
-		datasources.LoadTime()
-
-		fmt.Println("Tick1s")
+	s.Every("1m1s").Do(func() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
@@ -80,7 +74,7 @@ func main() {
 				go parser.ParseTime(x, v, v1, &wg)
 				go parser.ParsePenemy(x, v, v1, &wg)
 				wg.Wait()
-				fmt.Println("parsepool v=" + v + " goroutine exit")
+				//fmt.Println("parsepool v=" + v + " goroutine exit")
 
 			}
 			/*
@@ -89,11 +83,41 @@ func main() {
 			*/
 		}
 	})
-	c1.Run()
-	c1.Start()
-	c0.Run()
-	c0.Start()
+	s.Every("5m1s").Do(func() {
+		datasources.LoadKuvadata()
+		datasources.LoadAnomalydata()
+	})
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  200,
+			"message": "pong",
+		})
+	})
+	r.GET("/:platform", outputs.Everything)                            // looks ok
+	r.GET("/:platform/darvo", outputs.DarvoDeals)                      // looks ok
+	r.GET("/:platform/news", outputs.News)                             // looks ok
+	r.GET("/:platform/alerts", outputs.Alerts)                         // null response
+	r.GET("/:platform/fissures", outputs.Fissures)                     // MissionFaction & MissionLocation empty
+	r.GET("/:platform/nightwave", outputs.Nightwave)                   // looks ok
+	r.GET("/:platform/penemy", outputs.Penemy)                         // null response
+	r.GET("/:platform/invasion", outputs.Invasion)                     // empty location
+	r.GET("/:platform/time", outputs.Time)                             // empty response
+	r.GET("/:platform/sortie", outputs.Sortie)                         // Reward & MissionLocation empty
+	r.GET("/:platform/voidtrader", outputs.Voidtrader)                 // Node empty
+	r.GET("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards"
+	r.GET("/:platform/anomaly", outputs.AnomalyData)                   // needs work
+	r.GET("/:platform/progress", outputs.Progress1)                    // looks ok
+	r.GET("/:platform/event", outputs.Event)                           // looks ok
+	r.GET("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response
+	r.GET("/:platform/kuvamission", outputs.KuvaMission)               // null response
+
+	s.StartAsync()
+
 	PrintMemUsage()
+	fmt.Println("PrintMemUsage  created")
+	r.Run()
+
+	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 }
 
