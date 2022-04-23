@@ -23,7 +23,7 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/swaggo/swag v1.8.1
-	github.com/tidwall/gjson v1.14.0
+	github.com/tidwall/gjson v1.14.1
 	github.com/ugorji/go v1.2.7 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
