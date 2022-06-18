@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/buger/jsonparser v1.1.1
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-co-op/gocron v1.13.0
+	github.com/go-co-op/gocron v1.14.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
@@ -22,7 +22,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/swaggo/swag v1.8.2
+	github.com/swaggo/swag v1.8.3
 	github.com/tidwall/gjson v1.14.1
 	github.com/ugorji/go v1.2.7 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
