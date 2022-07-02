@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/buger/jsonparser v1.1.1
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-co-op/gocron v1.14.0
+	github.com/go-co-op/gocron v1.15.0
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
