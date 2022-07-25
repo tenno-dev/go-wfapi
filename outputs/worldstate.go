@@ -20,6 +20,7 @@ type Test struct {
 	Sortie     []parser.Sortie            `json:"sortie"`
 	Voidtrader []parser.Voidtrader        `json:"voidtrader"`
 	Syndicate  []parser.SyndicateMissions `json:"syndicate"`
+	Invasion   []parser.Invasion          `json:"invasion"`
 }
 
 // Everything test 2
@@ -40,7 +41,7 @@ func Everything2(c *gin.Context) {
 	header.Set("Accept-Language", t2)
 	header.Set("Content-Type", "application/json; charset=utf-8")
 	test := Test{datasources.Timestamp[v], parser.Darvodata[v][t1], parser.Newsdata[v][t1], parser.Nightwavedata[v][t1], parser.Alertsdata[v][t1], parser.Progress1data[v][t1], parser.Fissuresdata[v][t1], parser.Time1sdata[v][t1],
-		parser.Sortiedata[v][t1], parser.Voidtraderdata[v][t1], parser.SyndicateMissionsdata[v][t1]}
+		parser.Sortiedata[v][t1], parser.Voidtraderdata[v][t1], parser.SyndicateMissionsdata[v][t1], parser.Invasiondata[v][t1]}
 	c.JSON(200, test)
 }
 
