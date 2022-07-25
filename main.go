@@ -35,6 +35,8 @@ var Apidata [][]byte
 
 func main() {
 	r := gin.Default()
+	// Recovery middleware recovers from any panics and writes a 500 if there was one.
+	r.Use(gin.Recovery())
 	s := gocron.NewScheduler(time.UTC)
 
 	var wg sync.WaitGroup
@@ -119,8 +121,7 @@ func main() {
 
 	PrintMemUsage()
 	fmt.Println("PrintMemUsage  created")
-	r.Run()
-
+	r.Run(":8080")
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 }

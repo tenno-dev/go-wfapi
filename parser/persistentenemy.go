@@ -49,8 +49,7 @@ func ParsePenemy(platformno int, platform string, lang string, wg *sync.WaitGrou
 		rank, _ := jsonparser.GetInt(value, "Rank")
 		region, _ := jsonparser.GetInt(value, "Region")
 		lastlocation1, _ := jsonparser.GetString(value, "LastDiscoveredLocation")
-		lastlocation2 := helper.Regiontranslate(lastlocation1, lang)
-		lastlocation := lastlocation2[0]
+		lastlocation := helper.Regiontranslate(lastlocation1, lang)
 		lasttime, _ := jsonparser.GetString(value, "LastDiscoveredTime", "$date", "$numberLong")
 
 		missiontype, _ := jsonparser.GetString(value, "MissionInfo", "missionType")

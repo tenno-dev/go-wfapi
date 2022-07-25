@@ -66,7 +66,7 @@ func ParseVoidTrader(platformno int, platform string, lang string, wg *sync.Wait
 		})
 	}, "VoidTraders", "[0]", "Manifest")
 	w := Voidtrader{ID: id, Started: started,
-		Ends: ended, NPC: npc, Node: location[2], Offers: voidoffers}
+		Ends: ended, NPC: npc, Node: location, Offers: voidoffers}
 	voidtrader = append(voidtrader, w)
 	Voidtraderdata[platformno][lang] = voidtrader
 }

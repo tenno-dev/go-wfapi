@@ -15,16 +15,15 @@ type Progress1 struct {
 }
 
 // Progress1data export Progress1
-var Progress1data = make(map[int]map[string][]Progress1)
+var Progress1data = make(map[int]map[string]Progress1)
 
 // ParseProgress1 Parse Void trader
 func ParseProgress1(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	if _, ok := Progress1data[platformno]; !ok {
-		Progress1data[platformno] = make(map[string][]Progress1)
+		Progress1data[platformno] = make(map[string]Progress1)
 	}
 	data := datasources.Apidata[platformno]
-	var progress1 []Progress1
 
 	_, _, _, pro1err := jsonparser.Get(data, "ProjectPct")
 	if pro1err != nil {
@@ -38,7 +37,6 @@ func ParseProgress1(platformno int, platform string, lang string, wg *sync.WaitG
 
 	w := Progress1{P1: p1, P2: p2,
 		P3: p3}
-	progress1 = append(progress1, w)
-	Progress1data[platformno][lang] = progress1
+	Progress1data[platformno][lang] = w
 
 }

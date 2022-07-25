@@ -52,8 +52,7 @@ func ParseAlerts(platformno int, platform string, lang string, wg *sync.WaitGrou
 		missionfaction, _ := jsonparser.GetString(value, "MissionInfo", "faction")
 		missionfaction = helper.Factionstranslate(missionfaction, lang)
 		missionlocation, _ := jsonparser.GetString(value, "MissionInfo", "location")
-		missionlocation1 := helper.Regiontranslate(missionlocation, lang)
-		missionlocation = missionlocation1[0]
+		missionlocation = helper.Regiontranslate(missionlocation, lang)
 		minEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "minEnemyLevel")
 		maxEnemyLevel, _ := jsonparser.GetInt(value, "MissionInfo", "maxEnemyLevel")
 		enemywaves, _ := jsonparser.GetInt(value, "MissionInfo", "maxWaveNum")

@@ -45,37 +45,6 @@ func Sortietranslate(src string, langtype string, lang string) (ret [2]string) {
 	return ret
 }
 
-// Regiontranslate - Region "translate "
-func Regiontranslate(src string, lang string) (ret [4]string) {
-
-	var x1 [4]string
-	//nodesearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".name"
-	//planetsearch := "ExportRegions.#(uniqueName==" + "\"" + src + "\"" + ")" + ".systemName"
-	//fmt.Println(src)
-	//Nodename := gjson.GetBytes(datasources.Regiondata[lang], nodesearch).String()
-	//Planetname := gjson.GetBytes(datasources.Regiondata[lang], planetsearch).String()
-
-	// fmt.Println("test2:", Nodename)
-	//	fmt.Println("test21:", string(datasources.Regiondata["en"]))
-
-	x1[3] = src
-	result, ok := datasources.Sortieloc[lang][src].(map[string]interface{})
-	if ok {
-		//x1[0] = Nodename
-		//x1[1] = Planetname
-		x1[0] = result["enemy"].(string)
-		x1[1] = result["type"].(string)
-		x1[2] = result["value"].(string)
-
-	}
-	/**/
-	//fmt.Println(x1)
-
-	ret = x1
-	/**/
-	return ret
-}
-
 type SortieRewards1 struct {
 	Id       string `json:"_id"`
 	ItemName string `json:"itemName"`

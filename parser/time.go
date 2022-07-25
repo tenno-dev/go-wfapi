@@ -23,13 +23,13 @@ type Time2 struct {
 }
 
 // Time1sdata export Time1
-var Time1sdata = make(map[int]map[string][]Time1)
+var Time1sdata = make(map[int]map[string]Time1)
 
 // ParseTime Parse Void trader
 func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	if _, ok := Time1sdata[platformno]; !ok {
-		Time1sdata[platformno] = make(map[string][]Time1)
+		Time1sdata[platformno] = make(map[string]Time1)
 	}
 	data := datasources.Apidata[platformno]
 
@@ -38,7 +38,6 @@ func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup)
 	data3 := datasources.Earthtime
 	fmt.Println(data1)
 
-	var time1 []Time1
 	var cetus []Time2
 	var valis []Time2
 	var earth []Time2
@@ -71,6 +70,5 @@ func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup)
 	})
 	w := Time1{Cetus: cetus, Vallis: valis,
 		Earth: earth}
-	time1 = append(time1, w)
-	Time1sdata[platformno][lang] = time1
+	Time1sdata[platformno][lang] = w
 }

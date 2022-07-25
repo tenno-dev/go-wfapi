@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/bitti09/go-wfapi/datasources"
-	"github.com/bitti09/go-wfapi/helper"
 	"github.com/buger/jsonparser"
 )
 
@@ -72,22 +71,22 @@ func ParseKuva(platformno int, platform string, lang string, wg *sync.WaitGroup)
 			edate := ended
 			mtyperaw, _ := jsonparser.GetString(value, "missiontype")
 
-			mloc1, _ := jsonparser.GetString(value, "solnode")
+			/*mloc1, _ := jsonparser.GetString(value, "solnode")
 			mloc2 := helper.Regiontranslate(mloc1, lang)
 			mtype := mloc2[3]
 			node := mloc2[0]
 			planet := mloc2[2]
 			node2 := mloc2[2]
-			enemy := mloc2[0]
+			enemy := mloc2[0]*/
 			arch, _ := jsonparser.GetBoolean(value, "archwing")
 			shark, _ := jsonparser.GetBoolean(value, "sharkwing")
 
 			if mtyperaw == "EliteAlertMission" {
-				a := ArbitrationData{id, sdate, edate, node, node2, planet, mtype, enemy,
+				a := ArbitrationData{id, sdate, edate, "node", "node2", "planet", "mtype", "enemy",
 					arch, shark}
 				arbi = append(arbi, a)
 			} else {
-				k := KuvaData{id, sdate, edate, node, node2, planet, mtype, enemy,
+				k := KuvaData{id, sdate, edate, "node", "node2", "planet", "mtype", "enemy",
 					arch, shark}
 				kuva = append(kuva, k)
 			}

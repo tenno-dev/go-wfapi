@@ -49,12 +49,13 @@ func ParseFissures(platformno int, platform string, lang string, wg *sync.WaitGr
 		location := helper.Regiontranslate(location1, lang)
 		missiontype1, _ := jsonparser.GetString(value, "MissionType")
 		missiontype := helper.Missiontranslate(missiontype1, lang)
+		missionenemy := helper.Enemytranslate(location1, lang)
 		tier1, _ := jsonparser.GetString(value, "Modifier")
 		tier := helper.Voidtranslate(tier1, lang)
 		expired, _ := jsonparser.GetBoolean(value, "expired")
 
 		w := Fissures{id, started, ended, active,
-			missiontype, location[1], location[0], tier[0], tier[1],
+			missiontype, missionenemy, location, tier[0], tier[1],
 			expired}
 		fissures = append(fissures, w)
 	}, "ActiveMissions")

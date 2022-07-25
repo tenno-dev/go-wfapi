@@ -86,7 +86,8 @@ func ParseSorties(platformno int, platform string, lang string, wg *sync.WaitGro
 		mmod := helper.Sortietranslate(mmod1, "sortiemod", lang)
 		mloc1, _ := jsonparser.GetString(value, "node")
 		mloc2 := helper.Regiontranslate(mloc1, lang)
-		mloc := mloc2[0] + " (" + mloc2[1] + ")"
+		//mloc3 := helper.Typetranslate(mloc2, lang)
+		mloc := mloc2
 		variants = append(variants, Sortievariant{
 			MissionType:     mtype,
 			MissionMod:      mmod[0],

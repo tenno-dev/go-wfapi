@@ -75,7 +75,7 @@ func ParseInvasions(platformno int, platform string, lang string, wg *sync.WaitG
 			completion1, _ := jsonparser.GetInt(value, "Count")
 			completion2, _ := jsonparser.GetInt(value, "Goal")
 			completion := calcCompletion(completion1, completion2, attackerfaction)
-			w := Invasion{id, location[0], missiontype, completed, started,
+			w := Invasion{id, location, missiontype, completed, started,
 				attackeritem, attackeritemcount, attackerfaction,
 				defenderitem, defenderitemcount, defenderfaction, completion}
 			invasions = append(invasions, w)
