@@ -8,6 +8,15 @@ import (
 
 var intMap = map[string]int{"pc": 0, "ps4": 1, "xb1": 2, "swi": 3}
 
+type Test struct {
+	Timestamp string              `json:"timestamp"`
+	Darvo     []parser.DarvoDeals `json:"darvo"`
+	News      []parser.News       `json:"news"`
+	/*Nightwave  []parser.Nightwave  `json:"nightwave"`
+	Alerts     []parser.Alerts     `json:"alerts"`
+	Penemydata parser.Progress1    `json:"progress"`*/
+}
+
 // Everything test 2
 func Everything(c *gin.Context) {
 	v, _, t2 := getPlatformValueAndTokens(c)
@@ -17,6 +26,16 @@ func Everything(c *gin.Context) {
 	header.Set("Content-Type", "application/json; charset=utf-8")
 	test := datasources.Apidata[v]
 	c.String(200, string(test[:]))
+}
+
+func Everything2(c *gin.Context) {
+	v, t1, t2 := getPlatformValueAndTokens(c)
+	w := c.Writer
+	header := w.Header()
+	header.Set("Accept-Language", t2)
+	header.Set("Content-Type", "application/json; charset=utf-8")
+	test := Test{datasources.Timestamp[v], parser.Darvodata[v][t1], parser.Newsdata[v][t1]}
+	c.JSON(200, test)
 }
 
 // DarvoDeals DarvoDeals
@@ -166,6 +185,9 @@ func getPlatformValueAndTokens(c *gin.Context) (int, string, string) {
 	platform := c.Params.ByName("platform")
 	token := c.GetHeader("Accept-Language")
 	value := intMap[platform]
-	token1 := token[0:2]
+	token1 := "en"
+	if token[0:1] != "" {
+		token1 = token[0:2]
+	}
 	return value, token1, token
 }

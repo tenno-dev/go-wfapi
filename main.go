@@ -17,7 +17,8 @@ import (
 )
 
 //current supported lang
-var langpool = [10]string{"en", "de", "es", "fr", "it", "ko", "pl", "pt", "ru", "zh"}
+//var langpool = [10]string{"en", "de", "es", "fr", "it", "ko", "pl", "pt", "ru", "zh"}
+var langpool = [2]string{"en", "de"} // debug & testing only
 
 // lang end
 // platforms start
@@ -112,6 +113,7 @@ func main() {
 	r.GET("/:platform/event", outputs.Event)                           // looks ok
 	r.GET("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
 	r.GET("/:platform/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
+	r.GET("/:platform/test", outputs.Everything2)                      // debug
 
 	s.StartAsync()
 

@@ -6,10 +6,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"sync"
+	"time"
 )
 
 // Apidata Result of LoadApidata
 var Apidata [4][]byte
+var Timestamp [4]string
 
 // Regiondata Result of LoadRegiondata
 var Regiondata = make(map[string][]byte)
@@ -41,6 +43,7 @@ func LoadApidata(id1 string, id2 int) (ret []byte) {
 	body, _ := ioutil.ReadAll(res.Body)
 	_, _ = io.Copy(ioutil.Discard, res.Body)
 	Apidata[id2] = body[:]
+	Timestamp[id2] = time.Now().UTC().String()
 	return
 }
 
