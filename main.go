@@ -15,7 +15,6 @@ import (
 	"github.com/bitti09/go-wfapi/parser"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 	"github.com/go-co-op/gocron"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -49,8 +48,8 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(render.SetContentType(render.ContentTypeJSON))
-	cors := cors.AllowAll()
-	r.Use(cors.Handler)
+	//cors := cors.AllowAll()
+	//r.Use(cors.Handler)
 	r.Use(middleware.Heartbeat("/"))
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
