@@ -132,7 +132,7 @@ func main() {
 
 	PrintMemUsage()
 	fmt.Println("PrintMemUsage  created")
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":8080", r)
 
 	//r.Run(":8080")
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
