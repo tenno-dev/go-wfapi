@@ -44,23 +44,7 @@ var Apidata [][]byte
 // @BasePath /
 // @host      api.tenno.dev
 
-func main() { /*
-		r := gin.Default()
-		pprof.Register(r)
-		logger, _ := zap.NewProduction()
-		defer logger.Sync() // flushes buffer, if any
-		sugar := logger.Sugar()
-		sugar.Infow("Starting", "version", "0.0.1")
-		// Recovery middleware recovers from any panics and writes a 500 if there was one.
-		r.Use(gin.Recovery())
-		r := chi.NewRouter()
-		r.Use(middleware.Logger)
-		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("welcome"))
-		})
-
-
-	*/
+func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -125,30 +109,25 @@ func main() { /*
 		datasources.LoadAnomalydata()
 	})
 
-	r.Get("/{platform}", outputs.Everything)       // looks ok
-	r.Get("/{platform}/test", outputs.Everything2) // debug
-	r.Get("/:platform/darvo", outputs.DarvoDeals)  // looks ok
-	r.Get("/:platform/news", outputs.News)         // looks ok
-	r.Get("/:platform/alerts", outputs.Alerts)     // null response
-
-	/*
-
-		r.Get("/:platform/", outputs.Everything) // looks ok
-
-		r.Get("/:platform/fissures", outputs.Fissures)                     // MissionFaction & MissionLocation empty
-		r.Get("/:platform/nightwave", outputs.Nightwave)                   // looks ok
-		r.Get("/:platform/penemy", outputs.Penemy)                         // null response
-		r.Get("/:platform/invasion", outputs.Invasion)                     // empty location
-		r.Get("/:platform/time", outputs.Time)                             // empty response
-		r.Get("/:platform/sortie", outputs.Sortie)                         // looks ok
-		r.Get("/:platform/voidtrader", outputs.Voidtrader)                 // looks ok
-		r.Get("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards" - needs  more work  in reward parser
-		r.Get("/:platform/anomaly", outputs.AnomalyData)                   // needs work
-		r.Get("/:platform/progress", outputs.Progress1)                    // looks ok
-		r.Get("/:platform/event", outputs.Event)                           // looks ok
-		r.Get("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
-		r.Get("/:platform/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
-	*/
+	r.Get("/{platform}", outputs.Everything)                            // looks ok
+	r.Get("/{platform}/test", outputs.Everything2)                      // debug
+	r.Get("/{platform}/darvo", outputs.DarvoDeals)                      // looks ok
+	r.Get("/{platform}/news", outputs.News)                             // looks ok
+	r.Get("/{platform}/alerts", outputs.Alerts)                         // null response
+	r.Get("/{platform}/fissures", outputs.Fissures)                     // MissionFaction & MissionLocation empty
+	r.Get("/{platform}/nightwave", outputs.Nightwave)                   // looks ok
+	r.Get("/{platform}/penemy", outputs.Penemy)                         // null response
+	r.Get("/{platform}/invasion", outputs.Invasion)                     // empty location
+	r.Get("/{platform}/time", outputs.Time)                             // empty response
+	r.Get("/{platform}/sortie", outputs.Sortie)                         // looks ok
+	r.Get("/{platform}/voidtrader", outputs.Voidtrader)                 // looks ok
+	r.Get("/{platform}/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards" - needs  more work  in reward parser
+	r.Get("/{platform}/anomaly", outputs.AnomalyData)                   // needs work
+	r.Get("/{platform}/progress", outputs.Progress1)                    // looks ok
+	r.Get("/{platform}/event", outputs.Event)                           // looks ok
+	r.Get("/{platform}/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
+	r.Get("/{platform}/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
+	/**/
 	s.StartAsync()
 
 	PrintMemUsage()
