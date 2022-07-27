@@ -11,7 +11,7 @@ WIP  Warframe API Parser  -- currently rewriting/resturcturing the codebase
 ## Demo
 
 -  URL: [api.tenno.dev](api.tenno.dev)
--  Swagger UI: [api.tenno.dev/swagger/](api.tenno.dev/swagger/)
+-  Swagger UI: [docs.tenno.dev](docs.tenno.dev)
 -   Heartbeat:   /
 -   Worldstate(unparsed) /:platform
 -   Darvos Deal: /:platform/platform/  (Accept-Language required)
