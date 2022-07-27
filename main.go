@@ -54,6 +54,7 @@ func main() {
 	r.Use(middleware.Heartbeat("/"))
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	r.Get("/swagger", httpSwagger.WrapHandler)
 
 	s := gocron.NewScheduler(time.UTC)
 
