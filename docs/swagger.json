@@ -1,25 +1,27 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is the  simple REST Version of Mybitti's Warframe API.",
-        "title": "Mybitti Warframe API",
+        "description": "Tenno.dev  APIs",
+        "title": "Tenno.dev  APIs",
         "contact": {},
-        "license": {},
-        "version": "1.0"
+        "version": "0.1"
     },
-    "host": "localhost:9090",
+    "host": "api.tenno.dev",
     "basePath": "/",
     "paths": {
-        "/{platform}/darvo/": {
+        "/{platform}/alerts": {
             "get": {
-                "description": "get platform  Darvo Deal by ID",
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "DarvoDeals"
+                    "Show Alertsdata"
                 ],
-                "summary": "Show active Darvo Deal",
+                "summary": "Show current Alerts",
                 "parameters": [
                     {
                         "type": "string",
@@ -27,6 +29,50 @@
                         "name": "platform",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "lang select",
+                        "name": "lang",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/parser.Alerts"
+                        }
+                    }
+                }
+            }
+        },
+        "/{platform}/darvo": {
+            "get": {
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Show DarvoDeals"
+                ],
+                "summary": "Show active  Darvo Deals",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Platform",
+                        "name": "platform",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "lang select",
+                        "name": "lang",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -39,16 +85,19 @@
                 }
             }
         },
-        "/{platform}/news/": {
+        "/{platform}/news": {
             "get": {
-                "description": "get platform  News",
+                "description": "get string by ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Newsdata"
+                    "Show Newsdata"
                 ],
-                "summary": "Show curent News",
+                "summary": "Show current News",
                 "parameters": [
                     {
                         "type": "string",
@@ -59,10 +108,9 @@
                     },
                     {
                         "type": "string",
-                        "description": "language",
-                        "name": "Accept-Language",
-                        "in": "header",
-                        "required": true
+                        "description": "lang select",
+                        "name": "lang",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -77,6 +125,50 @@
         }
     },
     "definitions": {
+        "parser.Alerts": {
+            "type": "object",
+            "properties": {
+                "ends": {
+                    "type": "string"
+                },
+                "enemyWaves": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "maxEnemyLevel": {
+                    "type": "integer"
+                },
+                "minEnemyLevel": {
+                    "type": "integer"
+                },
+                "missionFaction": {
+                    "type": "string"
+                },
+                "missionLocation": {
+                    "type": "string"
+                },
+                "missionType": {
+                    "type": "string"
+                },
+                "rewardCredits": {
+                    "type": "integer"
+                },
+                "rewardItem": {
+                    "type": "string"
+                },
+                "rewardItemMany": {
+                    "type": "string"
+                },
+                "rewardItemManyCount": {
+                    "type": "integer"
+                },
+                "started": {
+                    "type": "string"
+                }
+            }
+        },
         "parser.DarvoDeals": {
             "type": "object",
             "properties": {
@@ -126,9 +218,6 @@
                 },
                 "message": {
                     "type": "string"
-                },
-                "priority": {
-                    "type": "boolean"
                 },
                 "url": {
                     "type": "string"

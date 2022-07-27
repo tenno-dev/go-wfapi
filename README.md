@@ -5,34 +5,18 @@
 
 WIP  Warframe API Parser  -- currently rewriting/resturcturing the codebase
 
-## Current Status
+## Current Status :  reworking in progress
 
-### Parser
-
--   [x] News
--   [x] Sorties
--   [x] Void Fissures
--   [ ] Alerts (waiting for api response)
--   [x] Darvo's Deals
--   [x] Nightwave 
--   [ ] Syndicate Missions ( incomplete )
--   [x] Invasions  ( half translated )
--   [x] Void Trader
--   [x] World Events
--   [ ] Arbitration
--   [ ] Timers (incomplete)
-
+  
 ## Demo
 
--   Web:
-    -  URL: [api.tenno.dev](api.tenno.dev)
-    -   Ping:   /
-    -   Worldstate(unparsed) /:platform
-    -   Darvos Deal: /:platform/platform/  (Accept-Language required)
-    -   News /:platform/news/ (Accept-Language required)
-    -   Alerts /:platform/alerts/ (Accept-Language required)
-    -   Fissures /:platform/fissures/ (Accept-Language required)
-    -   Nightwave /:platform/nightwave/ (Accept-Language required)
-    -   Everythin  in one JSON  /:platform/test
-    - Lang Select via Query:  ?lang=(language)  { currently only **en** and **de** is  possible}
+-  URL: [api.tenno.dev](api.tenno.dev)
+-  Swagger UI: [api.tenno.dev/swagger/](api.tenno.dev/swagger/)
+-   Heartbeat:   /
+-   Worldstate(unparsed) /:platform
+-   Darvos Deal: /:platform/platform/  (Accept-Language required)
+-   News /:platform/news/ (Accept-Language required)
+-   Alerts /:platform/alerts/ (Accept-Language required)
+-   Everything  in one JSON  /:platform/test
+-   Lang Select via Query:  ?lang=(language) -- currently only **en** and **de** is possible
   

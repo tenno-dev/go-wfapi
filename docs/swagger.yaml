@@ -1,5 +1,34 @@
 basePath: /
 definitions:
+  parser.Alerts:
+    properties:
+      ends:
+        type: string
+      enemyWaves:
+        type: integer
+      id:
+        type: string
+      maxEnemyLevel:
+        type: integer
+      minEnemyLevel:
+        type: integer
+      missionFaction:
+        type: string
+      missionLocation:
+        type: string
+      missionType:
+        type: string
+      rewardCredits:
+        type: integer
+      rewardItem:
+        type: string
+      rewardItemMany:
+        type: string
+      rewardItemManyCount:
+        type: integer
+      started:
+        type: string
+    type: object
   parser.DarvoDeals:
     properties:
       dealPrice:
@@ -33,27 +62,55 @@ definitions:
         type: string
       message:
         type: string
-      priority:
-        type: boolean
       url:
         type: string
     type: object
-host: localhost:9090
+host: api.tenno.dev
 info:
   contact: {}
-  description: This is the  simple REST Version of Mybitti's Warframe API.
-  license: {}
-  title: Mybitti Warframe API
-  version: "1.0"
+  description: Tenno.dev  APIs
+  title: Tenno.dev  APIs
+  version: "0.1"
 paths:
-  /{platform}/darvo/:
+  /{platform}/alerts:
     get:
-      description: get platform  Darvo Deal by ID
+      consumes:
+      - application/json
+      description: get string by ID
       parameters:
       - description: Platform
         in: path
         name: platform
         required: true
+        type: string
+      - description: lang select
+        in: query
+        name: lang
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/parser.Alerts'
+      summary: Show current Alerts
+      tags:
+      - Show Alertsdata
+  /{platform}/darvo:
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Platform
+        in: path
+        name: platform
+        required: true
+        type: string
+      - description: lang select
+        in: query
+        name: lang
         type: string
       produces:
       - application/json
@@ -62,22 +119,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/parser.DarvoDeals'
-      summary: Show active Darvo Deal
+      summary: Show active  Darvo Deals
       tags:
-      - DarvoDeals
-  /{platform}/news/:
+      - Show DarvoDeals
+  /{platform}/news:
     get:
-      description: get platform  News
+      consumes:
+      - application/json
+      description: get string by ID
       parameters:
       - description: Platform
         in: path
         name: platform
         required: true
         type: string
-      - description: language
-        in: header
-        name: Accept-Language
-        required: true
+      - description: lang select
+        in: query
+        name: lang
         type: string
       produces:
       - application/json
@@ -86,7 +144,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/parser.News'
-      summary: Show curent News
+      summary: Show current News
       tags:
-      - Newsdata
+      - Show Newsdata
 swagger: "2.0"

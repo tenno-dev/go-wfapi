@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	_ "net/http/pprof"
 	"runtime"
 	"strconv"
@@ -12,8 +13,12 @@ import (
 	_ "github.com/bitti09/go-wfapi/docs"
 	"github.com/bitti09/go-wfapi/outputs"
 	"github.com/bitti09/go-wfapi/parser"
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
+	"github.com/go-chi/render"
 	"github.com/go-co-op/gocron"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 //current supported lang
@@ -33,10 +38,39 @@ type LangMap map[string]interface{}
 // Apidata downloaded api data
 var Apidata [][]byte
 
-func main() {
-	r := gin.Default()
-	// Recovery middleware recovers from any panics and writes a 500 if there was one.
-	r.Use(gin.Recovery())
+// @title Tenno.dev  APIs
+// @version 0.1
+// @description Tenno.dev  APIs
+// @BasePath /
+// @host      api.tenno.dev
+
+func main() { /*
+		r := gin.Default()
+		pprof.Register(r)
+		logger, _ := zap.NewProduction()
+		defer logger.Sync() // flushes buffer, if any
+		sugar := logger.Sugar()
+		sugar.Infow("Starting", "version", "0.0.1")
+		// Recovery middleware recovers from any panics and writes a 500 if there was one.
+		r.Use(gin.Recovery())
+		r := chi.NewRouter()
+		r.Use(middleware.Logger)
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("welcome"))
+		})
+
+
+	*/
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(render.SetContentType(render.ContentTypeJSON))
+	cors := cors.AllowAll()
+	r.Use(cors.Handler)
+	r.Use(middleware.Heartbeat("/"))
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+
 	s := gocron.NewScheduler(time.UTC)
 
 	var wg sync.WaitGroup
@@ -90,38 +124,38 @@ func main() {
 		datasources.LoadKuvadata()
 		datasources.LoadAnomalydata()
 	})
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  200,
-			"message": "pong",
-		})
-	})
-	r.GET("/:platform", outputs.Everything)  // looks ok
-	r.GET("/:platform/", outputs.Everything) // looks ok
 
-	r.GET("/:platform/darvo", outputs.DarvoDeals)                      // looks ok
-	r.GET("/:platform/news", outputs.News)                             // looks ok
-	r.GET("/:platform/alerts", outputs.Alerts)                         // null response
-	r.GET("/:platform/fissures", outputs.Fissures)                     // MissionFaction & MissionLocation empty
-	r.GET("/:platform/nightwave", outputs.Nightwave)                   // looks ok
-	r.GET("/:platform/penemy", outputs.Penemy)                         // null response
-	r.GET("/:platform/invasion", outputs.Invasion)                     // empty location
-	r.GET("/:platform/time", outputs.Time)                             // empty response
-	r.GET("/:platform/sortie", outputs.Sortie)                         // looks ok
-	r.GET("/:platform/voidtrader", outputs.Voidtrader)                 // looks ok
-	r.GET("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards" - needs  more work  in reward parser
-	r.GET("/:platform/anomaly", outputs.AnomalyData)                   // needs work
-	r.GET("/:platform/progress", outputs.Progress1)                    // looks ok
-	r.GET("/:platform/event", outputs.Event)                           // looks ok
-	r.GET("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
-	r.GET("/:platform/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
-	r.GET("/:platform/test", outputs.Everything2)                      // debug
+	r.Get("/{platform}", outputs.Everything)       // looks ok
+	r.Get("/{platform}/test", outputs.Everything2) // debug
+	r.Get("/:platform/darvo", outputs.DarvoDeals)  // looks ok
+	r.Get("/:platform/news", outputs.News)         // looks ok
+	r.Get("/:platform/alerts", outputs.Alerts)     // null response
 
+	/*
+
+		r.Get("/:platform/", outputs.Everything) // looks ok
+
+		r.Get("/:platform/fissures", outputs.Fissures)                     // MissionFaction & MissionLocation empty
+		r.Get("/:platform/nightwave", outputs.Nightwave)                   // looks ok
+		r.Get("/:platform/penemy", outputs.Penemy)                         // null response
+		r.Get("/:platform/invasion", outputs.Invasion)                     // empty location
+		r.Get("/:platform/time", outputs.Time)                             // empty response
+		r.Get("/:platform/sortie", outputs.Sortie)                         // looks ok
+		r.Get("/:platform/voidtrader", outputs.Voidtrader)                 // looks ok
+		r.Get("/:platform/syndicate", outputs.SyndicateMission)            // Rewards response is basic like "Narmer Table C Rewards" - needs  more work  in reward parser
+		r.Get("/:platform/anomaly", outputs.AnomalyData)                   // needs work
+		r.Get("/:platform/progress", outputs.Progress1)                    // looks ok
+		r.Get("/:platform/event", outputs.Event)                           // looks ok
+		r.Get("/:platform/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
+		r.Get("/:platform/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
+	*/
 	s.StartAsync()
 
 	PrintMemUsage()
 	fmt.Println("PrintMemUsage  created")
-	r.Run(":8080")
+	http.ListenAndServe(":3000", r)
+
+	//r.Run(":8080")
 	// listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 }

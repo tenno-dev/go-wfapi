@@ -1,9 +1,12 @@
 package outputs
 
 import (
+	"net/http"
+
 	"github.com/bitti09/go-wfapi/datasources"
 	"github.com/bitti09/go-wfapi/parser"
-	"github.com/gin-gonic/gin"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/render"
 )
 
 var intMap = map[string]int{"pc": 0, "ps4": 1, "xb1": 2, "swi": 3}
@@ -23,55 +26,69 @@ type Test struct {
 	Invasion   []parser.Invasion          `json:"invasion"`
 }
 
-// Everything test 2
-func Everything(c *gin.Context) {
-	v, _, t2 := getPlatformValueAndTokens(c)
-	w := c.Writer
-	header := w.Header()
-	header.Set("Content-Language", t2)
-	header.Set("Content-Type", "application/json; charset=utf-8")
+func Everything(w http.ResponseWriter, r *http.Request) {
+	v, _, _ := getPlatformValueAndTokens(r)
 	test := datasources.Apidata[v]
-	c.String(200, string(test[:]))
+	w.WriteHeader(http.StatusOK)
+	w.Write(test)
 }
 
-func Everything2(c *gin.Context) {
-	v, t1, t2 := getPlatformValueAndTokens(c)
-	w := c.Writer
-	header := w.Header()
-	header.Set("Accept-Language", t2)
-	header.Set("Content-Type", "application/json; charset=utf-8")
+func Everything2(w http.ResponseWriter, r *http.Request) {
+	v, t1, _ := getPlatformValueAndTokens(r)
 	test := Test{datasources.Timestamp[v], parser.Darvodata[v][t1], parser.Newsdata[v][t1], parser.Nightwavedata[v][t1], parser.Alertsdata[v][t1], parser.Progress1data[v][t1], parser.Fissuresdata[v][t1], parser.Time1sdata[v][t1],
 		parser.Sortiedata[v][t1], parser.Voidtraderdata[v][t1], parser.SyndicateMissionsdata[v][t1], parser.Invasiondata[v][t1]}
-	c.JSON(200, test)
+	render.JSON(w, r, test)
 }
 
+// DarvoDeals godoc
+// @Summary      Show active  Darvo Deals
+// @Description  get string by ID
+// @Tags         Show DarvoDeals
+// @Accept       json
+// @Produce      json
+// @Param        platform   path string  true  "Platform"
+// @Param        lang    query     string  false  "lang select"
+// @Success      200  {object}  parser.DarvoDeals
+// @Router       /{platform}/darvo [get]
 // DarvoDeals DarvoDeals
-func DarvoDeals(c *gin.Context) {
-	v, t1, t2 := getPlatformValueAndTokens(c)
-	w := c.Writer
-	header := w.Header()
-	header.Set("Accept-Language", t2)
-	c.JSON(200, parser.Darvodata[v][t1])
+func DarvoDeals(w http.ResponseWriter, r *http.Request) {
+	v, t1, _ := getPlatformValueAndTokens(r)
+	render.JSON(w, r, parser.Darvodata[v][t1])
 }
 
+// Newsdata godoc
+// @Summary      Show current News
+// @Description  get string by ID
+// @Tags         Show Newsdata
+// @Accept       json
+// @Produce      json
+// @Param        platform   path string  true  "Platform"
+// @Param        lang    query     string  false  "lang select"
+// @Success      200  {object}  parser.News
+// @Router       /{platform}/news [get]
 // News godoc
-func News(c *gin.Context) {
-	v, t1, t2 := getPlatformValueAndTokens(c)
-	w := c.Writer
-	header := w.Header()
-	header.Set("Accept-Language", t2)
-	c.JSON(200, parser.Newsdata[v][t1])
+func News(w http.ResponseWriter, r *http.Request) {
+	v, t1, _ := getPlatformValueAndTokens(r)
+	render.JSON(w, r, parser.Newsdata[v][t1])
 }
 
+// Alertsdata godoc
+// @Summary      Show current Alerts
+// @Description  get string by ID
+// @Tags         Show Alertsdata
+// @Accept       json
+// @Produce      json
+// @Param        platform   path string  true  "Platform"
+// @Param        lang    query     string  false  "lang select"
+// @Success      200  {object}  parser.Alerts
+// @Router       /{platform}/alerts [get]
 // Alerts Alertsdata
-func Alerts(c *gin.Context) {
-	v, t1, t2 := getPlatformValueAndTokens(c)
-	w := c.Writer
-	header := w.Header()
-	header.Set("Accept-Language", t2)
-	c.JSON(200, parser.Alertsdata[v][t1])
+func Alerts(w http.ResponseWriter, r *http.Request) {
+	v, t1, _ := getPlatformValueAndTokens(r)
+	render.JSON(w, r, parser.Alertsdata[v][t1])
 }
 
+/*
 // Fissures Fissuresdata
 func Fissures(c *gin.Context) {
 	v, t1, t2 := getPlatformValueAndTokens(c)
@@ -188,9 +205,13 @@ func KuvaMission(c *gin.Context) {
 	header.Set("Accept-Language", t2)
 	c.JSON(200, parser.KuvaMission[v][t1])
 }
-func getPlatformValueAndTokens(c *gin.Context) (int, string, string) {
-	platform := c.Params.ByName("platform")
-	lang := c.DefaultQuery("lang", "en")
+*/
+func getPlatformValueAndTokens(r *http.Request) (int, string, string) {
+	platform := chi.URLParam(r, "platform")
+	lang := r.URL.Query().Get("lang")
+	if lang == "" {
+		lang = "en"
+	}
 	value := intMap[platform]
 	return value, lang, lang
 }
