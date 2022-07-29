@@ -48,7 +48,9 @@ func ParseNews(platformno int, platform string, lang string, wg *sync.WaitGroup)
 
 			}
 		}, "Messages")
-
+		if message == "/Lotus/Language/CommunityMessages/JoinDiscord" {
+			message = "Join the official Warframe Discord server"
+		}
 		if message != "" {
 			errnews2 = false
 		} else {

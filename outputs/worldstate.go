@@ -24,6 +24,7 @@ type Test struct {
 	Voidtrader []parser.Voidtrader        `json:"voidtrader"`
 	Syndicate  []parser.SyndicateMissions `json:"syndicate"`
 	Invasion   []parser.Invasion          `json:"invasion"`
+	Kuva       []parser.KuvaData          `json:"kuva"`
 }
 
 func Everything(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +37,7 @@ func Everything(w http.ResponseWriter, r *http.Request) {
 func Everything2(w http.ResponseWriter, r *http.Request) {
 	v, t1, _ := getPlatformValueAndTokens(r)
 	test := Test{datasources.Timestamp[v], parser.Darvodata[v][t1], parser.Newsdata[v][t1], parser.Nightwavedata[v][t1], parser.Alertsdata[v][t1], parser.Progress1data[v][t1], parser.Fissuresdata[v][t1], parser.Time1sdata[v][t1],
-		parser.Sortiedata[v][t1], parser.Voidtraderdata[v][t1], parser.SyndicateMissionsdata[v][t1], parser.Invasiondata[v][t1]}
+		parser.Sortiedata[v][t1], parser.Voidtraderdata[v][t1], parser.SyndicateMissionsdata[v][t1], parser.Invasiondata[v][t1], parser.KuvaMission[v][t1]}
 	render.JSON(w, r, test)
 }
 

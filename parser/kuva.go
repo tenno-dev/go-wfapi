@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -55,6 +56,7 @@ func ParseKuva(platformno int, platform string, lang string, wg *sync.WaitGroup)
 		ArbitrationMission[platformno] = make(map[string][]ArbitrationData)
 	}
 	data := datasources.Kuvadata[:]
+	fmt.Println(string(data))
 	var kuva []KuvaData
 	var arbi []ArbitrationData
 
@@ -70,14 +72,6 @@ func ParseKuva(platformno int, platform string, lang string, wg *sync.WaitGroup)
 			sdate := started
 			edate := ended
 			mtyperaw, _ := jsonparser.GetString(value, "missiontype")
-
-			/*mloc1, _ := jsonparser.GetString(value, "solnode")
-			mloc2 := helper.Regiontranslate(mloc1, lang)
-			mtype := mloc2[3]
-			node := mloc2[0]
-			planet := mloc2[2]
-			node2 := mloc2[2]
-			enemy := mloc2[0]*/
 			arch, _ := jsonparser.GetBoolean(value, "archwing")
 			shark, _ := jsonparser.GetBoolean(value, "sharkwing")
 

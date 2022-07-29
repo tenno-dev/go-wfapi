@@ -77,7 +77,7 @@ func main() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
 			for _, v1 := range langpool {
-				wg.Add(15)
+				wg.Add(16)
 				go parser.ParseGoals(x, v, v1, &wg)
 				go parser.ParseAnomaly(x, v, v1, &wg)
 				go parser.ParseKuva(x, v, v1, &wg)
@@ -93,6 +93,8 @@ func main() {
 				go parser.ParseProgress1(x, v, v1, &wg)
 				go parser.ParseTime(x, v, v1, &wg)
 				go parser.ParsePenemy(x, v, v1, &wg)
+				go parser.ParseZariman(x, v, v1, &wg)
+
 				wg.Wait()
 				//fmt.Println("parsepool v=" + v + " goroutine exit")
 
