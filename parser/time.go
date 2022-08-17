@@ -1,25 +1,27 @@
 package parser
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/bitti09/go-wfapi/datasources"
-	"github.com/buger/jsonparser"
+	"github.com/tidwall/gjson"
 )
+
+const nightTime = 3000
 
 // Time1 - Time Base
 type Time1 struct {
-	Cetus  []Time2
-	Vallis []Time2
-	Earth  []Time2
+	Cetus   Time2
+	Vallis  Time2
+	Cambion Time2
 }
 
 // Time2 - Time Details
 type Time2 struct {
-	Start string `json:",omitempty"`
-	End   string
-	State string
+	Start    string `json:",omitempty"`
+	End      string
+	State    string
+	TimeLeft string
 }
 
 // Time1sdata export Time1
@@ -31,44 +33,18 @@ func ParseTime(platformno int, platform string, lang string, wg *sync.WaitGroup)
 	if _, ok := Time1sdata[platformno]; !ok {
 		Time1sdata[platformno] = make(map[string]Time1)
 	}
-	data := datasources.Apidata[platformno]
+	data := datasources.CetusTimedata[platformno]
+	data1 := datasources.VallisTimedata[platformno]
+	data2 := datasources.CambionTimedata[platformno]
 
-	data1 := datasources.Cetustime
-	data2 := datasources.Valistime
-	data3 := datasources.Earthtime
-	fmt.Println(data1)
+	// Cetus
+	cetus := Time2{Start: gjson.Get(string(data), "activation").String(), End: gjson.Get(string(data), "expiry").String(), State: gjson.Get(string(data), "state").String(), TimeLeft: gjson.Get(string(data), "timeLeft").String()}
 
-	var cetus []Time2
-	var valis []Time2
-	var earth []Time2
+	// data1
+	vallis := Time2{Start: gjson.Get(string(data1), "activation").String(), End: gjson.Get(string(data1), "expiry").String(), State: gjson.Get(string(data1), "state").String(), TimeLeft: gjson.Get(string(data1), "timeLeft").String()}
 
-	cetusbegin, _ := jsonparser.GetString(data, "Cetustime", "activation")
-	cetusend, _ := jsonparser.GetString(data1, "expiry")
-	cetusstate, _ := jsonparser.GetString(data1, "state")
-	cetus = append(cetus, Time2{
-		Start: cetusbegin,
-		End:   cetusend,
-		State: cetusstate,
-	})
-
-	valisbegin, _ := jsonparser.GetString(data2, "activation")
-	valisend, _ := jsonparser.GetString(data2, "expiry")
-	valisstate, _ := jsonparser.GetString(data2, "state")
-	valis = append(valis, Time2{
-		Start: valisbegin,
-		End:   valisend,
-		State: valisstate,
-	})
-
-	earthbegin, _ := jsonparser.GetString(data3, "activation")
-	earthend, _ := jsonparser.GetString(data3, "expiry")
-	earthstate, _ := jsonparser.GetString(data3, "state")
-	earth = append(earth, Time2{
-		Start: earthbegin,
-		End:   earthend,
-		State: earthstate,
-	})
-	w := Time1{Cetus: cetus, Vallis: valis,
-		Earth: earth}
+	// cambion
+	cambion := Time2{Start: gjson.Get(string(data2), "activation").String(), End: gjson.Get(string(data2), "expiry").String(), State: gjson.Get(string(data2), "active").String(), TimeLeft: gjson.Get(string(data2), "timeLeft").String()}
+	w := Time1{Cetus: cetus, Vallis: vallis, Cambion: cambion}
 	Time1sdata[platformno][lang] = w
 }

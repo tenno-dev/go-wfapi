@@ -20,8 +20,9 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-//current supported lang
+// current supported lang
 //var langpool = [10]string{"en", "de", "es", "fr", "it", "ko", "pl", "pt", "ru", "zh"}
+
 var langpool = [2]string{"en", "de"} // debug & testing only
 
 // lang end
@@ -76,11 +77,15 @@ func main() {
 	s.Every("1m1s").Do(func() {
 		for x, v := range platforms {
 			datasources.LoadApidata(v, x)
+
+			datasources.LoadCambionTimedata(v, x)
+			datasources.LoadCetusTimedata(v, x)
+			datasources.LoadVallisTimedata(v, x)
 			for _, v1 := range langpool {
-				wg.Add(16)
+				wg.Add(15)
 				go parser.ParseGoals(x, v, v1, &wg)
 				go parser.ParseAnomaly(x, v, v1, &wg)
-				go parser.ParseKuva(x, v, v1, &wg)
+				//go parser.ParseKuva(x, v, v1, &wg)
 				go parser.ParseSorties(x, v, v1, &wg)
 				go parser.ParseNews(x, v, v1, &wg)
 				go parser.ParseAlerts(x, v, v1, &wg)
@@ -96,7 +101,7 @@ func main() {
 				go parser.ParseZariman(x, v, v1, &wg)
 
 				wg.Wait()
-				//fmt.Println("parsepool v=" + v + " goroutine exit")
+				//fmt.Println("parsepool v=" + v + " goroutine exit" )
 
 			}
 			/*
@@ -106,12 +111,12 @@ func main() {
 		}
 	})
 	s.Every("5m1s").Do(func() {
-		datasources.LoadKuvadata()
+		//datasources.LoadKuvadata()
 		datasources.LoadAnomalydata()
 	})
 
-	r.Get("/{platform}", outputs.Everything)                            // looks ok
-	r.Get("/{platform}/test", outputs.Everything2)                      // debug
+	r.Get("/{platform}", outputs.Everything2)                           // looks ok
+	r.Get("/{platform}/test", outputs.Everything)                       // debug
 	r.Get("/{platform}/darvo", outputs.DarvoDeals)                      // looks ok
 	r.Get("/{platform}/news", outputs.News)                             // looks ok
 	r.Get("/{platform}/alerts", outputs.Alerts)                         // null response
@@ -127,7 +132,7 @@ func main() {
 	r.Get("/{platform}/progress", outputs.Progress1)                    // looks ok
 	r.Get("/{platform}/event", outputs.Event)                           // looks ok
 	r.Get("/{platform}/arbitrationmission", outputs.ArbitrationMission) // null response - is intended as source is empty
-	r.Get("/{platform}/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
+	//r.Get("/{platform}/kuvamission", outputs.KuvaMission)               // null response - is intended as source is empty
 	/**/
 	s.StartAsync()
 
